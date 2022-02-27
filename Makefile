@@ -38,7 +38,7 @@ include $(DEVKITPPC)/wii_rules
 #---------------------------------------------------------------------------------
 TARGET		:=	$(notdir $(CURDIR))
 BUILD		:=	build
-SOURCES		:=	src src/classes/graphics src/classes/wiimote src/modules
+SOURCES		:=	src src/classes/graphics src/classes/wiimote src/lib/FreeTypeGX src/modules
 DATA		:=	data
 INCLUDES	:=
 
@@ -46,7 +46,7 @@ INCLUDES	:=
 # options for code generation
 #---------------------------------------------------------------------------------
 
-CFLAGS	= -g -O2 -Wall $(MACHDEP) $(INCLUDE)
+CFLAGS	= -g -O2 -Wall $(MACHDEP) $(INCLUDE) `freetype-config --cflags`
 CXXFLAGS	=	$(CFLAGS)
 
 LDFLAGS	=	-g $(MACHDEP) -Wl,-Map,$(notdir $@).map
@@ -55,7 +55,7 @@ LDFLAGS	=	-g $(MACHDEP) -Wl,-Map,$(notdir $@).map
 # any extra libraries we wish to link with the project
 # the order can-be/is critical
 #---------------------------------------------------------------------------------
-LIBS	:= -lgrrlib -lfreetype -lbz2 -lpngu -lpng -ljpeg -lz -lfat
+LIBS	:= -lgrrlib `freetype-config --libs` -lpngu -lpng -ljpeg -lz -lfat
 LIBS	+= -llua
 LIBS	+= -lwiiuse
 #LIBS	+= -lmodplay -laesnd

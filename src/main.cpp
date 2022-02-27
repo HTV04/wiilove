@@ -78,11 +78,19 @@ int main(int argc, char **argv) {
             "isWidescreen", love::graphics::module::isWidescreen,
 
             "getColor", love::graphics::module::getColor,
-            "setColor", sol::overload(love::graphics::module::setColor, love::graphics::module::setColor1),
+            "setColor", sol::overload(
+                love::graphics::module::setColor,
+                love::graphics::module::setColor1
+            ),
 
             "circle", love::graphics::module::circle,
             "line", love::graphics::module::line,
-            "print", love::graphics::module::print,
+            "print", sol::overload(
+                love::graphics::module::print,
+                love::graphics::module::print1,
+                love::graphics::module::print2,
+                love::graphics::module::print3
+            ),
             "rectangle", love::graphics::module::rectangle,
 
             "draw", love::graphics::module::draw,
@@ -91,7 +99,10 @@ int main(int argc, char **argv) {
         ),
 
 		"math", lua.create_table_with(
-            "random", sol::overload(love::math::module::doubleRandom, love::math::module::intRandom)
+            "random", sol::overload(
+                love::math::module::doubleRandom,
+                love::math::module::intRandom
+            )
         ),
 
         "system", lua.create_table_with(

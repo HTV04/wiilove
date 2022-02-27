@@ -42,7 +42,10 @@ void setColor1(int r, int g, int b);
 
 void circle(std::string drawMode, float x, float y, float radius);
 void line(float x1, float y1, float x2, float y2);
-void print(const char *str, float x, float y);
+void print(std::wstring str, float x, float y, float r, float sx, float sy, float ox, float oy);
+void print1(std::wstring str, float x, float y, float r, float sx, float sy);
+void print2(std::wstring str, float x, float y, float r);
+void print3(std::wstring str, float x, float y);
 void rectangle(std::string drawMode, float x, float y, float width, float height);
 
 void draw(love::graphics::Image image, float x, float y, float r, float sx, float sy, float ox, float oy);

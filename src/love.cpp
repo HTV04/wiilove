@@ -24,8 +24,8 @@
 namespace love {
 namespace module {
 
-std::tuple<int, int, std::string> getVersion(); {
-	return make_tuple(1, 0, "Cumulus"); // Major, minor, codename
+std::tuple<int, int, std::string> getVersion() {
+	return std::make_tuple(1, 0, "Cumulus"); // Major, minor, codename
 }
 
 } // module
