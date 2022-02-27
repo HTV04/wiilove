@@ -1,0 +1,7 @@
+# Build
+build/*
+wiilove.dol
+wiilove.elf
+
+# Visual Studio Code
+.vscode/*
