@@ -26,7 +26,7 @@
 #include <cstdlib>
 
 // Classes
-#include "../classes/wiimote/wiimoteClass.hpp"
+#include "../classes/wiimote/wiimote-class.hpp"
 
 // Modules
 #include "wiimote.hpp"

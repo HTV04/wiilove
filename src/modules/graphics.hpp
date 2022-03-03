@@ -24,6 +24,9 @@
 #include <tuple>
 #include <string>
 
+// Classes
+#include "../classes/graphics/font.hpp"
+
 namespace love {
 namespace graphics {
 
@@ -31,7 +34,7 @@ void init();
 
 namespace module {
 
-std::tuple<int, int> getDimensions();
+std::pair<int, int> getDimensions();
 int getHeight();
 int getWidth();
 bool isWidescreen();
@@ -40,15 +43,24 @@ std::tuple<int, int, int, int> getColor();
 void setColor(int r, int g, int b, int a);
 void setColor1(int r, int g, int b);
 
+void origin();
+void pop();
+void push();
+void scale(float x, float y);
+void rotate(float angle);
+void translate(float dx, float dy);
+
 void circle(std::string drawMode, float x, float y, float radius);
 void line(float x1, float y1, float x2, float y2);
+void rectangle(std::string drawMode, float x, float y, float width, float height);
+
 void print(std::wstring str, float x, float y, float r, float sx, float sy, float ox, float oy);
 void print1(std::wstring str, float x, float y, float r, float sx, float sy);
 void print2(std::wstring str, float x, float y, float r);
 void print3(std::wstring str, float x, float y);
-void rectangle(std::string drawMode, float x, float y, float width, float height);
+void setFont(love::graphics::Font &font);
 
-void draw(love::graphics::Image image, float x, float y, float r, float sx, float sy, float ox, float oy);
+void draw(love::graphics::Texture &image, float x, float y, float r, float sx, float sy, float ox, float oy);
 
 void present();
 

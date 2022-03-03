@@ -1,4 +1,4 @@
-/* WiiLÖVE wiimote module
+/* WiiLÖVE Texture class
  *
  * This file is part of WiiLÖVE.
  *
@@ -20,23 +20,16 @@
 
 #pragma once
 
-// Libraries
-#include "../lib/sol.hpp"
-#include <vector>
-
-// Classes
-#include "../classes/wiimote/wiimote-class.hpp"
+#include <grrlib.h>
 
 namespace love {
-namespace wiimote {
+namespace graphics {
 
-void init();
-void update(std::vector<bool> &adds, std::vector<bool> &removes, int &homePressed);
+struct Texture {
+	GRRLIB_texImg *texImg;
 
-namespace module {
+	Texture(const char *filename);
+};
 
-sol::table getWiimotes(sol::this_state s);
-
-} // module
-} // system
+} // graphics
 } // love

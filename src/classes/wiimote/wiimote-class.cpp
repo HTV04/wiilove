@@ -28,7 +28,7 @@
 #include "../../modules/timer.hpp"
 
 // Header
-#include "wiimoteClass.hpp"
+#include "wiimote-class.hpp"
 
 namespace {
 	std::map<std::string, int> buttonMap = {

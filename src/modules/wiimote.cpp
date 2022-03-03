@@ -26,7 +26,7 @@
 #include <utility>
 
 // Classes
-#include "../classes/wiimote/wiimoteClass.hpp"
+#include "../classes/wiimote/wiimote-class.hpp"
 
 // Header
 #include "system.hpp"

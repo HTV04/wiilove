@@ -25,8 +25,9 @@
 #include <string>
 
 // Classes
-#include "classes/graphics/image.hpp"
-#include "classes/wiimote/wiimoteClass.hpp"
+#include "classes/graphics/font.hpp"
+#include "classes/graphics/texture.hpp"
+#include "classes/wiimote/wiimote-class.hpp"
 
 // Modules
 #include "love.hpp"
@@ -83,15 +84,24 @@ int main(int argc, char **argv) {
                 love::graphics::module::setColor1
             ),
 
+            "origin", love::graphics::module::origin,
+            "pop", love::graphics::module::pop,
+            "push", love::graphics::module::push,
+            "scale", love::graphics::module::scale,
+            "rotate", love::graphics::module::rotate,
+            "translate", love::graphics::module::translate,
+
             "circle", love::graphics::module::circle,
             "line", love::graphics::module::line,
+            "rectangle", love::graphics::module::rectangle,
+
             "print", sol::overload(
                 love::graphics::module::print,
                 love::graphics::module::print1,
                 love::graphics::module::print2,
                 love::graphics::module::print3
             ),
-            "rectangle", love::graphics::module::rectangle,
+            "setFont", love::graphics::module::setFont,
 
             "draw", love::graphics::module::draw,
 
@@ -126,32 +136,43 @@ int main(int argc, char **argv) {
 
     // Usertypes setup
     // NOTE: We have to make these in the global namespace due to sol limitations.
-    //       For now, we'll work around this in boot.lua.
-    sol::usertype<love::graphics::Image> Image_type = lua.new_usertype<love::graphics::Image>(
-        "_Image", sol::constructors<love::graphics::Image(const char*)>()
+    //       For now, we'll work around this.
+    sol::usertype<love::graphics::Font> FontType = lua.new_usertype<love::graphics::Font>(
+        "_Font", sol::constructors<
+            love::graphics::Font(unsigned int),
+            love::graphics::Font(),
+            love::graphics::Font(const char*, unsigned int),
+            love::graphics::Font(const char*)
+        >()
     );
 
-    sol::usertype<love::wiimote::Wiimote> Wiimote_type = lua.new_usertype<love::wiimote::Wiimote>(
+    sol::usertype<love::graphics::Texture> TextureType = lua.new_usertype<love::graphics::Texture>(
+        "_Texture", sol::constructors<love::graphics::Texture(const char*)>()
+    );
+
+    sol::usertype<love::wiimote::Wiimote> WiimoteType = lua.new_usertype<love::wiimote::Wiimote>(
         "_Wiimote", sol::constructors<love::wiimote::Wiimote()>()
     );
 
-    lua["_Wiimote"]["getExtension"] = &love::wiimote::Wiimote::getExtension;
-    lua["_Wiimote"]["getX"] = &love::wiimote::Wiimote::getX;
-    lua["_Wiimote"]["getY"] = &love::wiimote::Wiimote::getY;
-    lua["_Wiimote"]["isConnected"] = &love::wiimote::Wiimote::isConnected;
-    lua["_Wiimote"]["isDown"] = &love::wiimote::Wiimote::isDown;
-    lua["_Wiimote"]["isRumbling"] = &love::wiimote::Wiimote::isRumbling;
+    WiimoteType["getExtension"] = &love::wiimote::Wiimote::getExtension;
+    WiimoteType["getX"] = &love::wiimote::Wiimote::getX;
+    WiimoteType["getY"] = &love::wiimote::Wiimote::getY;
+    WiimoteType["isConnected"] = &love::wiimote::Wiimote::isConnected;
+    WiimoteType["isDown"] = &love::wiimote::Wiimote::isDown;
+    WiimoteType["isRumbling"] = &love::wiimote::Wiimote::isRumbling;
 
-    lua["_Wiimote"]["isClassicDown"] = &love::wiimote::Wiimote::isClassicDown;
+    WiimoteType["isClassicDown"] = &love::wiimote::Wiimote::isClassicDown;
 
-    lua["_Wiimote"]["rumble"] = &love::wiimote::Wiimote::rumble;
-    lua["_Wiimote"]["rumbleDuration"] = &love::wiimote::Wiimote::rumbleDuration;
+    WiimoteType["rumble"] = &love::wiimote::Wiimote::rumble;
+    WiimoteType["rumbleDuration"] = &love::wiimote::Wiimote::rumbleDuration;
 
     // Workaround for global usertypes
-    lua["love"]["graphics"]["newImage"] = lua["_Image"]["new"];
+    lua["love"]["graphics"]["newFont"] = lua["_Font"]["new"];
+    lua["love"]["graphics"]["newTexture"] = lua["_Texture"]["new"];
 
     // Delete global usertypes
-    lua["_Image"] = sol::nil;
+    lua["_Font"] = sol::nil;
+    lua["_Texture"] = sol::nil;
     lua["_Wiimote"] = sol::nil;
 
     // Start!

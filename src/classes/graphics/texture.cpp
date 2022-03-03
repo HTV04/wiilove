@@ -1,4 +1,4 @@
-/* WiiLÖVE Image class
+/* WiiLÖVE Texture class
  *
  * This file is part of WiiLÖVE.
  *
@@ -18,18 +18,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
-
 #include <grrlib.h>
+
+#include "texture.hpp"
 
 namespace love {
 namespace graphics {
 
-struct Image {
-	GRRLIB_texImg *texImg;
-
-	Image(const char *filename);
-};
+Texture::Texture(const char *filename) {
+	texImg = GRRLIB_LoadTextureFromFile(filename);
+}
 
 } // graphics
 } // love

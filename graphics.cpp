@@ -20,8 +20,8 @@
 
 // Libraries
 #include <grrlib.h>
+#include <
 #include "../lib/FreeTypeGX/FreeTypeGX.h"
-#include <ogc/gu.h>
 #include <ogc/conf.h>
 #include <utility>
 #include <tuple>
@@ -46,8 +46,7 @@ namespace {
 
 	bool widescreen;
 
-	// Transforms are stored for push/pop operations
-	std::vector<GRRLIB_matrix> transforms;
+	std::vector<std::vector<std::pair<int, std::pair<float, float>>>> transforms{{}};
 
 	unsigned int color = 0xffffffff; // Default color to white
 
@@ -76,27 +75,62 @@ bool isWidescreen() { return widescreen; }
 
 // Transformation functions
 void origin() {
-	if (transforms.empty()) { return; } // No transforms performed
+	std::vector<std::pair<int, std::pair<float, float>>> reverseTransforms{};
+
+	if transforms.empty() { return; } // No transforms performed
+
+	// Add transforms in reverse
+	for (std::vector<std::vector<std::pair<int, std::pair<float, float>>>>::iterator it = transformList->begin(); it != transformList->end(); ++it ) {
+		for (std::vector<std::pair<int, std::pair<float, float>>>::iterator jt = it->begin(); jt != it->end(); ++jt ) {
+			int transform = it->first;
+			std::pair<float, float> transformData = it->second;
+
+			switch (transform) {
+				case 0: reverseTransforms.push_back(std::make_pair(transformData.first,  std::make_pair(-angle, 0.0)));
+				case 0: GRRLIB_Scale(transformData.first, transformData.second); break; // Scale
+				case 1: GRRLIB_Rotate(transformData.first); break; // Rotate
+				case 2: GRRLIB_Translate(transformData.first, transformData.second); break; // Translate
+			}
+		}
+	}
 
 	GRRLIB_Origin();
 }
 void pop() {
-	if (transforms.empty()) { throw std::runtime_error("Stack is empty"); }
+	if transforms.empty() { throw std::runtime_error("Stack is empty"); }
 
-	GRRLIB_SetMatrix(&transforms.back()); // Use previously stored transform before removing it
+	std::vector<std::pair<int, std::pair<float, float>>> *transformList = &transforms.back();
+
+	for (std::vector<std::pair<int, std::pair<float, float>>>::reverse_iterator it = transformList->rbegin(); it != transformList->rend(); ++it ) {
+		int transform = it->first;
+		std::pair<float, float> transformData = it->second;
+
+		switch (transform) {
+			case 0: GRRLIB_Scale(transformData.first, transformData.second); break; // Scale
+			case 1: GRRLIB_Rotate(transformData.first); break; // Rotate
+			case 2: GRRLIB_Translate(transformData.first, transformData.second); break; // Translate
+		}
+	}
 
 	transforms.pop_back();
 }
 void push() {
-	transforms.push_back(GRRLIB_GetMatrix()); // Store the current transform for later
+	//transforms.push_back(std::vector<std::pair<int, float>>());
+	transforms.push_back({});
 }
 void rotate(float angle) {
+	transforms.back().push_back(std::make_pair(1,  std::make_pair(-angle, 0.0))); // Second argument is a dummy value
+
 	GRRLIB_Rotate(angle);
 }
 void scale(float x, float y) {
+	transforms.back().push_back(std::make_pair(0, std::make_pair(1.0 / x, 1.0 / y)));
+
 	GRRLIB_Scale(x, y);
 }
 void translate(float dx, float dy) {
+	transforms.back().push_back(std::make_pair(2, std::make_pair(-dx, -dy)));
+
 	GRRLIB_Translate(dx, dy);
 }
 
