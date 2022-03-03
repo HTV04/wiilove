@@ -79,7 +79,10 @@ int main(int argc, char **argv) {
             "getWidth", love::graphics::module::getWidth,
             "isWidescreen", love::graphics::module::isWidescreen,
 
+            "clear", love::graphics::module::clear,
+            "getBackgroundColor", love::graphics::module::getBackgroundColor,
             "getColor", love::graphics::module::getColor,
+            "setBackgroundColor", love::graphics::module::setBackgroundColor,
             "setColor", sol::overload(
                 love::graphics::module::setColor,
                 love::graphics::module::setColor1

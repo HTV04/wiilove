@@ -40,7 +40,10 @@ int getHeight();
 int getWidth();
 bool isWidescreen();
 
+void clear(int r, int g, int b);
 std::tuple<int, int, int, int> getColor();
+std::tuple<int, int, int> getBackgroundColor();
+void setBackgroundColor(int r, int g, int b);
 void setColor(int r, int g, int b, int a);
 void setColor1(int r, int g, int b);
 

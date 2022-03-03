@@ -25,12 +25,10 @@
 #include <ogc/gu.h>
 #include <ogc/conf.h>
 #include <utility>
-#include <tuple>
 #include <vector>
-#include <map>
+#include <tuple>
 #include <string>
 #include <stdexcept>
-#include <cstdint>
 
 // Classes
 #include "../classes/graphics/font.hpp"
@@ -50,6 +48,7 @@ namespace {
 	// Transforms are stored for push/pop operations
 	std::vector<GRRLIB_matrix> transforms;
 
+	std::tuple<int, int, int> backgroundColor {0, 0, 0}; // Default color to black
 	unsigned int color = 0xffffffff; // Default color to white
 
 	love::graphics::Font *curFont; // Initial font
@@ -101,9 +100,18 @@ void translate(float dx, float dy) {
 	GRRLIB_Translate(dx, dy);
 }
 
-// Set and get drawing color
+// Set and get drawing colors
+void clear(int r, int g, int b) {
+	GRRLIB_FillScreen(RGBA(r, g, b, 255));
+}
+std::tuple<int, int, int> getBackgroundColor() {
+	return backgroundColor;
+}
 std::tuple<int, int, int, int> getColor() {
 	return std::make_tuple(R(color), G(color), B(color), A(color));
+}
+void setBackgroundColor(int r, int g, int b) {
+	backgroundColor = std::make_tuple(r, g, b); // Since only used for values, optimize by storing as tuple
 }
 void setColor(int r, int g, int b, int a) {
 	color = RGBA(r, g, b, a);
