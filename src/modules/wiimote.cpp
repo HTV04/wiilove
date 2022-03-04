@@ -43,11 +43,6 @@ namespace wiimote {
 void init() {
     int homePressed = -1;
 
-    // Init WPAD module
-    WPAD_Init();
-    WPAD_SetVRes(0, 640, 480);
-    WPAD_SetDataFormat(WPAD_CHAN_ALL, WPAD_FMT_BTNS_ACC_IR);
-
     for (int i = 0; i < 4; i++) {
         Wiimote &wiimote = wiimotes[i];
 

@@ -33,6 +33,7 @@
 // Modules
 #include "love.hpp"
 #include "modules/event.hpp"
+#include "modules/filesystem.hpp"
 #include "modules/graphics.hpp"
 #include "modules/math.hpp"
 #include "modules/system.hpp"
@@ -40,10 +41,19 @@
 #include "modules/wiimote.hpp"
 
 // Data
+#include "identity_bin.h"
 #include "boot_lua.h"
 
 int main(int argc, char **argv) {
-    // Init Lua state
+    // Init GRRLIB
+    GRRLIB_Init();
+
+    // Init WPAD module
+    WPAD_Init();
+    WPAD_SetVRes(0, 640, 480);
+    WPAD_SetDataFormat(WPAD_CHAN_ALL, WPAD_FMT_BTNS_ACC_IR);
+
+    // Init Lua state with default libraries
     sol::state lua;
     lua.open_libraries(
         sol::lib::base,
@@ -57,6 +67,7 @@ int main(int argc, char **argv) {
     );
 
     // Init modules if necessary (and in order of dependency)
+    love::filesystem::init(); // A lot of things depend on this
     love::graphics::init();
     love::system::init();
     love::timer::init();

@@ -58,10 +58,7 @@ namespace love {
 namespace graphics {
 
 void init() {
-    // Init GRRLIB
-    GRRLIB_Init();
-
-	widescreen = CONF_GetAspectRatio() == CONF_ASPECT_16_9;
+    widescreen = CONF_GetAspectRatio() == CONF_ASPECT_16_9;
 
 	curFont = new love::graphics::Font();
 }
