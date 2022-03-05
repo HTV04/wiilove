@@ -21,6 +21,7 @@
 
 #pragma once
 
+// Libraries
 #include "../../lib/FreeTypeGX/FreeTypeGX.h"
 
 namespace love {
@@ -31,8 +32,8 @@ struct Font {
 
 	Font(unsigned int size);
 	Font();
-	Font(const char *filename, unsigned int size);
-	Font(const char *filename);
+	Font(std::string filename, unsigned int size);
+	Font(std::string filename);
 };
 
 } // graphics

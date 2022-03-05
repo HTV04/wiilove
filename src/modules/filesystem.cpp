@@ -20,41 +20,101 @@
  */
 
 // Libraries
-#include <fat.h>
+#include "../lib/sol.hpp"
 #include <sys/unistd.h>
-#include <sys/dir.h>
+#include <dirent.h>
 #include <string>
+#include <fstream>
+#include <cstdio>
 
 // Header
 #include "filesystem.hpp"
 
-// Data
-#include "identity_bin.h"
-
 // Local variables
 namespace {
-    std::string identity = (const char*) identity_bin;
-
-	std::string identityPath;
+    std::string identity;
+	std::string filesystemPath;
 }
 
 namespace love {
 namespace filesystem {
 
-void init() {
-	// If identity is unchanged (set to "|IDENTITY|") then we'll use the default identity "love"
-    if (identity.compare("|IDENTITY|") == 0) {
-        identity = "love";
-    }
+void init(int argc, char **argv) {
+	std::string executablePath;
 
-	identityPath = "sd:/" + identity + "/data";
+	if (argc > 0) { // argv[0] is the executable path
+		executablePath = argv[0];
 
-	// Create directory if it doesn't exist (but it should already)
-	if (chdir(identityPath.c_str())) {
-		mkdir(identityPath.c_str(), 0777);
-		chdir(identityPath.c_str());
+		filesystemPath = executablePath.substr(0, executablePath.find_last_of("/"));
+	}
+
+	if (argc >= 2) { // argv[1] is the identity
+		identity = argv[1];
+	} else if (argc == 1) { // No identity passed, so we'll use the default identity ("love")
+		identity = "love";
+	} else {
+		// This case is interesting, since this means that the executable is not loaded with any arguments.
+		// * We're likely running on Dolphin (directly), because the Homebrew Channel would at least pass the executable path. Potentially same issue with Wii VC injects?
+		// * There is no set identity, so we'll use the default identity ("love").
+		// * We'll default to sd:/love as the filesystem path.
+
+		identity = "love";
+		filesystemPath = "sd:/love";
+	}
+
+	// Create filesystem directory if it doesn't exist (but it should already) and enter it
+	if (chdir(filesystemPath.c_str())) {
+		mkdir(filesystemPath.c_str(), 0777);
+		chdir(filesystemPath.c_str());
+	}
+
+	// Create data and save directories if they don't exist (but data should already)
+	if (opendir("data") == NULL) {
+		mkdir("data", 0777);
+	}
+	if (opendir("save") == NULL) {
+		mkdir("save", 0777);
 	}
 }
 
+std::string getFilePath(std::string filename) { // Get the path of a file, using the save directory as a filter and the data directory otherwise.
+	std::string savePath = "save/" + filename;
+	std::string dataPath = "data/" + filename;
+
+	FILE *f = fopen(savePath.c_str(), "r");
+
+	if (f != NULL) {
+		fclose(f);
+
+		return savePath;
+	} else { // If the save path doesn't exist, return the data path.
+		return dataPath;
+	}
+}
+
+namespace module {
+
+// Querying functions
+std::string getIdentity() {
+	return identity;
+}
+
+// Working with files
+sol::protected_function load(std::string filename, sol::this_state s) {
+	sol::state_view lua(s);
+
+	// TODO: Add error handling
+	return lua.load_file(getFilePath(filename).c_str()).get<sol::protected_function>();
+}
+std::string read(std::string filename) {
+	std::stringstream stream;
+
+	// TODO: Add error handling
+	stream << std::ifstream(getFilePath(filename).c_str()).rdbuf();
+
+	return stream.str();
+}
+
+} // module
 } // filesystem
 } // love

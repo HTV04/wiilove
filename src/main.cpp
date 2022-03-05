@@ -41,7 +41,6 @@
 #include "modules/wiimote.hpp"
 
 // Data
-#include "identity_bin.h"
 #include "boot_lua.h"
 
 int main(int argc, char **argv) {
@@ -67,7 +66,7 @@ int main(int argc, char **argv) {
     );
 
     // Init modules if necessary (and in order of dependency)
-    love::filesystem::init(); // A lot of things depend on this
+    love::filesystem::init(argc, argv); // A lot of things depend on this
     love::graphics::init();
     love::system::init();
     love::timer::init();
@@ -82,6 +81,13 @@ int main(int argc, char **argv) {
             "getPoll", love::event::module::getPoll,
 
             "quit", love::event::module::quit
+        ),
+
+        "filesystem", lua.create_table_with(
+            "getIdentity", love::filesystem::module::getIdentity,
+
+            "load", love::filesystem::module::load,
+            "read", love::filesystem::module::read
         ),
 
         "graphics", lua.create_table_with(
@@ -156,13 +162,13 @@ int main(int argc, char **argv) {
         "_Font", sol::constructors<
             love::graphics::Font(unsigned int),
             love::graphics::Font(),
-            love::graphics::Font(const char*, unsigned int),
-            love::graphics::Font(const char*)
+            love::graphics::Font(std::string, unsigned int),
+            love::graphics::Font(std::string)
         >()
     );
 
     sol::usertype<love::graphics::Texture> TextureType = lua.new_usertype<love::graphics::Texture>(
-        "_Texture", sol::constructors<love::graphics::Texture(const char*)>()
+        "_Texture", sol::constructors<love::graphics::Texture(std::string)>()
     );
 
     sol::usertype<love::wiimote::Wiimote> WiimoteType = lua.new_usertype<love::wiimote::Wiimote>(

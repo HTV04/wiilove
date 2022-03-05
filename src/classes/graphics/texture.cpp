@@ -19,15 +19,21 @@
  * <https://www.gnu.org/licenses/>.
  */
 
+// Libraries
+#include "../../lib/sol.hpp" // Prevents macro conflicts
 #include <grrlib.h>
 
+// Modules
+#include "../../modules/filesystem.hpp"
+
+// Header
 #include "texture.hpp"
 
 namespace love {
 namespace graphics {
 
-Texture::Texture(const char *filename) {
-	texImg = GRRLIB_LoadTextureFromFile(filename);
+Texture::Texture(std::string filename) {
+	texImg = GRRLIB_LoadTextureFromFile(love::filesystem::getFilePath(filename).c_str());
 }
 
 } // graphics

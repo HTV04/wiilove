@@ -107,7 +107,7 @@ function love.run()
 end
 
 -- Load main.lua to intialize functions
-dofile("main.lua")
+love.filesystem.load("main.lua")()
 
 while true do
 	local status, result = pcall(love.run())

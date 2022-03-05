@@ -21,10 +21,24 @@
 
 #pragma once
 
+// Libraries
+#include "../lib/sol.hpp"
+#include <string>
+
 namespace love {
 namespace filesystem {
 
-void init();
+void init(int argc, char **argv);
 
+std::string getFilePath(std::string filename);
+
+namespace module {
+
+std::string getIdentity();
+
+sol::protected_function load(std::string filename, sol::this_state s);
+std::string read(std::string filename);
+
+} // module
 } // filesystem
 } // love

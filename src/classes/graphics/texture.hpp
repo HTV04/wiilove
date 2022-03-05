@@ -29,7 +29,7 @@ namespace graphics {
 struct Texture {
 	GRRLIB_texImg *texImg;
 
-	Texture(const char *filename);
+	Texture(std::string filename);
 };
 
 } // graphics
