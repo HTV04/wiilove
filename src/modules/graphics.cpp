@@ -22,13 +22,14 @@
 // Libraries
 #include <grrlib.h>
 #include "../lib/FreeTypeGX/FreeTypeGX.h"
-#include <ogc/gu.h>
+#include <ogc/gx.h>
 #include <ogc/conf.h>
 #include <utility>
 #include <vector>
 #include <tuple>
 #include <string>
 #include <stdexcept>
+#include <cmath>
 
 // Classes
 #include "../classes/graphics/font.hpp"
@@ -118,39 +119,19 @@ void setColor1(int r, int g, int b) {
 }
 
 // Basic drawing functions
-void circle(std::string drawMode, float x, float y, float radius) {
-	bool fill;
-
-	if (drawMode.compare("fill") == 0) {
-		fill = true;
-	} else if (drawMode.compare("line") == 0) {
-		fill = false;
-	} else {
-		throw std::invalid_argument("Invalid DrawMode: " + drawMode);
-	}
-
+void circle(bool fill, float x, float y, float radius) {
 	GRRLIB_Circle(x, y, radius, color, fill);
 }
 void line(float x1, float y1, float x2, float y2) {
 	GRRLIB_Line(x1, y1, x2, y2, color);
 }
-void rectangle(std::string drawMode, float x, float y, float width, float height) {
-	bool fill;
-
-	if (drawMode.compare("fill") == 0) {
-		fill = true;
-	} else if (drawMode.compare("line") == 0) {
-		fill = false;
-	} else {
-		throw std::invalid_argument("Invalid DrawMode: " + drawMode);
-	}
-
+void rectangle(bool fill, float x, float y, float width, float height) {
 	GRRLIB_Rectangle(x, y, width, height, color, fill);
 }
 
 // Font functions
 void print(std::wstring str, float x, float y, float r, float sx, float sy, float ox, float oy) {
-	curFont->fontSystem->drawText(x - ox * sx, y - ox * sy, str.c_str(), sx, sy, r, color);
+	curFont->fontSystem->drawText(x, y, str.c_str(), sx, sy, ox, oy, r, color);
 }
 void print1(std::wstring str, float x, float y, float r, float sx, float sy) {
 	print(str, x, y, r, sx, sy, 0.0, 0.0);
@@ -161,16 +142,33 @@ void print2(std::wstring str, float x, float y, float r) {
 void print3(std::wstring str, float x, float y) {
 	print(str, x, y, 0.0, 1.0, 1.0, 0.0, 0.0);
 }
-void setFont(love::graphics::Font &font) {
-	curFont = &font;
+void setFont(love::graphics::Font *font) {
+	curFont = font;
 }
 
 // Texture functions
 void draw(love::graphics::Texture &image, float x, float y, float r, float sx, float sy, float ox, float oy) {
-	GRRLIB_DrawImg(x - ox * sx, y - ox * sx, image.texImg, r, sx, sy, color);
+	GRRLIB_DrawImg(x, y, image.texImg, r, sx, sy, ox, oy, color);
+}
+void draw1(love::graphics::Texture &image, float x, float y, float r, float sx, float sy) {
+	draw(image, x, y, r, sx, sy, 0.0, 0.0);
+}
+void draw2(love::graphics::Texture &image, float x, float y, float r) {
+	draw(image, x, y, r, 1.0, 1.0, 0.0, 0.0);
+}
+void draw3(love::graphics::Texture &image, float x, float y) {
+	draw(image, x, y, 0.0, 1.0, 1.0, 0.0, 0.0);
 }
 
-// Render
+// Graphics state functions
+void reset() {
+	color = 0xffffffff;
+	backgroundColor = std::make_tuple(0, 0, 0);
+
+	origin();
+}
+
+// Rendering functions
 void present() {
 	GRRLIB_Render();
 }

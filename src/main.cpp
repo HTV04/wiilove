@@ -78,14 +78,12 @@ int main(int argc, char **argv) {
 
         "event", lua.create_table_with(
             "pump", love::event::module::pump,
-            "getPoll", love::event::module::getPoll,
+            "poll", love::event::module::poll,
 
             "quit", love::event::module::quit
         ),
 
         "filesystem", lua.create_table_with(
-            "getIdentity", love::filesystem::module::getIdentity,
-
             "load", love::filesystem::module::load,
             "read", love::filesystem::module::read
         ),
@@ -124,7 +122,14 @@ int main(int argc, char **argv) {
             ),
             "setFont", love::graphics::module::setFont,
 
-            "draw", love::graphics::module::draw,
+            "draw", sol::overload(
+                love::graphics::module::draw,
+                love::graphics::module::draw1,
+                love::graphics::module::draw2,
+                love::graphics::module::draw3
+            ),
+
+            "reset", love::graphics::module::reset,
 
             "present", love::graphics::module::present
         ),
@@ -175,7 +180,10 @@ int main(int argc, char **argv) {
         "_Wiimote", sol::constructors<love::wiimote::Wiimote()>()
     );
 
+    WiimoteType["getAngle"] = &love::wiimote::Wiimote::getAngle;
     WiimoteType["getExtension"] = &love::wiimote::Wiimote::getExtension;
+    WiimoteType["getID"] = &love::wiimote::Wiimote::getID;
+    WiimoteType["getPosition"] = &love::wiimote::Wiimote::getPosition;
     WiimoteType["getX"] = &love::wiimote::Wiimote::getX;
     WiimoteType["getY"] = &love::wiimote::Wiimote::getY;
     WiimoteType["isConnected"] = &love::wiimote::Wiimote::isConnected;
@@ -184,17 +192,11 @@ int main(int argc, char **argv) {
 
     WiimoteType["isClassicDown"] = &love::wiimote::Wiimote::isClassicDown;
 
-    WiimoteType["rumble"] = &love::wiimote::Wiimote::rumble;
-    WiimoteType["rumbleDuration"] = &love::wiimote::Wiimote::rumbleDuration;
-
-    // Workaround for global usertypes
-    lua["love"]["graphics"]["newFont"] = lua["_Font"]["new"];
-    lua["love"]["graphics"]["newTexture"] = lua["_Texture"]["new"];
-
-    // Delete global usertypes
-    lua["_Font"] = sol::nil;
-    lua["_Texture"] = sol::nil;
-    lua["_Wiimote"] = sol::nil;
+    WiimoteType["setVibration"] = sol::overload(
+        &love::wiimote::Wiimote::setVibration,
+        &love::wiimote::Wiimote::setVibration1,
+        &love::wiimote::Wiimote::setVibration2
+    );
 
     // Start!
     lua.script(std::string(boot_lua, boot_lua + boot_lua_size));

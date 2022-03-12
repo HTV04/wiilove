@@ -59,7 +59,7 @@ void pump(sol::this_state s) {
     if (homePressed != -1) {
         events.push_back(std::make_tuple(sol::make_object(s, "homepressed"), sol::make_object(s, homePressed), sol::nil, sol::nil, sol::nil, sol::nil, sol::nil));
     }
-    for (int i = 3; i > -1; i--) {
+    for (int i = 3; i >= 0; i--) {
         if (wiimoteAdds[i]) {
             events.push_back(std::make_tuple(sol::make_object(s, "wiimoteadded"), sol::make_object(s, i), sol::nil, sol::nil, sol::nil, sol::nil, sol::nil));
         }
@@ -69,7 +69,7 @@ void pump(sol::this_state s) {
         }
     }
 }
-std::tuple<sol::object, sol::object, sol::object, sol::object, sol::object, sol::object, sol::object> getPoll() {
+std::tuple<sol::object, sol::object, sol::object, sol::object, sol::object, sol::object, sol::object> poll() {
     std::tuple<sol::object, sol::object, sol::object, sol::object, sol::object, sol::object, sol::object> event = events.back();
 
     events.pop_back();

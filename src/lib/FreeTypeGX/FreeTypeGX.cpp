@@ -465,7 +465,7 @@ ftgxCharData* FreeTypeGX::getCharacter(wchar_t character) {
  * @param textStyle	Flags which specify any styling which should be applied to the rendered string.
  * @return The number of characters printed.
  */
-int FreeTypeGX::drawText(float x, float y, wchar_t *text, float scaleX, float scaleY, float degrees, unsigned int color, int textStyle) {
+int FreeTypeGX::drawText(float x, float y, wchar_t *text, float scaleX, float scaleY, float offsetX, float offsetY, float degrees, unsigned int color, int textStyle) {
 	float x_pos = x, printed = 0;
 	float x_offset = 0, y_offset = 0;
 	GXTexObj glyphTexture;
@@ -500,7 +500,7 @@ int FreeTypeGX::drawText(float x, float y, wchar_t *text, float scaleX, float sc
 			}
 
 			GX_InitTexObj(&glyphTexture, glyphData->glyphDataTexture, glyphData->textureWidth, glyphData->textureHeight, this->textureFormat, GX_CLAMP, GX_CLAMP, GX_FALSE);
-			this->copyTextureToFramebuffer(&glyphTexture, glyphData->textureWidth, glyphData->textureHeight, x_pos - x_offset, y - glyphData->renderOffsetY - y_offset, scaleX, scaleY, degrees, color);
+			this->copyTextureToFramebuffer(&glyphTexture, glyphData->textureWidth, glyphData->textureHeight, x_pos - x_offset, y - glyphData->renderOffsetY - y_offset, scaleX, scaleY, offsetX, offsetY, degrees, color);
 
 			x_pos += (float) glyphData->glyphAdvanceX;
 			printed++;
@@ -510,7 +510,7 @@ int FreeTypeGX::drawText(float x, float y, wchar_t *text, float scaleX, float sc
 	}
 
 	if(textStyle & FTGX_STYLE_MASK) {
-		this->drawTextFeature(x - x_offset, y - y_offset, textWidth > 0 ? textWidth : textWidth = this->getWidth(text), textStyle, scaleX, scaleY, degrees, color);
+		this->drawTextFeature(x - x_offset, y - y_offset, textWidth > 0 ? textWidth : textWidth = this->getWidth(text), textStyle, scaleX, scaleY, offsetX, offsetY, degrees, color);
 	}
 
 	return printed;
@@ -519,8 +519,8 @@ int FreeTypeGX::drawText(float x, float y, wchar_t *text, float scaleX, float sc
 /**
  * \overload
  */
-int FreeTypeGX::drawText(float x, float y, wchar_t const *text, float scaleX, float scaleY, float degrees, unsigned int color, int textStyle) {
-	return this->drawText(x, y, (wchar_t *)text, scaleX, scaleY, degrees, color, textStyle);
+int FreeTypeGX::drawText(float x, float y, wchar_t const *text, float scaleX, float scaleY, float offsetX, float offsetY, float degrees, unsigned int color, int textStyle) {
+	return this->drawText(x, y, (wchar_t *)text, scaleX, scaleY, offsetX, offsetY, degrees, color, textStyle);
 }
 
 /**
@@ -534,15 +534,15 @@ int FreeTypeGX::drawText(float x, float y, wchar_t const *text, float scaleX, fl
  * @param textStyle	Flags which specify any styling which should be applied to the rendered string.
  * @param color	Color to be applied to the text feature.
  */
-void FreeTypeGX::drawTextFeature(float x, float y, int width, int textStyle, float scaleX, float scaleY, float degrees, unsigned int color) {
+void FreeTypeGX::drawTextFeature(float x, float y, int width, int textStyle, float scaleX, float scaleY, float offsetX, float offsetY, float degrees, unsigned int color) {
 	int featureHeight = this->ftPointSize >> 4 > 0 ? this->ftPointSize >> 4 : 1;
 
 	if (textStyle & FTGX_STYLE_UNDERLINE ) {
-		this->copyFeatureToFramebuffer(width, featureHeight, x, y + 1, scaleX, scaleY, degrees, color);
+		this->copyFeatureToFramebuffer(width, featureHeight, x, y + 1, scaleX, scaleY, offsetX, offsetY, degrees, color);
 	}
 
 	if (textStyle & FTGX_STYLE_STRIKE ) {
-		this->copyFeatureToFramebuffer(width, featureHeight, x, y - (float) (this->ftAscender >> 2), scaleX, scaleY, degrees, color);
+		this->copyFeatureToFramebuffer(width, featureHeight, x, y - (float) (this->ftAscender >> 2), scaleX, scaleY, offsetX, offsetY, degrees, color);
 	}
 }
 
@@ -636,9 +636,9 @@ int FreeTypeGX::getHeight(wchar_t const *text) {
  * @param screenY	The screen Y coordinate at which to output the rendered texture.
  * @param color	Color to apply to the texture.
  */
-void FreeTypeGX::copyTextureToFramebuffer(GXTexObj *texObj, float texWidth, float texHeight, float screenX, float screenY, float scaleX, float scaleY, float degrees, unsigned int color) {
+void FreeTypeGX::copyTextureToFramebuffer(GXTexObj *texObj, float texWidth, float texHeight, float screenX, float screenY, float scaleX, float scaleY, float offsetX, float offsetY, float degrees, unsigned int color) {
 
-	GRRLIB_Transform(scaleX, scaleY, degrees, 0.0, 0.0);
+	GRRLIB_Transform(scaleX, scaleY, degrees, offsetX, offsetY);
 
 	GX_LoadTexObj(texObj, GX_TEXMAP0);
 	GX_SetTevOp(GX_TEVSTAGE0, GX_MODULATE);
@@ -676,7 +676,7 @@ void FreeTypeGX::copyTextureToFramebuffer(GXTexObj *texObj, float texWidth, floa
     GX_SetVtxDesc(GX_VA_TEX0, GX_NONE);
 
 	// Undo transformations
-	GRRLIB_Transform(1.0 / scaleX, 1.0 / scaleY, -degrees, 0.0, 0.0);
+	GRRLIB_Transform(1.0 / scaleX, 1.0 / scaleY, -degrees, offsetX, offsetY);
 }
 
 /**
@@ -690,9 +690,9 @@ void FreeTypeGX::copyTextureToFramebuffer(GXTexObj *texObj, float texWidth, floa
  * @param screenY	The screen Y coordinate at which to output the quad.
  * @param color	Color to apply to the texture.
  */
-void FreeTypeGX::copyFeatureToFramebuffer(float featureWidth, float featureHeight, float screenX, float screenY, float scaleX, float scaleY, float degrees, unsigned int color) {
+void FreeTypeGX::copyFeatureToFramebuffer(float featureWidth, float featureHeight, float screenX, float screenY, float scaleX, float scaleY, float offsetX, float offsetY, float degrees, unsigned int color) {
 
-	GRRLIB_Transform(scaleX, scaleY, degrees, 0.0, 0.0);
+	GRRLIB_Transform(scaleX, scaleY, degrees, offsetX, offsetY);
 
 	GX_SetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
 	GX_SetVtxDesc(GX_VA_TEX0, GX_NONE);
@@ -715,5 +715,5 @@ void FreeTypeGX::copyFeatureToFramebuffer(float featureWidth, float featureHeigh
     GX_SetVtxDesc(GX_VA_TEX0, GX_NONE);
 
 	// Undo transformations
-	GRRLIB_Transform(1.0 / scaleX, 1.0 / scaleY, -degrees, 0.0, 0.0);
+	GRRLIB_Transform(1.0 / scaleX, 1.0 / scaleY, -degrees, offsetX, offsetY);
 }

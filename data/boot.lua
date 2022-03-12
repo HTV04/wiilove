@@ -22,6 +22,30 @@ License along with this program.  If not, see
 
 local function nop() end
 
+local result
+
+-- Workaround for global usertypes
+love.graphics.newFont = _Font.new
+love.graphics.newTexture = _Texture.new
+
+-- Delete global usertypes
+_Font = nil
+_Texture = nil
+_Wiimote = nil
+
+-- API Expansion
+function love.graphics.setNewFont(...)
+	local font = love.graphics.newFont(unpack({...}))
+
+	love.graphics.setFont(font)
+
+	return font
+end
+
+-- Redirect package paths
+package.path = "data/?.lua; data/?/init.lua"
+package.cpath = "" -- Disable C modules
+
 -- Standard callback handlers
 love.handlers = setmetatable({
 	-- WIP: These handlers may change in the future
@@ -68,21 +92,21 @@ love.handlers = setmetatable({
 })
 
 function love.run()
+	local dt = 0
+
 	-- We don't want the first frame's dt to include time taken by love.load
 	if love.timer then love.timer.step() end
 
-	local dt = 0
-
 	-- Main loop
-	return function()
+	while true do
 		-- Process events.
 		if love.event then
 			love.event.pump()
 
-			for name, a,b,c,d,e,f in love.event.getPoll do
+			for name, a,b,c,d,e,f in love.event.poll do
 				if name == "homepressed" then
 					if not love.homepressed or not love.homepressed(a) then
-						return a or 0
+						return 0
 					end
 				end
 
@@ -106,11 +130,51 @@ function love.run()
 	end
 end
 
--- Load main.lua to intialize functions
-love.filesystem.load("main.lua")()
+function love.errhand(err)
+	local msg = "Error\n\n" ..
+	            err ..
+				"\n\n\n" ..
+				string.gsub(string.gsub(debug.traceback(), "\t", ""), "stack traceback:", "Traceback\n") ..
+				"\n\n\nPress HOME to return to loader\n"
+	local msgTable = {}
 
-while true do
-	local status, result = pcall(love.run())
+	-- Temporary workaround for newlines
+	for line in string.gmatch(msg, "([^\n]*)\n") do
+		table.insert(msgTable, line)
+	end
 
-	if result then return result end
+	-- Stop all Wiimote vibrations
+	for _, wiimote in ipairs(love.wiimote.getWiimotes()) do
+		wiimote:setVibration()
+	end
+
+	--love.audio.stop()
+
+	love.graphics.reset()
+	love.graphics.setNewFont(14)
+
+	while true do
+		love.event.pump()
+
+		for name, a,b,c,d,e,f in love.event.poll do
+			if name == "homepressed" then
+				return 1
+			end
+		end
+
+		love.graphics.clear(89, 157, 220)
+
+		for i, line in ipairs(msgTable) do
+			love.graphics.print(line, 70, 60 + i * 18)
+		end
+
+		love.graphics.present()
+	end
 end
+
+-- Load main.lua to intialize functions
+xpcall(love.filesystem.load("main.lua"), love.errhand)
+
+_, result = xpcall(love.run, love.errhand)
+
+return result

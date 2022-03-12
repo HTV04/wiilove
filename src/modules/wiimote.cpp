@@ -43,28 +43,24 @@ namespace wiimote {
 void init() {
     int homePressed = -1;
 
-    for (int i = 0; i < 4; i++) {
-        Wiimote &wiimote = wiimotes[i];
+    for (int i = 0; i <= 3; i++) {
+        wiimotes[i].id = i;
 
-        wiimote.id = i;
-
-        wiimote.update(homePressed); // Init values
+        wiimotes[i].update(homePressed); // Init values
     }
 }
 void update(std::vector<bool> &adds, std::vector<bool> &removes, int &homePressed) {
     WPAD_ScanPads();
 
-    for (int i = 0; i < 4; i++) {
-        Wiimote &wiimote = wiimotes[i];
-
+    for (int i = 0; i <= 3; i++) {
         int status = WPAD_Probe(i, NULL);
-        if (wiimote.isConnected() and status != WPAD_ERR_NONE) {
+        if (wiimotes[i].isConnected() and status != WPAD_ERR_NONE) {
             removes[i] = true;
-        } else if (!wiimote.isConnected() and status == WPAD_ERR_NONE) {
+        } else if (!wiimotes[i].isConnected() and status == WPAD_ERR_NONE) {
             adds[i] = true;
         }
 
-        wiimote.update(homePressed);
+        wiimotes[i].update(homePressed);
     }
 }
 
@@ -73,7 +69,7 @@ namespace module {
 sol::table getWiimotes(sol::this_state s) {
     sol::table wiimoteTable(s, sol::create);
 
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i <= 3; i++) {
         wiimoteTable[i + 1] = &wiimotes[i];
     }
 

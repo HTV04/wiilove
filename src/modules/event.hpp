@@ -30,7 +30,7 @@ namespace event {
 namespace module {
 
 void pump(sol::this_state s);
-std::tuple<sol::object, sol::object, sol::object, sol::object, sol::object, sol::object, sol::object> getPoll();
+std::tuple<sol::object, sol::object, sol::object, sol::object, sol::object, sol::object, sol::object> poll();
 
 void quit();
 

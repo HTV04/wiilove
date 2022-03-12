@@ -23,6 +23,7 @@
 #include <wiiuse/wpad.h>
 #include <map>
 #include <string>
+#include <utility>
 #include <stdexcept>
 
 // Modules
@@ -81,8 +82,9 @@ void Wiimote::update(int &homePressed) {
 
 	status = WPAD_Probe(id, &extension);
 	buttonsDown = data->btns_h;
-	x = data->ir.sx;
-	y = data->ir.sy;
+	x = data->ir.x;
+	y = data->ir.y;
+	angle = data->ir.angle;
 
 	if (rumbling && rumbleLength != -1.0 && rumbleTime < rumbleLength) {
 		rumbleTime += love::timer::module::getDelta();
@@ -96,8 +98,13 @@ void Wiimote::update(int &homePressed) {
 }
 
 // Wii Remote querying functions
+float Wiimote::getAngle() { return angle; }
 std::string Wiimote::getExtension() {
 	return extensionMap[extension];
+}
+int Wiimote::getID() { return id; }
+std::pair<float, float> Wiimote::getPosition() {
+	return std::make_pair(x, y);
 }
 float Wiimote::getX() { return x; }
 float Wiimote::getY() { return y; }
@@ -115,24 +122,23 @@ bool Wiimote::isClassicDown(std::string button) {
 }
 
 // Actions
-void Wiimote::rumble(bool status){
-	WPAD_Rumble(id, int(status));
-
-	rumbleLength = -1.0;
-
-	rumbling = status;
-}
-void Wiimote::rumbleDuration(int status, double duration) {
+void Wiimote::setVibration(bool status, double duration) {
 	if (duration < 0.0 and duration != -1.0) {
 		throw std::invalid_argument("Rumble duration must be positive or -1");
 	}
 
-	WPAD_Rumble(id, status);
+	WPAD_Rumble(id, int(status));
 
 	rumbleTime = 0.0;
 	rumbleLength = duration;
 
 	rumbling = status;
+}
+void Wiimote::setVibration1(bool status) {
+	setVibration(status, -1.0);
+}
+void Wiimote::setVibration2() {
+	setVibration(false, -1.0);
 }
 
 } // wiimote

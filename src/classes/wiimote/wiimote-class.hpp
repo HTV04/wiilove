@@ -24,7 +24,7 @@
 // Libraries
 #include <wiiuse/wpad.h>
 #include <string>
-#include <map>
+#include <utility>
 
 namespace love {
 namespace wiimote {
@@ -36,6 +36,7 @@ struct Wiimote {
 	unsigned int extension;
 	unsigned int buttonsDown;
 	float x, y;
+	float angle;
 
 	bool rumbling;
 	double rumbleTime;
@@ -44,7 +45,10 @@ struct Wiimote {
 	Wiimote();
 	void update(int &homePressed);
 
+	float getAngle();
 	std::string getExtension();
+	int getID();
+	std::pair<float, float> getPosition();
 	float getX();
 	float getY();
 	bool isConnected();
@@ -53,8 +57,9 @@ struct Wiimote {
 
 	bool isClassicDown(std::string button);
 
-	void rumble(bool status);
-	void rumbleDuration(int status, double duration);
+	void setVibration(bool status, double duration);
+	void setVibration1(bool status);
+	void setVibration2();
 };
 
 } // wiimote

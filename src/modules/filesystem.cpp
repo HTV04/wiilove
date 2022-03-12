@@ -32,8 +32,7 @@
 
 // Local variables
 namespace {
-    std::string identity;
-	std::string filesystemPath;
+    std::string filesystemPath;
 }
 
 namespace love {
@@ -43,22 +42,12 @@ void init(int argc, char **argv) {
 	std::string executablePath;
 
 	if (argc > 0) { // argv[0] is the executable path
-		executablePath = argv[0];
-
 		filesystemPath = executablePath.substr(0, executablePath.find_last_of("/"));
-	}
-
-	if (argc >= 2) { // argv[1] is the identity
-		identity = argv[1];
-	} else if (argc == 1) { // No identity passed, so we'll use the default identity ("love")
-		identity = "love";
 	} else {
 		// This case is interesting, since this means that the executable is not loaded with any arguments.
 		// * We're likely running on Dolphin (directly), because the Homebrew Channel would at least pass the executable path. Potentially same issue with Wii VC injects?
-		// * There is no set identity, so we'll use the default identity ("love").
 		// * We'll default to sd:/love as the filesystem path.
 
-		identity = "love";
 		filesystemPath = "sd:/love";
 	}
 
@@ -93,11 +82,6 @@ std::string getFilePath(std::string filename) { // Get the path of a file, using
 }
 
 namespace module {
-
-// Querying functions
-std::string getIdentity() {
-	return identity;
-}
 
 // Working with files
 sol::protected_function load(std::string filename, sol::this_state s) {

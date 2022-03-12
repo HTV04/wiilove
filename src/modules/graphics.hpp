@@ -54,17 +54,22 @@ void scale(float x, float y);
 void rotate(float angle);
 void translate(float dx, float dy);
 
-void circle(std::string drawMode, float x, float y, float radius);
+void circle(bool fill, float x, float y, float radius);
 void line(float x1, float y1, float x2, float y2);
-void rectangle(std::string drawMode, float x, float y, float width, float height);
+void rectangle(bool fill, float x, float y, float width, float height);
 
 void print(std::wstring str, float x, float y, float r, float sx, float sy, float ox, float oy);
 void print1(std::wstring str, float x, float y, float r, float sx, float sy);
 void print2(std::wstring str, float x, float y, float r);
 void print3(std::wstring str, float x, float y);
-void setFont(love::graphics::Font &font);
+void setFont(love::graphics::Font *font);
 
 void draw(love::graphics::Texture &image, float x, float y, float r, float sx, float sy, float ox, float oy);
+void draw1(love::graphics::Texture &image, float x, float y, float r, float sx, float sy);
+void draw2(love::graphics::Texture &image, float x, float y, float r);
+void draw3(love::graphics::Texture &image, float x, float y);
+
+void reset();
 
 void present();
 

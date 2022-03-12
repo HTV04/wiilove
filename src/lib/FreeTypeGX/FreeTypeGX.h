@@ -237,9 +237,9 @@ class FreeTypeGX {
 		int cacheGlyphDataComplete();
 		void loadGlyphData(FT_Bitmap *bmp, ftgxCharData *charData);
 
-		void drawTextFeature(float x, float y, int width, int format, float scaleX, float scaleY, float degrees, unsigned int color);
-		void copyTextureToFramebuffer(GXTexObj *texObj, float texWidth, float texHeight, float screenX, float screenY, float scaleX, float scaleY, float degrees, unsigned int color);
-		void copyFeatureToFramebuffer(float featureWidth, float featureHeight, float screenX, float screenY, float scaleX, float scaleY, float degrees, unsigned int color);
+		void drawTextFeature(float x, float y, int width, int format, float scaleX, float scaleY, float offsetX, float offsetY, float degrees, unsigned int color);
+		void copyTextureToFramebuffer(GXTexObj *texObj, float texWidth, float texHeight, float screenX, float screenY, float scaleX, float scaleY, float offsetX, float offsetY, float degrees, unsigned int color);
+		void copyFeatureToFramebuffer(float featureWidth, float featureHeight, float screenX, float screenY, float scaleX, float offsetX, float offsetY, float scaleY, float degrees, unsigned int color);
 
 	public:
 		FreeTypeGX(uint8_t textureFormat = GX_TF_RGBA8);
@@ -258,8 +258,8 @@ class FreeTypeGX {
 		int loadFont(uint8_t* fontBuffer, FT_Long bufferSize, FT_UInt pointSize, bool cacheAll = false);
 		int loadFont(const uint8_t* fontBuffer, FT_Long bufferSize, FT_UInt pointSize, bool cacheAll = false);
 
-		int drawText(float x, float y, wchar_t *text, float scaleX = 1.0, float scaleY = 1.0, float degrees = 0.0, unsigned int color = ftgxWhite, int textStyling = FTGX_NULL);
-		int drawText(float x, float y, wchar_t const *text, float scaleX = 1.0, float scaleY = 1.0, float degrees = 0.0, unsigned int color = ftgxWhite, int textStyling = FTGX_NULL);
+		int drawText(float x, float y, wchar_t *text, float scaleX = 1.0, float scaleY = 1.0, float offsetX = 0.0, float offsetY = 0.0, float degrees = 0.0, unsigned int color = ftgxWhite, int textStyling = FTGX_NULL);
+		int drawText(float x, float y, wchar_t const *text, float scaleX = 1.0, float scaleY = 1.0, float offsetX = 0.0, float offsetY = 0.0, float degrees = 0.0, unsigned int color = ftgxWhite, int textStyling = FTGX_NULL);
 
 		int getWidth(wchar_t *text);
 		int getWidth(wchar_t const *text);
