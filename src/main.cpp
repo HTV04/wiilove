@@ -1,4 +1,4 @@
-/* WiiLÖVE 1.0 "Cumulus" alpha 1
+/* WiiLÖVE 1.0.0 "Terra" alpha 2
  *
  * Copyright (C) 2022  HTV04
  *
