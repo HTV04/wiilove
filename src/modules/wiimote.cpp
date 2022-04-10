@@ -30,38 +30,41 @@
 #include "../classes/wiimote/wiimote-class.hpp"
 
 // Header
-#include "system.hpp"
+#include "wiimote.hpp"
 
 // Local variables
 namespace {
-    std::vector<love::wiimote::Wiimote> wiimotes(4);
+	std::vector<love::wiimote::Wiimote> wiimotes(4);
 }
 
 namespace love {
 namespace wiimote {
 
 void init() {
-    int homePressed = -1;
+	int homePressed = -1;
 
-    for (int i = 0; i <= 3; i++) {
-        wiimotes[i].id = i;
+	WPAD_ScanPads();
 
-        wiimotes[i].update(homePressed); // Init values
-    }
+	for (int i = 0; i <= 3; i++) {
+		wiimotes[i].id = i;
+
+		wiimotes[i].update(WPAD_Probe(i, NULL), homePressed); // Init values
+	}
 }
 void update(std::vector<bool> &adds, std::vector<bool> &removes, int &homePressed) {
-    WPAD_ScanPads();
+	WPAD_ScanPads();
 
-    for (int i = 0; i <= 3; i++) {
-        int status = WPAD_Probe(i, NULL);
-        if (wiimotes[i].isConnected() and status != WPAD_ERR_NONE) {
-            removes[i] = true;
-        } else if (!wiimotes[i].isConnected() and status == WPAD_ERR_NONE) {
-            adds[i] = true;
-        }
+	for (int i = 0; i <= 3; i++) {
+		int status = WPAD_Probe(i, NULL);
 
-        wiimotes[i].update(homePressed);
-    }
+		if (wiimotes[i].isConnected() and status != WPAD_ERR_NONE) {
+			removes[i] = true;
+		} else if (!wiimotes[i].isConnected() and status == WPAD_ERR_NONE) {
+			adds[i] = true;
+		}
+
+		wiimotes[i].update(status, homePressed);
+	}
 }
 
 namespace module {
@@ -69,11 +72,11 @@ namespace module {
 sol::table getWiimotes(sol::this_state s) {
     sol::table wiimoteTable(s, sol::create);
 
-    for (int i = 0; i <= 3; i++) {
+	for (int i = 0; i <= 3; i++) {
         wiimoteTable[i + 1] = &wiimotes[i];
     }
 
-    return wiimoteTable;
+	return wiimoteTable;
 }
 
 } // module

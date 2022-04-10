@@ -161,11 +161,19 @@ void draw3(love::graphics::Texture &image, float x, float y) {
 }
 
 // Graphics state functions
+bool getAntiAliasing() {
+	return GRRLIB_GetAntiAliasing();
+}
 void reset() {
 	color = 0xffffffff;
 	backgroundColor = std::make_tuple(0, 0, 0);
 
 	origin();
+
+	GRRLIB_SetAntiAliasing(true);
+}
+void setAntiAliasing(bool enable) {
+	GRRLIB_SetAntiAliasing(enable);
 }
 
 // Rendering functions

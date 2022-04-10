@@ -28,14 +28,16 @@
 namespace love {
 namespace filesystem {
 
-void init(int argc, char **argv);
+void init(int argc);
 
 std::string getFilePath(std::string filename);
 
 namespace module {
 
+bool exists(std::string filename);
 sol::protected_function load(std::string filename, sol::this_state s);
 std::string read(std::string filename);
+void write (std::string filename, std::string data);
 
 } // module
 } // filesystem

@@ -39,11 +39,9 @@ struct Wiimote {
 	float angle;
 
 	bool rumbling;
-	double rumbleTime;
-	double rumbleLength;
 
 	Wiimote();
-	void update(int &homePressed);
+	void update(int curStatus, int &homePressed);
 
 	float getAngle();
 	std::string getExtension();
@@ -57,9 +55,7 @@ struct Wiimote {
 
 	bool isClassicDown(std::string button);
 
-	void setVibration(bool status, double duration);
-	void setVibration1(bool status);
-	void setVibration2();
+	bool setRumble(bool status);
 };
 
 } // wiimote

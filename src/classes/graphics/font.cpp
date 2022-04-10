@@ -39,7 +39,7 @@
 namespace love {
 namespace graphics {
 
-// Internal functions
+// Constructors
 Font::Font(unsigned int size) { // Load Vera.ttf as default font
 	fontSystem = new FreeTypeGX();
 

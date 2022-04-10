@@ -25,8 +25,9 @@ namespace love {
 namespace math {
 namespace module {
 
-double doubleRandom();
-int intRandom(int min, int max);
+int random(int min, int max);
+int random1(int max);
+double random2();
 
 } // module
 } // math

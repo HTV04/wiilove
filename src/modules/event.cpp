@@ -36,7 +36,7 @@
 #include "event.hpp"
 
 namespace {
-    std::vector<std::tuple<sol::object, sol::object, sol::object, sol::object, sol::object, sol::object, sol::object>> events;
+	std::vector<std::tuple<sol::object, sol::object, sol::object, sol::object, sol::object, sol::object, sol::object>> events;
 }
 
 namespace love {
@@ -46,44 +46,44 @@ namespace module {
 // Event functions
 // NOTE: We have to add events in reverse!
 void pump(sol::this_state s) {
-    std::vector<bool> wiimoteAdds {false, false, false, false};
-    std::vector<bool> wiimoteRemoves {false, false, false, false};
+	std::vector<bool> wiimoteAdds {false, false, false, false};
+	std::vector<bool> wiimoteRemoves {false, false, false, false};
 
-    int homePressed = -1;
+	int homePressed = -1;
 
-    events.push_back(std::make_tuple(sol::nil, sol::nil, sol::nil, sol::nil, sol::nil, sol::nil, sol::nil));
+	events.push_back(std::make_tuple(sol::nil, sol::nil, sol::nil, sol::nil, sol::nil, sol::nil, sol::nil));
 
-    // Update wiimotes
-    love::wiimote::update(wiimoteAdds, wiimoteRemoves, homePressed);
+	// Update wiimotes
+	love::wiimote::update(wiimoteAdds, wiimoteRemoves, homePressed);
 
-    if (homePressed != -1) {
-        events.push_back(std::make_tuple(sol::make_object(s, "homepressed"), sol::make_object(s, homePressed), sol::nil, sol::nil, sol::nil, sol::nil, sol::nil));
-    }
-    for (int i = 3; i >= 0; i--) {
-        if (wiimoteAdds[i]) {
-            events.push_back(std::make_tuple(sol::make_object(s, "wiimoteadded"), sol::make_object(s, i), sol::nil, sol::nil, sol::nil, sol::nil, sol::nil));
-        }
+	if (homePressed != -1) {
+		events.push_back(std::make_tuple(sol::make_object(s, "homepressed"), sol::make_object(s, homePressed), sol::nil, sol::nil, sol::nil, sol::nil, sol::nil));
+	}
+	for (int i = 3; i >= 0; i--) {
+		if (wiimoteAdds[i]) {
+			events.push_back(std::make_tuple(sol::make_object(s, "wiimoteconnected"), sol::make_object(s, i), sol::nil, sol::nil, sol::nil, sol::nil, sol::nil));
+		}
 
-        if (wiimoteRemoves[i]) {
-            events.push_back(std::make_tuple(sol::make_object(s, "wiimoteremoved"), sol::make_object(s, i), sol::nil, sol::nil, sol::nil, sol::nil, sol::nil));
-        }
-    }
+		if (wiimoteRemoves[i]) {
+			events.push_back(std::make_tuple(sol::make_object(s, "wiimotedisconnected"), sol::make_object(s, i), sol::nil, sol::nil, sol::nil, sol::nil, sol::nil));
+		}
+	}
 }
 std::tuple<sol::object, sol::object, sol::object, sol::object, sol::object, sol::object, sol::object> poll() {
-    std::tuple<sol::object, sol::object, sol::object, sol::object, sol::object, sol::object, sol::object> event = events.back();
+	std::tuple<sol::object, sol::object, sol::object, sol::object, sol::object, sol::object, sol::object> event = events.back();
 
-    events.pop_back();
+	events.pop_back();
 
-    return event;
+	return event;
 }
 
 // State functions
 void quit() {
-    // Be a good boy, clear the memory allocated by GRRLIB
-    GRRLIB_Exit();
+	// Be a good boy, clear the memory allocated by GRRLIB
+	GRRLIB_Exit();
 
-    // Exit
-    std::exit(0);
+	// Exit
+	std::exit(0);
 }
 
 } // module

@@ -28,8 +28,7 @@
 #include "timer.hpp"
 
 namespace {
-    std::random_device rd;
-    std::default_random_engine generator(rd());
+    std::default_random_engine generator(gettime());
 
     std::uniform_real_distribution<double> doubleDist(0.0, 1.0);
 }
@@ -39,13 +38,16 @@ namespace math {
 namespace module {
 
 // Random number generation
-double doubleRandom() {
-    return doubleDist(generator);
-};
-int intRandom(int min, int max) {
+int random(int min, int max) {
     std::uniform_int_distribution<int> intDist(min, max);
 
     return intDist(generator);
+};
+int random1(int max) {
+    return random(1, max);
+};
+double random2() {
+    return doubleDist(generator);
 };
 
 } // module

@@ -29,17 +29,15 @@
 
 // Local variables
 namespace {
-    std::uint64_t deltaTimeStart;
-    double deltaTime;
+	std::uint64_t deltaTimeStart;
+	double deltaTime = 0.0;
 }
 
 namespace love {
 namespace timer {
 
 void init() {
-    settime((std::uint64_t)0); // So we don't have to start with a huge number
-
-    deltaTimeStart = gettime();
+	deltaTimeStart = gettime();
 }
 
 namespace module {
@@ -49,13 +47,13 @@ double getDelta() { return deltaTime; }
 
 // Actions
 void sleep(int ms) {
-    usleep(ms);
+	usleep(ms);
 }
 double step() { // Update deltaTime
-    deltaTime = (double) (gettime() - deltaTimeStart) / (double) (TB_TIMER_CLOCK * 1000); // Division is to convert from ticks to seconds
-    deltaTimeStart = gettime();
+	deltaTime = (double) (gettime() - deltaTimeStart) / (double) (TB_TIMER_CLOCK * 1000); // Division is to convert from ticks to seconds
+	deltaTimeStart = gettime();
 
-    return deltaTime;
+	return deltaTime;
 }
 
 } // module

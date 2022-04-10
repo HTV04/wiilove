@@ -69,7 +69,9 @@ void draw1(love::graphics::Texture &image, float x, float y, float r, float sx, 
 void draw2(love::graphics::Texture &image, float x, float y, float r);
 void draw3(love::graphics::Texture &image, float x, float y);
 
+bool getAntiAliasing();
 void reset();
+void setAntiAliasing(bool enable);
 
 void present();
 

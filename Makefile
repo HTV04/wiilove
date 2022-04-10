@@ -47,7 +47,8 @@ INCLUDES	:=
 # options for code generation
 #---------------------------------------------------------------------------------
 
-CFLAGS	= -g -O2 -Wall $(MACHDEP) $(INCLUDE) `freetype-config --cflags`
+CFLAGS	=	-g -O2 -Wall $(MACHDEP) $(INCLUDE) `freetype-config --cflags` \
+			-DSOL_ALL_SAFETIES_ON=1 -DSOL_USING_CXX_LUA=1
 CXXFLAGS	=	$(CFLAGS)
 
 LDFLAGS	=	-g $(MACHDEP) -Wl,-Map,$(notdir $@).map

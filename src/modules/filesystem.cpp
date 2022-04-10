@@ -21,11 +21,9 @@
 
 // Libraries
 #include "../lib/sol.hpp"
-#include <sys/unistd.h>
-#include <dirent.h>
 #include <string>
+#include <filesystem>
 #include <fstream>
-#include <cstdio>
 
 // Header
 #include "filesystem.hpp"
@@ -38,7 +36,7 @@ namespace {
 namespace love {
 namespace filesystem {
 
-void init(int argc, char **argv) {
+void init(int argc) {
 	std::string executablePath;
 
 	if (argc > 0) { // argv[0] is the executable path
@@ -52,17 +50,17 @@ void init(int argc, char **argv) {
 	}
 
 	// Create filesystem directory if it doesn't exist (but it should already) and enter it
-	if (chdir(filesystemPath.c_str())) {
-		mkdir(filesystemPath.c_str(), 0777);
-		chdir(filesystemPath.c_str());
+	if (!std::filesystem::exists(filesystemPath)) {
+		std::filesystem::create_directory(filesystemPath);
 	}
+	std::filesystem::current_path(filesystemPath);
 
 	// Create data and save directories if they don't exist (but data should already)
-	if (opendir("data") == NULL) {
-		mkdir("data", 0777);
+	if (!std::filesystem::exists("data")) {
+		std::filesystem::create_directory("data");
 	}
-	if (opendir("save") == NULL) {
-		mkdir("save", 0777);
+	if (!std::filesystem::exists("save")) {
+		std::filesystem::create_directory("save");
 	}
 }
 
@@ -70,11 +68,7 @@ std::string getFilePath(std::string filename) { // Get the path of a file, using
 	std::string savePath = "save/" + filename;
 	std::string dataPath = "data/" + filename;
 
-	FILE *f = fopen(savePath.c_str(), "r");
-
-	if (f != NULL) {
-		fclose(f);
-
+	if (std::filesystem::exists(savePath)) {
 		return savePath;
 	} else { // If the save path doesn't exist, return the data path.
 		return dataPath;
@@ -84,19 +78,28 @@ std::string getFilePath(std::string filename) { // Get the path of a file, using
 namespace module {
 
 // Working with files
+bool exists(std::string filename) {
+	return std::filesystem::exists(getFilePath(filename));
+}
 sol::protected_function load(std::string filename, sol::this_state s) {
 	sol::state_view lua(s);
 
 	// TODO: Add error handling
-	return lua.load_file(getFilePath(filename).c_str()).get<sol::protected_function>();
+	return lua.load_file(getFilePath(filename)).get<sol::protected_function>();
 }
 std::string read(std::string filename) {
 	std::stringstream stream;
 
 	// TODO: Add error handling
-	stream << std::ifstream(getFilePath(filename).c_str()).rdbuf();
+	stream << std::ifstream(getFilePath(filename)).rdbuf();
 
 	return stream.str();
+}
+void write(std::string filename, std::string data) {
+	// TODO: Add error handling
+	std::ofstream out("save/" + filename);
+
+	out << data; // Write data to file
 }
 
 } // module

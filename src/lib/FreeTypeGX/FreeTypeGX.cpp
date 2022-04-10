@@ -101,7 +101,7 @@ int FreeTypeGX::setMaxVideoWidth(int width) {
 int FreeTypeGX::loadFont(uint8_t* fontBuffer, FT_Long bufferSize, FT_UInt pointSize, bool cacheAll) {
 	int numCached = 0;
 
-	this->unloadFont();
+	//this->unloadFont(); // NEEDS FIX
 	this->ftFontBuffer = (FT_Byte *)fontBuffer;
 	this->ftFontBufferSize = bufferSize;
 	this->ftPointSize = pointSize;
@@ -134,10 +134,7 @@ int FreeTypeGX::loadFont(const uint8_t* fontBuffer, FT_Long bufferSize, FT_UInt 
  * This routine clears all members of the font map structure and frees all allocated memory back to the system.
  */
 void FreeTypeGX::unloadFont() {
-	GX_DrawDone();
-	GX_Flush();
-
-	for( std::map<wchar_t, ftgxCharData>::iterator i = this->fontData.begin(); i != this->fontData.end(); i++) {
+	for(std::map<wchar_t, ftgxCharData>::iterator i = this->fontData.begin(); i != this->fontData.end(); i++) {
 		free(i->second.glyphDataTexture);
 	}
 	if(this->ftFace) {
@@ -478,16 +475,16 @@ int FreeTypeGX::drawText(float x, float y, wchar_t *text, float scaleX, float sc
 	}
 
 	if(textStyle & FTGX_JUSTIFY_MASK) {
-		x_offset = (float) this->getStyleOffsetWidth(textWidth > 0 ? textWidth : this->getWidth(text), textStyle);
+		x_offset = static_cast<float>(this->getStyleOffsetWidth(textWidth > 0 ? textWidth : this->getWidth(text), textStyle));
 	}
 
 	if(textStyle & FTGX_ALIGN_MASK) {
-		y_offset = (float) this->getStyleOffsetHeight(textStyle);
+		y_offset = static_cast<float>(this->getStyleOffsetHeight(textStyle));
 	}
 
 	int i = 0;
 	while(text[i]) {
-		if(maxVideoWidth > 0 && (x_pos > (float) maxVideoWidth)) {
+		if(maxVideoWidth > 0 && (x_pos > maxVideoWidth)) {
 			break;
 		}
 
@@ -495,14 +492,14 @@ int FreeTypeGX::drawText(float x, float y, wchar_t *text, float scaleX, float sc
 
 		if(glyphData != NULL) {
 			if(this->ftKerningEnabled && i) {
-				FT_Get_Kerning( this->ftFace, this->fontData[text[i - 1]].glyphIndex, glyphData->glyphIndex, FT_KERNING_DEFAULT, &pairDelta );
-				x_pos += (float) (pairDelta.x >> 6);
+				FT_Get_Kerning(this->ftFace, this->fontData[text[i - 1]].glyphIndex, glyphData->glyphIndex, FT_KERNING_DEFAULT, &pairDelta);
+				x_pos += static_cast<float>(pairDelta.x >> 6) * scaleX;
 			}
 
 			GX_InitTexObj(&glyphTexture, glyphData->glyphDataTexture, glyphData->textureWidth, glyphData->textureHeight, this->textureFormat, GX_CLAMP, GX_CLAMP, GX_FALSE);
 			this->copyTextureToFramebuffer(&glyphTexture, glyphData->textureWidth, glyphData->textureHeight, x_pos - x_offset, y - glyphData->renderOffsetY - y_offset, scaleX, scaleY, offsetX, offsetY, degrees, color);
 
-			x_pos += (float) glyphData->glyphAdvanceX;
+			x_pos += static_cast<float>(glyphData->glyphAdvanceX) * scaleX;
 			printed++;
 		}
 
@@ -542,7 +539,7 @@ void FreeTypeGX::drawTextFeature(float x, float y, int width, int textStyle, flo
 	}
 
 	if (textStyle & FTGX_STYLE_STRIKE ) {
-		this->copyFeatureToFramebuffer(width, featureHeight, x, y - (float) (this->ftAscender >> 2), scaleX, scaleY, offsetX, offsetY, degrees, color);
+		this->copyFeatureToFramebuffer(width, featureHeight, x, y - static_cast<float>(this->ftAscender >> 2), scaleX, scaleY, offsetX, offsetY, degrees, color);
 	}
 }
 
@@ -637,8 +634,14 @@ int FreeTypeGX::getHeight(wchar_t const *text) {
  * @param color	Color to apply to the texture.
  */
 void FreeTypeGX::copyTextureToFramebuffer(GXTexObj *texObj, float texWidth, float texHeight, float screenX, float screenY, float scaleX, float scaleY, float offsetX, float offsetY, float degrees, unsigned int color) {
+	// Backup matrix
+	GRRLIB_matrix matrixObject = GRRLIB_GetMatrix();
 
-	GRRLIB_Transform(scaleX, scaleY, degrees, offsetX, offsetY);
+	GRRLIB_Translate(screenX, screenY);
+
+	GRRLIB_Scale(scaleX, scaleY);
+	GRRLIB_Translate(-offsetX, -offsetY);
+	GRRLIB_Rotate(degrees);
 
 	GX_LoadTexObj(texObj, GX_TEXMAP0);
 	GX_SetTevOp(GX_TEVSTAGE0, GX_MODULATE);
@@ -655,19 +658,19 @@ void FreeTypeGX::copyTextureToFramebuffer(GXTexObj *texObj, float texWidth, floa
     }
 
 	GX_Begin(GX_QUADS, GX_VTXFMT0, 4);
-		GX_Position3f32(screenX, screenY, 0.0);
+		GX_Position3f32(0.0, 0.0, 0.0);
 		GX_Color1u32(color);
 		GX_TexCoord2f32(0.0, 0.0);
 
-		GX_Position3f32(texWidth + screenX, screenY, 0.0);
+		GX_Position3f32(texWidth, 0.0, 0.0);
 		GX_Color1u32(color);
 		GX_TexCoord2f32(1.0, 0.0);
 
-		GX_Position3f32(texWidth + screenX, texHeight + screenY, 0);
+		GX_Position3f32(texWidth, texHeight, 0.0);
 		GX_Color1u32(color);
 		GX_TexCoord2f32(1, 1);
 
-		GX_Position3f32(screenX, texHeight + screenY, 0);
+		GX_Position3f32(0.0, texHeight, 0.0);
 		GX_Color1u32(color);
 		GX_TexCoord2f32(0, 1);
 	GX_End();
@@ -675,8 +678,8 @@ void FreeTypeGX::copyTextureToFramebuffer(GXTexObj *texObj, float texWidth, floa
 	GX_SetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
     GX_SetVtxDesc(GX_VA_TEX0, GX_NONE);
 
-	// Undo transformations
-	GRRLIB_Transform(1.0 / scaleX, 1.0 / scaleY, -degrees, offsetX, offsetY);
+	// Restore matrix
+	GRRLIB_SetMatrix(&matrixObject);
 }
 
 /**
@@ -691,29 +694,32 @@ void FreeTypeGX::copyTextureToFramebuffer(GXTexObj *texObj, float texWidth, floa
  * @param color	Color to apply to the texture.
  */
 void FreeTypeGX::copyFeatureToFramebuffer(float featureWidth, float featureHeight, float screenX, float screenY, float scaleX, float scaleY, float offsetX, float offsetY, float degrees, unsigned int color) {
+	// Backup matrix
+	GRRLIB_matrix matrixObject = GRRLIB_GetMatrix();
 
+	GRRLIB_Translate(screenX, screenY);
 	GRRLIB_Transform(scaleX, scaleY, degrees, offsetX, offsetY);
 
 	GX_SetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
 	GX_SetVtxDesc(GX_VA_TEX0, GX_NONE);
 
 	GX_Begin(GX_QUADS, GX_VTXFMT0, 4);
-		GX_Position3f32(screenX, screenY, 0.0);
+		GX_Position3f32(0.0, 0.0, 0.0);
 		GX_Color1u32(color);
 
- 		GX_Position3f32(featureWidth + screenX, screenY, 0.0);
+ 		GX_Position3f32(featureWidth, 0.0, 0.0);
 		GX_Color1u32(color);
 
-		GX_Position3f32(featureWidth + screenX, featureHeight + screenY, 0.0);
+		GX_Position3f32(featureWidth, featureHeight, 0.0);
 		GX_Color1u32(color);
 
-		GX_Position3f32(screenX, featureHeight + screenY, 0.0);
+		GX_Position3f32(0.0, featureHeight, 0.0);
 		GX_Color1u32(color);
 	GX_End();
 
 	GX_SetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
     GX_SetVtxDesc(GX_VA_TEX0, GX_NONE);
 
-	// Undo transformations
-	GRRLIB_Transform(1.0 / scaleX, 1.0 / scaleY, -degrees, offsetX, offsetY);
+	// Revert matrix
+	GRRLIB_SetMatrix(&matrixObject);
 }

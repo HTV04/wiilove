@@ -35,8 +35,6 @@ std::string getConsole();
 std::string getLanguage();
 std::string getNickname();
 
-void scanPads();
-
 } // module
 } // system
 } // love

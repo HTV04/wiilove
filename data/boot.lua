@@ -49,41 +49,38 @@ package.cpath = "" -- Disable C modules
 -- Standard callback handlers
 love.handlers = setmetatable({
 	-- WIP: These handlers may change in the future
-	gamepadpressed = function(j,b)
+	gamepadpressed = function(j,b) -- Unused for now
 		if love.gamepadpressed then return love.gamepadpressed(j,b) end
 	end,
-	gamepadreleased = function(j,b)
+	gamepadreleased = function(j,b) -- Unused for now
 		if love.gamepadreleased then return love.gamepadreleased(j,b) end
 	end,
-	gamepadaxis = function(j,a,v)
+	gamepadaxis = function(j,a,v) -- Unused for now
 		if love.gamepadaxis then return love.gamepadaxis(j,a,v) end
 	end,
-	wiimoteadded = function(w)
-		if love.wiimoteadded then return love.wiimoteadded(w) end
+	wiimoteconnected = function(w)
+		if love.wiimoteconnected then return love.wiimoteconnected(w) end
 	end,
-	wiimoteremoved = function(w)
-		if love.wiimoteremoved then return love.wiimoteremoved(w) end
+	wiimotedisconnected = function(w)
+		if love.wiimotedisconnected then return love.wiimotedisconnected(w) end
 	end,
-	joystickadded = function(j)
+	joystickadded = function(j) -- Unused for now
 		if love.joystickadded then return love.joystickadded(j) end
 	end,
-	joystickremoved = function(j)
+	joystickremoved = function(j) -- Unused for now
 		if love.joystickremoved then return love.joystickremoved(j) end
 	end,
-	keypressed = function(b,s,r)
+	keypressed = function(b,s,r) -- Unused for now
 		if love.keypressed then return love.keypressed(b,s,r) end
 	end,
-	keyreleased = function(b,s)
+	keyreleased = function(b,s) -- Unused for now
 		if love.keyreleased then return love.keyreleased(b,s) end
 	end,
-	textinput = function(t)
+	textinput = function(t) -- Unused for now
 		if love.textinput then return love.textinput(t) end
 	end,
-	textedited = function(t,s,l)
+	textedited = function(t,s,l) -- Unused for now
 		if love.textedited then return love.textedited(t,s,l) end
-	end,
-	homepressed = function(w)
-		if love.homepressed then return love.homepressed(w) end
 	end,
 }, {
 	__index = function(self, name)
@@ -93,6 +90,8 @@ love.handlers = setmetatable({
 
 function love.run()
 	local dt = 0
+
+	if love.load then love.load() end
 
 	-- We don't want the first frame's dt to include time taken by love.load
 	if love.timer then love.timer.step() end
@@ -108,9 +107,9 @@ function love.run()
 					if not love.homepressed or not love.homepressed(a) then
 						return 0
 					end
+				else
+					love.handlers[name](a,b,c,d,e,f)
 				end
-
-				love.handlers[name](a,b,c,d,e,f)
 			end
 		end
 
@@ -132,7 +131,7 @@ end
 
 function love.errhand(err)
 	local msg = "Error\n\n" ..
-	            err ..
+	            tostring(err) ..
 				"\n\n\n" ..
 				string.gsub(string.gsub(debug.traceback(), "\t", ""), "stack traceback:", "Traceback\n") ..
 				"\n\n\nPress HOME to return to loader\n"
@@ -145,7 +144,7 @@ function love.errhand(err)
 
 	-- Stop all Wiimote vibrations
 	for _, wiimote in ipairs(love.wiimote.getWiimotes()) do
-		wiimote:setVibration()
+		wiimote:setRumble(false)
 	end
 
 	--love.audio.stop()

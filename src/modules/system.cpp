@@ -31,40 +31,40 @@
 
 // Local variables
 namespace {
-    std::map<int, std::string> languageMap = {
-        {CONF_LANG_JAPANESE, "Japanese"},
-        {CONF_LANG_ENGLISH, "English"},
-        {CONF_LANG_GERMAN, "German"},
-        {CONF_LANG_FRENCH, "French"},
-        {CONF_LANG_SPANISH, "Spanish"},
-        {CONF_LANG_ITALIAN, "Italian"},
-        {CONF_LANG_DUTCH, "Dutch"},
-        {CONF_LANG_SIMP_CHINESE, "Simplified Chinese"},
-        {CONF_LANG_TRAD_CHINESE, "Traditional Chinese"},
-        {CONF_LANG_KOREAN, "Korean"}
-    };
+	std::map<int, std::string> languageMap = {
+		{CONF_LANG_JAPANESE, "Japanese"},
+		{CONF_LANG_ENGLISH, "English"},
+		{CONF_LANG_GERMAN, "German"},
+		{CONF_LANG_FRENCH, "French"},
+		{CONF_LANG_SPANISH, "Spanish"},
+		{CONF_LANG_ITALIAN, "Italian"},
+		{CONF_LANG_DUTCH, "Dutch"},
+		{CONF_LANG_SIMP_CHINESE, "Simplified Chinese"},
+		{CONF_LANG_TRAD_CHINESE, "Traditional Chinese"},
+		{CONF_LANG_KOREAN, "Korean"}
+	};
 
-    std::string language;
-    std::string nickname;
+	std::string language;
+	std::string nickname;
 }
 
 namespace love {
 namespace system {
 
 void init() {
-    int languageInt = CONF_GetLanguage();
-    uint8_t nicknameInt[22];
+	int languageInt = CONF_GetLanguage();
+	uint8_t nicknameInt[22];
 
-    // Cache language
-    if (languageMap.count(languageInt) > 0) {
-        language = languageMap[languageInt];
-    } else {
-        language = "Unknown";
-    }
+	// Cache language
+	if (languageMap.count(languageInt) > 0) {
+		language = languageMap[languageInt];
+	} else {
+		language = "Unknown";
+	}
 
-    // Cache nickname
-    CONF_GetNickName(nicknameInt);
-    nickname = std::string((char*) nicknameInt);
+	// Cache nickname
+	CONF_GetNickName(nicknameInt);
+	nickname = std::string(nicknameInt, nicknameInt + 22);
 }
 
 namespace module {
@@ -73,11 +73,6 @@ namespace module {
 std::string getConsole() { return "Wii"; } // Only Wii is supported... for now ;)
 std::string getLanguage() { return language; }
 std::string getNickname() { return nickname; }
-
-// TEMP: Will improve this later
-void scanPads() {
-    WPAD_ScanPads();
-};
 
 } // module
 } // system
