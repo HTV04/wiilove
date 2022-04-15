@@ -29,6 +29,8 @@ void init();
 namespace module {
 
 double getDelta();
+double getFPS();
+double getTime();
 
 void sleep(int ms);
 double step();

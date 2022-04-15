@@ -29,29 +29,52 @@
 
 // Local variables
 namespace {
-	std::uint64_t deltaTimeStart;
+	std::uint64_t lastTime;
 	double deltaTime = 0.0;
+
+	std::uint64_t lastFrameTime;
+	double fps = 0.0;
+	double frames = 0.0;
 }
 
 namespace love {
 namespace timer {
 
 void init() {
-	deltaTimeStart = gettime();
+	lastTime = gettime();
+
+	lastFrameTime = lastTime;
 }
 
 namespace module {
 
 // Querying functions
 double getDelta() { return deltaTime; }
+double getFPS() { return fps; }
+double getTime() { return ticks_to_millisecs(gettime()); }
 
 // Actions
 void sleep(int ms) {
 	usleep(ms);
 }
-double step() { // Update deltaTime
-	deltaTime = (double) (gettime() - deltaTimeStart) / (double) (TB_TIMER_CLOCK * 1000); // Division is to convert from ticks to seconds
-	deltaTimeStart = gettime();
+double step() { // Update timer
+	std::uint64_t curTime = gettime();
+
+	double sinceFrameTime = static_cast<double>(curTime - lastFrameTime) / static_cast<double>(TB_TIMER_CLOCK * 1000);
+
+	// Update delta time
+	deltaTime = static_cast<double>(curTime - lastTime) / static_cast<double>(TB_TIMER_CLOCK * 1000);
+
+	// Update FPS
+	frames++;
+	if(sinceFrameTime >= 1.0) {
+		fps = frames / sinceFrameTime;
+
+		frames = 0.0;
+		lastFrameTime = curTime;
+	}
+
+	lastTime = curTime;
 
 	return deltaTime;
 }

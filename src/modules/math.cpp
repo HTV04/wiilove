@@ -25,7 +25,7 @@
 #include <random>
 
 // Header
-#include "timer.hpp"
+#include "math.hpp"
 
 namespace {
     std::default_random_engine generator(gettime());

@@ -151,6 +151,10 @@ int main(int argc, char **argv) {
 		),
 
 		"timer", lua.create_table_with(
+			"getDelta", love::timer::module::getDelta,
+			"getFPS", love::timer::module::getFPS,
+			"getTime", love::timer::module::getTime,
+
 			"step", love::timer::module::step,
 
 			"sleep", love::timer::module::sleep
