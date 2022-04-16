@@ -45,7 +45,7 @@ int main(int argc, char **argv) {
 	// Init GRRLIB
 	GRRLIB_Init();
 
-	// Init WPAD module
+	// Init WPAD
 	WPAD_Init();
 	WPAD_SetVRes(0, 640, 480);
 	WPAD_SetDataFormat(WPAD_CHAN_ALL, WPAD_FMT_BTNS_ACC_IR);
@@ -63,7 +63,8 @@ int main(int argc, char **argv) {
 		sol::lib::debug
 	);
 
-	// Init modules if necessary (and in order of dependency)
+	// Init modules if necessary
+	love::event::init();
 	love::filesystem::init(argc); // A lot of things depend on this
 	love::graphics::init();
 	love::system::init();

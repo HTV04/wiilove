@@ -27,6 +27,9 @@
 
 namespace love {
 namespace event {
+
+void init();
+
 namespace module {
 
 void pump(sol::this_state s);

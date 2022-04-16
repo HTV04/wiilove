@@ -42,14 +42,17 @@ void init(int argc) {
 	if (argc > 0) { // argv[0] is the executable path
 		filesystemPath = executablePath.substr(0, executablePath.find_last_of("/"));
 	} else {
-		// This case is interesting, since this means that the executable is not loaded with any arguments.
-		// * We're likely running on Dolphin (directly), because the Homebrew Channel would at least pass the executable path. Potentially same issue with Wii VC injects?
+		// This case is interesting, since this means that the executable is not loaded
+		// with any arguments.
+		// * We're likely running on Dolphin (directly), because the Homebrew Channel would
+		//   at least pass the executable path. Potentially same issue with Wii VC injects?
 		// * We'll default to sd:/love as the filesystem path.
 
 		filesystemPath = "sd:/love";
 	}
 
-	// Create filesystem directory if it doesn't exist (but it should already) and enter it
+	// Create filesystem directory if it doesn't exist (but it should already) and
+	// enter it
 	if (!std::filesystem::exists(filesystemPath)) {
 		std::filesystem::create_directory(filesystemPath);
 	}
