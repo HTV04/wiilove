@@ -28,18 +28,16 @@
 // Header
 #include "filesystem.hpp"
 
-// Local variables
-namespace {
-    std::string filesystemPath;
-}
-
 namespace love {
 namespace filesystem {
 
-void init(int argc) {
+void init(int argc, char **argv) {
 	std::string executablePath;
+	std::string filesystemPath;
 
-	if (argc > 0) { // argv[0] is the executable path
+	if (argc > 0) {
+		executablePath = argv[0];
+
 		filesystemPath = executablePath.substr(0, executablePath.find_last_of("/"));
 	} else {
 		// This case is interesting, since this means that the executable is not loaded

@@ -28,7 +28,7 @@
 namespace love {
 namespace filesystem {
 
-void init(int argc);
+void init(int argc, char **argv);
 
 std::string getFilePath(std::string filename);
 

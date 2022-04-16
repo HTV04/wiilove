@@ -64,8 +64,9 @@ int main(int argc, char **argv) {
 	);
 
 	// Init modules if necessary
+	love::filesystem::init(argc, argv); // A lot of things depend on this
+
 	love::event::init();
-	love::filesystem::init(argc); // A lot of things depend on this
 	love::graphics::init();
 	love::system::init();
 	love::timer::init();
