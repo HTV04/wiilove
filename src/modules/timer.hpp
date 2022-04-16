@@ -28,6 +28,7 @@ void init();
 
 namespace module {
 
+double getAverageDelta();
 double getDelta();
 double getFPS();
 double getTime();

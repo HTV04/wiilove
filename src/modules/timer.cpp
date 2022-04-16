@@ -34,6 +34,7 @@ namespace {
 
 	std::uint64_t lastFrameTime;
 	double fps = 0.0;
+	double avgDelta = 0.0;
 	double frames = 0.0;
 }
 
@@ -49,14 +50,13 @@ void init() {
 namespace module {
 
 // Querying functions
+double getAverageDelta() { return avgDelta; }
 double getDelta() { return deltaTime; }
 double getFPS() { return fps; }
 double getTime() { return ticks_to_millisecs(gettime()); }
 
 // Actions
-void sleep(int ms) {
-	usleep(ms);
-}
+void sleep(int ms) { usleep(ms); }
 double step() { // Update timer
 	std::uint64_t curTime = gettime();
 
@@ -65,10 +65,11 @@ double step() { // Update timer
 	// Update delta time
 	deltaTime = static_cast<double>(curTime - lastTime) / static_cast<double>(TB_TIMER_CLOCK * 1000);
 
-	// Update FPS
+	// Update FPS and average delta
 	frames++;
 	if(sinceFrameTime >= 1.0) {
-		fps = frames / sinceFrameTime;
+		fps = frames;
+		avgDelta = sinceFrameTime / frames;
 
 		frames = 0.0;
 		lastFrameTime = curTime;
