@@ -57,7 +57,7 @@ LDFLAGS	=	-g $(MACHDEP) -Wl,-Map,$(notdir $@).map
 # any extra libraries we wish to link with the project
 # the order can-be/is critical
 #---------------------------------------------------------------------------------
-LIBS	:= -lgrrlib `freetype-config --libs` -lpngu -lpng -ljpeg -lz -lfat
+LIBS	:= -lgrrlib-mod `freetype-config --libs` -lpngu -lpng -ljpeg -lz -lfat
 LIBS	+= -llua
 LIBS	+= -lwiiuse
 #LIBS	+= -lmodplay -laesnd
@@ -125,12 +125,13 @@ export LIBPATHS	:= -L$(LIBOGC_LIB) $(foreach dir,$(LIBDIRS),-L$(dir)/lib)
 #---------------------------------------------------------------------------------
 $(BUILD):
 	@[ -d $@ ] || mkdir -p $@
+	@mkdir -p bin
 	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
 
 #---------------------------------------------------------------------------------
 clean:
 	@echo clean ...
-	@rm -fr $(BUILD) $(OUTPUT).elf $(OUTPUT).dol
+	@rm -fr $(BUILD) bin dist
 
 #---------------------------------------------------------------------------------
 release: $(BUILD)

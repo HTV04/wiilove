@@ -23,7 +23,7 @@
 #include "../lib/sol.hpp"
 #include <vector>
 #include <tuple>
-#include <grrlib.h>
+#include <grrlib-mod.h>
 #include <cstdlib>
 
 // Classes

@@ -21,7 +21,7 @@
 
 // Libraries
 #include "../../lib/sol.hpp" // Prevents macro conflicts
-#include <grrlib.h>
+#include <grrlib-mod.h>
 
 // Modules
 #include "../../modules/filesystem.hpp"

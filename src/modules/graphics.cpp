@@ -20,7 +20,7 @@
  */
 
 // Libraries
-#include <grrlib.h>
+#include <grrlib-mod.h>
 #include "../lib/FreeTypeGX/FreeTypeGX.h"
 #include <ogc/gx.h>
 #include <ogc/conf.h>

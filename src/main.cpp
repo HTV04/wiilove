@@ -19,7 +19,7 @@
 
 // Libraries
 #include "lib/sol.hpp"
-#include <grrlib.h>
+#include <grrlib-mod.h>
 #include <wiiuse/wpad.h>
 #include <string>
 

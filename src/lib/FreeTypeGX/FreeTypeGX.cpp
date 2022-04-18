@@ -21,7 +21,7 @@
  * along with FreeTypeGX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <grrlib.h>
+#include <grrlib-mod.h>
 #include "FreeTypeGX.h"
 
 /**

@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include <grrlib.h>
+#include <grrlib-mod.h>
 
 namespace love {
 namespace graphics {
