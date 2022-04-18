@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<app version="1">
+	<name>SuperGame</name>
+	<version>1.0.0</version>
+	<coder>SuperDeveloper</coder>
+	<short_description>Your short description here!</short_description>
+	<long_description>Your long description here!</long_description>
+</app>

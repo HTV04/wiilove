@@ -76,7 +76,7 @@ LIBDIRS	:= $(PORTLIBS)
 ifneq ($(BUILD),$(notdir $(CURDIR)))
 #---------------------------------------------------------------------------------
 
-export OUTPUT	:=	$(CURDIR)/$(TARGET)
+export OUTPUT	:=	$(CURDIR)/bin/$(TARGET)
 
 export VPATH	:=	$(foreach dir,$(SOURCES),$(CURDIR)/$(dir)) \
 					$(foreach dir,$(DATA),$(CURDIR)/$(dir))
@@ -120,7 +120,6 @@ export INCLUDE	:=	$(foreach dir,$(INCLUDES), -iquote $(CURDIR)/$(dir)) \
 #---------------------------------------------------------------------------------
 export LIBPATHS	:= -L$(LIBOGC_LIB) $(foreach dir,$(LIBDIRS),-L$(dir)/lib)
 
-export OUTPUT	:=	$(CURDIR)/$(TARGET)
 .PHONY: $(BUILD) clean
 
 #---------------------------------------------------------------------------------
@@ -134,8 +133,19 @@ clean:
 	@rm -fr $(BUILD) $(OUTPUT).elf $(OUTPUT).dol
 
 #---------------------------------------------------------------------------------
-run:
-	wiiload $(TARGET).dol
+release: $(BUILD)
+	@rm -rf dist
+	@mkdir -p dist/sd/apps/supergame
+	@mkdir -p dist/dolphin/sd/love/data
+
+	@cp $(OUTPUT).dol dist/sd/apps/supergame/boot.dol
+	@cp -r game/* dist/sd/apps/supergame
+
+	@cp $(OUTPUT).dol dist/dolphin
+	@cp -r game/data/* dist/dolphin/sd/love/data
+
+	@cd dist/sd; zip -r -9 ../wiilove.zip .
+	@cd dist/dolphin; zip -r -9 ../wiilove-dolphin.zip .
 
 
 #---------------------------------------------------------------------------------
