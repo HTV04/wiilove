@@ -288,7 +288,7 @@ ftgxCharData *FreeTypeGX::cacheGlyphData(wchar_t charCode) {
 	int textureWidth = 0, textureHeight = 0;
 
 	gIndex = FT_Get_Char_Index( this->ftFace, charCode );
-	if (!FT_Load_Glyph(this->ftFace, gIndex, FT_LOAD_DEFAULT | FT_LOAD_RENDER)) {
+	if (!FT_Load_Glyph(this->ftFace, gIndex, FT_LOAD_DEFAULT | FT_LOAD_FORCE_AUTOHINT | FT_LOAD_RENDER)) {
 
 		if(this->ftFace->glyph->format == FT_GLYPH_FORMAT_BITMAP) {
 			FT_Bitmap *glyphBitmap = &(this->ftFace->glyph->bitmap);
