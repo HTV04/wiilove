@@ -40,12 +40,12 @@ int getHeight();
 int getWidth();
 bool isWidescreen();
 
-void clear(int r, int g, int b);
-std::tuple<int, int, int, int> getColor();
-std::tuple<int, int, int> getBackgroundColor();
-void setBackgroundColor(int r, int g, int b);
-void setColor(int r, int g, int b, int a);
-void setColor1(int r, int g, int b);
+void clear(unsigned char r, unsigned char g, unsigned char b);
+std::tuple<unsigned char, unsigned char, unsigned char, unsigned char> getColor();
+std::tuple<unsigned char, unsigned char, unsigned char> getBackgroundColor();
+void setBackgroundColor(unsigned char r, unsigned char g, unsigned char b);
+void setColor(unsigned char r, unsigned char g, unsigned char b, unsigned char a);
+void setColor1(unsigned char r, unsigned char g, unsigned char b);
 
 void origin();
 void pop();
@@ -70,8 +70,14 @@ void draw2(love::graphics::Texture &image, float x, float y, float r);
 void draw3(love::graphics::Texture &image, float x, float y);
 
 bool getAntiAliasing();
+unsigned char getDeflicker();
+unsigned char getLineWidth();
+unsigned char getPointSize();
 void reset();
 void setAntiAliasing(bool enable);
+void setDeflicker(bool enable);
+void setLineWidth(unsigned char width);
+void setPointSize(unsigned char size);
 
 void present();
 

@@ -458,11 +458,10 @@ ftgxCharData* FreeTypeGX::getCharacter(wchar_t character) {
  * @param x	Screen X coordinate at which to output the text.
  * @param y Screen Y coordinate at which to output the text. Note that this value corresponds to the text string origin and not the top or bottom of the glyphs.
  * @param text	NULL terminated string to output.
- * @param color	Optional color to apply to the text characters. If not specified default value is ftgxWhite: 0xffffffff
  * @param textStyle	Flags which specify any styling which should be applied to the rendered string.
  * @return The number of characters printed.
  */
-int FreeTypeGX::drawText(float x, float y, wchar_t *text, float scaleX, float scaleY, float offsetX, float offsetY, float degrees, unsigned int color, int textStyle) {
+int FreeTypeGX::drawText(float x, float y, wchar_t *text, float scaleX, float scaleY, float offsetX, float offsetY, float degrees, int textStyle) {
 	float x_pos = x, printed = 0;
 	float x_offset = 0, y_offset = 0;
 	GXTexObj glyphTexture;
@@ -497,7 +496,7 @@ int FreeTypeGX::drawText(float x, float y, wchar_t *text, float scaleX, float sc
 			}
 
 			GX_InitTexObj(&glyphTexture, glyphData->glyphDataTexture, glyphData->textureWidth, glyphData->textureHeight, this->textureFormat, GX_CLAMP, GX_CLAMP, GX_FALSE);
-			this->copyTextureToFramebuffer(&glyphTexture, glyphData->textureWidth, glyphData->textureHeight, x_pos - x_offset, y - glyphData->renderOffsetY - y_offset, scaleX, scaleY, offsetX, offsetY, degrees, color);
+			this->copyTextureToFramebuffer(&glyphTexture, glyphData->textureWidth, glyphData->textureHeight, x_pos - x_offset, y - glyphData->renderOffsetY - y_offset, scaleX, scaleY, offsetX, offsetY, degrees);
 
 			x_pos += static_cast<float>(glyphData->glyphAdvanceX) * scaleX;
 			printed++;
@@ -507,7 +506,7 @@ int FreeTypeGX::drawText(float x, float y, wchar_t *text, float scaleX, float sc
 	}
 
 	if(textStyle & FTGX_STYLE_MASK) {
-		this->drawTextFeature(x - x_offset, y - y_offset, textWidth > 0 ? textWidth : textWidth = this->getWidth(text), textStyle, scaleX, scaleY, offsetX, offsetY, degrees, color);
+		this->drawTextFeature(x - x_offset, y - y_offset, textWidth > 0 ? textWidth : textWidth = this->getWidth(text), textStyle, scaleX, scaleY, offsetX, offsetY, degrees);
 	}
 
 	return printed;
@@ -516,8 +515,8 @@ int FreeTypeGX::drawText(float x, float y, wchar_t *text, float scaleX, float sc
 /**
  * \overload
  */
-int FreeTypeGX::drawText(float x, float y, wchar_t const *text, float scaleX, float scaleY, float offsetX, float offsetY, float degrees, unsigned int color, int textStyle) {
-	return this->drawText(x, y, (wchar_t *)text, scaleX, scaleY, offsetX, offsetY, degrees, color, textStyle);
+int FreeTypeGX::drawText(float x, float y, wchar_t const *text, float scaleX, float scaleY, float offsetX, float offsetY, float degrees, int textStyle) {
+	return this->drawText(x, y, (wchar_t *)text, scaleX, scaleY, offsetX, offsetY, degrees, textStyle);
 }
 
 /**
@@ -529,17 +528,16 @@ int FreeTypeGX::drawText(float x, float y, wchar_t const *text, float scaleX, fl
  * @param y	Screen Y coordinate of the text baseline.
  * @param width	Pixel width of the text string.
  * @param textStyle	Flags which specify any styling which should be applied to the rendered string.
- * @param color	Color to be applied to the text feature.
  */
-void FreeTypeGX::drawTextFeature(float x, float y, int width, int textStyle, float scaleX, float scaleY, float offsetX, float offsetY, float degrees, unsigned int color) {
+void FreeTypeGX::drawTextFeature(float x, float y, int width, int textStyle, float scaleX, float scaleY, float offsetX, float offsetY, float degrees) {
 	int featureHeight = this->ftPointSize >> 4 > 0 ? this->ftPointSize >> 4 : 1;
 
 	if (textStyle & FTGX_STYLE_UNDERLINE ) {
-		this->copyFeatureToFramebuffer(width, featureHeight, x, y + 1, scaleX, scaleY, offsetX, offsetY, degrees, color);
+		this->copyFeatureToFramebuffer(width, featureHeight, x, y + 1, scaleX, scaleY, offsetX, offsetY, degrees);
 	}
 
 	if (textStyle & FTGX_STYLE_STRIKE ) {
-		this->copyFeatureToFramebuffer(width, featureHeight, x, y - static_cast<float>(this->ftAscender >> 2), scaleX, scaleY, offsetX, offsetY, degrees, color);
+		this->copyFeatureToFramebuffer(width, featureHeight, x, y - static_cast<float>(this->ftAscender >> 2), scaleX, scaleY, offsetX, offsetY, degrees);
 	}
 }
 
@@ -631,9 +629,10 @@ int FreeTypeGX::getHeight(wchar_t const *text) {
  * @param texHeight	The pixel height of the texture object.
  * @param screenX	The screen X coordinate at which to output the rendered texture.
  * @param screenY	The screen Y coordinate at which to output the rendered texture.
- * @param color	Color to apply to the texture.
  */
-void FreeTypeGX::copyTextureToFramebuffer(GXTexObj *texObj, float texWidth, float texHeight, float screenX, float screenY, float scaleX, float scaleY, float offsetX, float offsetY, float degrees, unsigned int color) {
+void FreeTypeGX::copyTextureToFramebuffer(GXTexObj *texObj, float texWidth, float texHeight, float screenX, float screenY, float scaleX, float scaleY, float offsetX, float offsetY, float degrees) {
+	unsigned int color = GRRLIB_Settings.color;
+
 	// Backup matrix
 	GRRLIB_matrix matrixObject = GRRLIB_GetMatrix();
 
@@ -648,13 +647,8 @@ void FreeTypeGX::copyTextureToFramebuffer(GXTexObj *texObj, float texWidth, floa
 	GX_SetVtxDesc(GX_VA_TEX0, GX_DIRECT);
 
 	// Follow GRRLIB anti-aliasing settings
-	if (GRRLIB_GetAntiAliasing() == false) {
-        GX_InitTexObjLOD(texObj, GX_NEAR, GX_NEAR,
-                         0.0, 0.0, 0.0, 0, 0, GX_ANISO_1);
-        GX_SetCopyFilter(GX_FALSE, rmode->sample_pattern, GX_FALSE, rmode->vfilter);
-    }
-    else {
-        GX_SetCopyFilter(rmode->aa, rmode->sample_pattern, GX_TRUE, rmode->vfilter);
+	if (GRRLIB_Settings.antialias == false) {
+        GX_InitTexObjLOD(texObj, GX_NEAR, GX_NEAR, 0.0, 0.0, 0.0, 0, 0, GX_ANISO_1);
     }
 
 	GX_Begin(GX_QUADS, GX_VTXFMT0, 4);
@@ -691,9 +685,10 @@ void FreeTypeGX::copyTextureToFramebuffer(GXTexObj *texObj, float texWidth, floa
  * @param featureHeight	The pixel height of the quad.
  * @param screenX	The screen X coordinate at which to output the quad.
  * @param screenY	The screen Y coordinate at which to output the quad.
- * @param color	Color to apply to the texture.
  */
-void FreeTypeGX::copyFeatureToFramebuffer(float featureWidth, float featureHeight, float screenX, float screenY, float scaleX, float scaleY, float offsetX, float offsetY, float degrees, unsigned int color) {
+void FreeTypeGX::copyFeatureToFramebuffer(float featureWidth, float featureHeight, float screenX, float screenY, float scaleX, float scaleY, float offsetX, float offsetY, float degrees) {
+	unsigned int color = GRRLIB_Settings.color;
+
 	// Backup matrix
 	GRRLIB_matrix matrixObject = GRRLIB_GetMatrix();
 

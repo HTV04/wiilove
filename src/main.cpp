@@ -132,8 +132,14 @@ int main(int argc, char **argv) {
 			),
 
 			"getAntiAliasing", love::graphics::module::getAntiAliasing,
+			"getDeflicker", love::graphics::module::getDeflicker,
+			"getLineWidth", love::graphics::module::getLineWidth,
+			"getPointSize", love::graphics::module::getPointSize,
 			"reset", love::graphics::module::reset,
 			"setAntiAliasing", love::graphics::module::setAntiAliasing,
+			"setDeflicker", love::graphics::module::setDeflicker,
+			"setLineWidth", love::graphics::module::setLineWidth,
+			"setPointSize", love::graphics::module::setPointSize,
 
 			"present", love::graphics::module::present
 		),

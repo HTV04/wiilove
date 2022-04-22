@@ -24,7 +24,6 @@
 #include <wiiuse/wpad.h>
 #include <string>
 #include <map>
-#include <cstdlib>
 
 // Header
 #include "system.hpp"
@@ -53,7 +52,7 @@ namespace system {
 
 void init() {
 	int languageInt = CONF_GetLanguage();
-	uint8_t nicknameInt[22];
+	unsigned char nicknameInt[22];
 
 	// Cache language
 	if (languageMap.count(languageInt) > 0) {

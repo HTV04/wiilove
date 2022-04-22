@@ -22,17 +22,16 @@
 // Libraries
 #include <ogc/lwp_watchdog.h>
 #include <sys/unistd.h>
-#include <cstdint>
 
 // Header
 #include "timer.hpp"
 
 // Local variables
 namespace {
-	std::uint64_t lastTime;
+	unsigned long long lastTime;
 	double deltaTime = 0.0;
 
-	std::uint64_t lastFrameTime;
+	unsigned long long lastFrameTime;
 	double fps = 0.0;
 	double avgDelta = 0.0;
 	double frames = 0.0;
@@ -58,7 +57,7 @@ double getTime() { return ticks_to_millisecs(gettime()); }
 // Actions
 void sleep(int ms) { usleep(ms); }
 double step() { // Update timer
-	std::uint64_t curTime = gettime();
+	unsigned long long curTime = gettime();
 
 	double sinceFrameTime = static_cast<double>(curTime - lastFrameTime) / static_cast<double>(TB_TIMER_CLOCK * 1000);
 

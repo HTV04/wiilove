@@ -23,7 +23,6 @@
 #include "../../lib/sol.hpp" // Prevents macro conflicts
 #include <grrlib-mod.h>
 #include "../../lib/FreeTypeGX/FreeTypeGX.h"
-#include <cstdlib>
 
 // Modules
 #include "../../modules/filesystem.hpp"
@@ -47,7 +46,7 @@ Font::Font(unsigned int size) { // Load Vera.ttf as default font
 }
 Font::Font() : Font(defaultSize) {} // Load Vera.ttf as default font (with default size)
 Font::Font(std::string filename, unsigned int size) { // Load TTF font
-	uint8_t *data;
+	unsigned char *data;
 	int dataSize;
 
 	fontSystem = new FreeTypeGX();

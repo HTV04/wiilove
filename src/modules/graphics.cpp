@@ -49,8 +49,7 @@ namespace {
 	// Transforms are stored for push/pop operations
 	std::vector<GRRLIB_matrix> transforms;
 
-	std::tuple<int, int, int> backgroundColor {0, 0, 0}; // Default color to black
-	unsigned int color = 0xffffffff; // Default color to white
+	std::tuple<unsigned char, unsigned char, unsigned char> backgroundColor {0, 0, 0}; // Default color to black
 
 	love::graphics::Font *curFont; // Initial font
 }
@@ -99,39 +98,41 @@ void translate(float dx, float dy) {
 }
 
 // Set and get drawing colors
-void clear(int r, int g, int b) {
-	GRRLIB_FillScreen(RGBA(r, g, b, 255));
+void clear(unsigned char r, unsigned char g, unsigned char b) {
+	GRRLIB_FillScreen(GRRLIB_RGBA(r, g, b, 255));
 }
-std::tuple<int, int, int> getBackgroundColor() {
+std::tuple<unsigned char, unsigned char, unsigned char> getBackgroundColor() {
 	return backgroundColor;
 }
-std::tuple<int, int, int, int> getColor() {
-	return std::make_tuple(R(color), G(color), B(color), A(color));
+std::tuple<unsigned char, unsigned char, unsigned char, unsigned char> getColor() {
+	unsigned long int color = GRRLIB_Settings.color;
+
+	return std::make_tuple(GRRLIB_R(color), GRRLIB_G(color), GRRLIB_B(color), GRRLIB_A(color));
 }
-void setBackgroundColor(int r, int g, int b) {
+void setBackgroundColor(unsigned char r, unsigned char g, unsigned char b) {
 	backgroundColor = std::make_tuple(r, g, b); // Since only used for values, optimize by storing as tuple
 }
-void setColor(int r, int g, int b, int a) {
-	color = RGBA(r, g, b, a);
+void setColor(unsigned char r, unsigned char g, unsigned char b, unsigned char a) {
+	GRRLIB_Settings.color = GRRLIB_RGBA(r, g, b, a);
 }
-void setColor1(int r, int g, int b) {
+void setColor1(unsigned char r, unsigned char g, unsigned char b) {
 	setColor(r, g, b, 255);
 }
 
 // Basic drawing functions
 void circle(bool fill, float x, float y, float radius) {
-	GRRLIB_Circle(x, y, radius, color, fill);
+	GRRLIB_Circle(x, y, radius, fill);
 }
 void line(float x1, float y1, float x2, float y2) {
-	GRRLIB_Line(x1, y1, x2, y2, color);
+	GRRLIB_Line(x1, y1, x2, y2);
 }
 void rectangle(bool fill, float x, float y, float width, float height) {
-	GRRLIB_Rectangle(x, y, width, height, color, fill);
+	GRRLIB_Rectangle(x, y, width, height, fill);
 }
 
 // Font functions
 void print(std::wstring str, float x, float y, float r, float sx, float sy, float ox, float oy) {
-	curFont->fontSystem->drawText(x, y, str.c_str(), sx, sy, ox, oy, r, color);
+	curFont->fontSystem->drawText(x, y, str.c_str(), sx, sy, ox, oy, r);
 }
 void print1(std::wstring str, float x, float y, float r, float sx, float sy) {
 	print(str, x, y, r, sx, sy, 0.0, 0.0);
@@ -148,7 +149,7 @@ void setFont(love::graphics::Font *font) {
 
 // Texture functions
 void draw(love::graphics::Texture &image, float x, float y, float r, float sx, float sy, float ox, float oy) {
-	GRRLIB_DrawImg(x, y, image.texImg, r, sx, sy, ox, oy, color);
+	GRRLIB_DrawImg(x, y, image.texImg, r, sx, sy, ox, oy);
 }
 void draw1(love::graphics::Texture &image, float x, float y, float r, float sx, float sy) {
 	draw(image, x, y, r, sx, sy, 0.0, 0.0);
@@ -162,18 +163,39 @@ void draw3(love::graphics::Texture &image, float x, float y) {
 
 // Graphics state functions
 bool getAntiAliasing() {
-	return GRRLIB_GetAntiAliasing();
+	return GRRLIB_Settings.antialias;
+}
+unsigned char getDeflicker() {
+	return GRRLIB_Settings.deflicker;
+}
+unsigned char getLineWidth() {
+	return GRRLIB_Settings.lineWidth;
+}
+unsigned char getPointSize() {
+	return GRRLIB_Settings.pointSize;
 }
 void reset() {
-	color = 0xffffffff;
+	GRRLIB_Settings.color = 0xFFFFFFFF;
 	backgroundColor = std::make_tuple(0, 0, 0);
 
 	origin();
 
-	GRRLIB_SetAntiAliasing(true);
+	GRRLIB_Settings.antialias = true;
+	GRRLIB_SetDeflicker(false);
+	GRRLIB_SetLineWidth(1);
+	GRRLIB_SetPointSize(1);
 }
 void setAntiAliasing(bool enable) {
-	GRRLIB_SetAntiAliasing(enable);
+	GRRLIB_Settings.antialias = enable;
+}
+void setDeflicker(bool enable) {
+	GRRLIB_SetDeflicker(enable);
+}
+void setLineWidth(unsigned char width) {
+	GRRLIB_SetLineWidth(width);
+}
+void setPointSize(unsigned char size) {
+	GRRLIB_SetPointSize(size);
 }
 
 // Rendering functions
