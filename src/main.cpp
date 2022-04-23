@@ -60,7 +60,9 @@ int main(int argc, char **argv) {
 		sol::lib::os,
 		sol::lib::math,
 		sol::lib::table,
-		sol::lib::debug
+		sol::lib::debug,
+		sol::lib::bit32,
+		sol::lib::io
 	);
 
 	// Init modules if necessary

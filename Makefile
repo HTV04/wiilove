@@ -48,7 +48,7 @@ INCLUDES	:=
 #---------------------------------------------------------------------------------
 
 CFLAGS	=	-g -O2 -Wall $(MACHDEP) $(INCLUDE) `freetype-config --cflags` \
-			-DSOL_ALL_SAFETIES_ON=1 -DSOL_USING_CXX_LUA=1
+			-DSOL_ALL_SAFETIES_ON=1
 CXXFLAGS	=	$(CFLAGS)
 
 LDFLAGS	=	-g $(MACHDEP) -Wl,-Map,$(notdir $@).map
@@ -58,7 +58,7 @@ LDFLAGS	=	-g $(MACHDEP) -Wl,-Map,$(notdir $@).map
 # the order can-be/is critical
 #---------------------------------------------------------------------------------
 LIBS	:= -lgrrlib-mod `freetype-config --libs` -lpngu -lpng -ljpeg -lz -lfat
-LIBS	+= -llua
+LIBS	+= -lluajit
 LIBS	+= -lwiiuse
 #LIBS	+= -lmodplay -laesnd
 LIBS	+= -lbte -logc -lm
