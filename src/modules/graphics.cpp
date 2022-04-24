@@ -49,7 +49,7 @@ namespace {
 	// Transforms are stored for push/pop operations
 	std::vector<GRRLIB_matrix> transforms;
 
-	std::tuple<unsigned char, unsigned char, unsigned char> backgroundColor {0, 0, 0}; // Default color to black
+	std::tuple<unsigned char, unsigned char, unsigned char> backgroundColor;
 
 	love::graphics::Font *curFont; // Initial font
 }
@@ -61,6 +61,8 @@ void init() {
     widescreen = CONF_GetAspectRatio() == CONF_ASPECT_16_9;
 
 	curFont = new love::graphics::Font();
+
+	module::reset(); // Set defaults
 }
 
 namespace module {
@@ -181,7 +183,7 @@ void reset() {
 	origin();
 
 	GRRLIB_Settings.antialias = true;
-	GRRLIB_SetDeflicker(false);
+	GRRLIB_SetDeflicker(true);
 	GRRLIB_SetLineWidth(1);
 	GRRLIB_SetPointSize(1);
 }
