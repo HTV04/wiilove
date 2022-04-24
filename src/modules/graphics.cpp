@@ -182,10 +182,10 @@ void reset() {
 
 	origin();
 
-	GRRLIB_Settings.antialias = true;
+	GRRLIB_SetAntiAliasing(true);
 	GRRLIB_SetDeflicker(true);
-	GRRLIB_SetLineWidth(1);
-	GRRLIB_SetPointSize(1);
+	GRRLIB_SetLineWidth(6);
+	GRRLIB_SetPointSize(6);
 }
 void setAntiAliasing(bool enable) {
 	GRRLIB_Settings.antialias = enable;
