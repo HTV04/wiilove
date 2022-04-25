@@ -20,7 +20,7 @@ License along with this program.  If not, see
 <https://www.gnu.org/licenses/>.
 ------------------------------------------------------------------------------]]
 
-local function nop() end
+local love = love
 
 local result
 
@@ -34,12 +34,17 @@ _Texture = nil
 _Wiimote = nil
 
 -- API Expansion
-function love.graphics.setNewFont(...)
-	local font = love.graphics.newFont(unpack({...}))
+do
+	local newFont = love.graphics.newFont
+	local setFont = love.graphics.setFont
 
-	love.graphics.setFont(font)
+	function love.graphics.setNewFont(...)
+		local font = love.graphics.newFont(unpack({...}))
 
-	return font
+		love.graphics.setFont(font)
+
+		return font
+	end
 end
 
 -- Redirect package paths
