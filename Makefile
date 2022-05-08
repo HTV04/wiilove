@@ -57,7 +57,7 @@ LDFLAGS	=	-g $(MACHDEP) -Wl,-Map,$(notdir $@).map
 # any extra libraries we wish to link with the project
 # the order can-be/is critical
 #---------------------------------------------------------------------------------
-LIBS	:= -lgrrlib-mod `freetype-config --libs` -lpngu -lpng -ljpeg -lz -lfat
+LIBS	:= -lgrrlib-mod `freetype-config --libs` -lpngu-mod -lpng -ljpeg -lz -lfat
 LIBS	+= -lluajit
 LIBS	+= -lwiiuse
 #LIBS	+= -lmodplay -laesnd
