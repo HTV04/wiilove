@@ -39,9 +39,9 @@ do
 	local setFont = love.graphics.setFont
 
 	function love.graphics.setNewFont(...)
-		local font = love.graphics.newFont(unpack({...}))
+		local font = newFont(unpack({...}))
 
-		love.graphics.setFont(font)
+		setFont(font)
 
 		return font
 	end
@@ -126,7 +126,7 @@ function love.run()
 
 		-- Draw
 		love.graphics.origin()
-		love.graphics.clear(love.graphics.getBackgroundColor())
+		love.graphics.clear()
 
 		if love.draw then love.draw() end
 

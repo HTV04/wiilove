@@ -49,7 +49,7 @@ namespace {
 	// Transforms are stored for push/pop operations
 	std::vector<GRRLIB_matrix> transforms;
 
-	std::tuple<unsigned char, unsigned char, unsigned char> backgroundColor;
+	unsigned int backgroundColor;
 
 	love::graphics::Font *curFont; // Initial font
 }
@@ -75,8 +75,6 @@ bool isWidescreen() { return widescreen; }
 
 // Transformation functions
 void origin() {
-	if (transforms.empty()) { return; } // No transforms performed
-
 	GRRLIB_Origin();
 }
 void pop() {
@@ -100,19 +98,26 @@ void translate(float dx, float dy) {
 }
 
 // Set and get drawing colors
-void clear(unsigned char r, unsigned char g, unsigned char b) {
-	GRRLIB_FillScreen(GRRLIB_RGBA(r, g, b, 255));
+void clear(unsigned char r, unsigned char g, unsigned char b, unsigned char a) {
+	GRRLIB_FillScreen(GRRLIB_RGBA(r, g, b, a));
 }
-std::tuple<unsigned char, unsigned char, unsigned char> getBackgroundColor() {
-	return backgroundColor;
+void clear1(unsigned char r, unsigned char g, unsigned char b) {
+	clear(r, g, b, 255);
+}
+void clear2()
+{
+	GRRLIB_FillScreen(backgroundColor);
+}
+std::tuple<unsigned char, unsigned char, unsigned char, unsigned char> getBackgroundColor() {
+	return std::make_tuple(GRRLIB_R(backgroundColor), GRRLIB_G(backgroundColor), GRRLIB_B(backgroundColor), GRRLIB_A(backgroundColor));
 }
 std::tuple<unsigned char, unsigned char, unsigned char, unsigned char> getColor() {
 	unsigned long int color = GRRLIB_Settings.color;
 
 	return std::make_tuple(GRRLIB_R(color), GRRLIB_G(color), GRRLIB_B(color), GRRLIB_A(color));
 }
-void setBackgroundColor(unsigned char r, unsigned char g, unsigned char b) {
-	backgroundColor = std::make_tuple(r, g, b); // Since only used for values, optimize by storing as tuple
+void setBackgroundColor(unsigned char r, unsigned char g, unsigned char b, unsigned char a) {
+	backgroundColor = GRRLIB_RGBA(r, g, b, a);
 }
 void setColor(unsigned char r, unsigned char g, unsigned char b, unsigned char a) {
 	GRRLIB_Settings.color = GRRLIB_RGBA(r, g, b, a);
@@ -178,14 +183,14 @@ unsigned char getPointSize() {
 }
 void reset() {
 	GRRLIB_Settings.color = 0xFFFFFFFF;
-	backgroundColor = std::make_tuple(0, 0, 0);
+	backgroundColor = 0x000000FF;
 
 	origin();
 
 	GRRLIB_SetAntiAliasing(true);
 	GRRLIB_SetDeflicker(true);
-	GRRLIB_SetLineWidth(6);
 	GRRLIB_SetPointSize(6);
+	GRRLIB_SetLineWidth(6);
 }
 void setAntiAliasing(bool enable) {
 	GRRLIB_Settings.antialias = enable;

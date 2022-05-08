@@ -40,10 +40,12 @@ int getHeight();
 int getWidth();
 bool isWidescreen();
 
-void clear(unsigned char r, unsigned char g, unsigned char b);
+void clear(unsigned char r, unsigned char g, unsigned char b, unsigned char a);
+void clear1(unsigned char r, unsigned char g, unsigned char b);
+void clear2();
+std::tuple<unsigned char, unsigned char, unsigned char, unsigned char> getBackgroundColor();
 std::tuple<unsigned char, unsigned char, unsigned char, unsigned char> getColor();
-std::tuple<unsigned char, unsigned char, unsigned char> getBackgroundColor();
-void setBackgroundColor(unsigned char r, unsigned char g, unsigned char b);
+void setBackgroundColor(unsigned char r, unsigned char g, unsigned char b, unsigned char a);
 void setColor(unsigned char r, unsigned char g, unsigned char b, unsigned char a);
 void setColor1(unsigned char r, unsigned char g, unsigned char b);
 
