@@ -27,7 +27,7 @@ namespace love {
 namespace graphics {
 
 struct Texture {
-	GRRLIB_texImg *texImg;
+	GRRLIB_texture *texture;
 
 	Texture(std::string filename);
 };

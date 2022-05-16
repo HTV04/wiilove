@@ -156,7 +156,7 @@ void setFont(love::graphics::Font *font) {
 
 // Texture functions
 void draw(love::graphics::Texture &image, float x, float y, float r, float sx, float sy, float ox, float oy) {
-	GRRLIB_DrawImg(x, y, image.texImg, r, sx, sy, ox, oy);
+	GRRLIB_DrawImg(x, y, image.texture, r, sx, sy, ox, oy);
 }
 void draw1(love::graphics::Texture &image, float x, float y, float r, float sx, float sy) {
 	draw(image, x, y, r, sx, sy, 0.0, 0.0);

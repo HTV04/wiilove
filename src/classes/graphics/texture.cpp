@@ -34,7 +34,7 @@ namespace graphics {
 
 // Constructor
 Texture::Texture(std::string filename) {
-	texImg = GRRLIB_LoadTextureFromFile(love::filesystem::getFilePath(filename).c_str());
+	texture = GRRLIB_LoadTextureFromFile(love::filesystem::getFilePath(filename).c_str());
 }
 
 } // graphics
