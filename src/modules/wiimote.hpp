@@ -24,9 +24,7 @@
 // Libraries
 #include "../lib/sol.hpp"
 #include <vector>
-
-// Classes
-#include "../classes/wiimote/wiimote-class.hpp"
+#include <string>
 
 namespace love {
 namespace wiimote {
@@ -36,7 +34,18 @@ void update(std::vector<bool> &adds, std::vector<bool> &removes, int &homePresse
 
 namespace module {
 
-sol::table getWiimotes(sol::this_state s);
+float getAngle(int id);
+std::string getExtension(int id);
+std::pair<float, float> getPosition(int id);
+float getX(int id);
+float getY(int id);
+bool isConnected(int id);
+bool isDown(int id, std::string button);
+bool isRumbling(int id);
+
+bool isClassicDown(int id, std::string button);
+
+bool setRumble(int id, bool status);
 
 } // module
 } // system

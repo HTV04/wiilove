@@ -31,7 +31,6 @@ love.graphics.newTexture = _Texture.new
 -- Delete global usertypes
 _Font = nil
 _Texture = nil
-_Wiimote = nil
 
 -- API Expansion
 do

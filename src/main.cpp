@@ -26,7 +26,6 @@
 // Classes
 #include "classes/graphics/font.hpp"
 #include "classes/graphics/texture.hpp"
-#include "classes/wiimote/wiimote-class.hpp"
 
 // Modules
 #include "love.hpp"
@@ -42,6 +41,11 @@
 #include "boot_lua.h"
 
 int main(int argc, char **argv) {
+	sol::state lua;
+
+	sol::usertype<love::graphics::Font> FontType;
+	sol::usertype<love::graphics::Texture> TextureType;
+
 	// Init GRRLIB
 	GRRLIB_Init();
 
@@ -51,7 +55,6 @@ int main(int argc, char **argv) {
 	WPAD_SetDataFormat(WPAD_CHAN_ALL, WPAD_FMT_BTNS_ACC_IR);
 
 	// Init Lua state with default libraries
-	sol::state lua;
 	lua.open_libraries(
 		sol::lib::base,
 		sol::lib::package,
@@ -178,14 +181,25 @@ int main(int argc, char **argv) {
 		),
 
 		"wiimote", lua.create_table_with(
-			"getWiimotes", love::wiimote::module::getWiimotes
+			"getAngle", love::wiimote::module::getAngle,
+			"getExtension", love::wiimote::module::getExtension,
+			"getPosition", love::wiimote::module::getPosition,
+			"getX", love::wiimote::module::getX,
+			"getY", love::wiimote::module::getY,
+			"isConnected", love::wiimote::module::isConnected,
+			"isDown", love::wiimote::module::isDown,
+			"isRumbling", love::wiimote::module::isRumbling,
+
+			"isClassicDown", love::wiimote::module::isClassicDown,
+
+			"setRumble", love::wiimote::module::setRumble
 		)
 	);
 
 	// Usertypes setup
 	// NOTE: We have to make these in the global namespace due to sol limitations.
 	//       For now, we'll work around this.
-	sol::usertype<love::graphics::Font> FontType = lua.new_usertype<love::graphics::Font>(
+	FontType = lua.new_usertype<love::graphics::Font>(
 		"_Font", sol::constructors<
 			love::graphics::Font(unsigned int),
 			love::graphics::Font(),
@@ -194,27 +208,9 @@ int main(int argc, char **argv) {
 		>()
 	);
 
-	sol::usertype<love::graphics::Texture> TextureType = lua.new_usertype<love::graphics::Texture>(
+	TextureType = lua.new_usertype<love::graphics::Texture>(
 		"_Texture", sol::constructors<love::graphics::Texture(std::string)>()
 	);
-
-	sol::usertype<love::wiimote::Wiimote> WiimoteType = lua.new_usertype<love::wiimote::Wiimote>(
-		"_Wiimote", sol::constructors<love::wiimote::Wiimote()>()
-	);
-
-	WiimoteType["getAngle"] = &love::wiimote::Wiimote::getAngle;
-	WiimoteType["getExtension"] = &love::wiimote::Wiimote::getExtension;
-	WiimoteType["getID"] = &love::wiimote::Wiimote::getID;
-	WiimoteType["getPosition"] = &love::wiimote::Wiimote::getPosition;
-	WiimoteType["getX"] = &love::wiimote::Wiimote::getX;
-	WiimoteType["getY"] = &love::wiimote::Wiimote::getY;
-	WiimoteType["isConnected"] = &love::wiimote::Wiimote::isConnected;
-	WiimoteType["isDown"] = &love::wiimote::Wiimote::isDown;
-	WiimoteType["isRumbling"] = &love::wiimote::Wiimote::isRumbling;
-
-	WiimoteType["isClassicDown"] = &love::wiimote::Wiimote::isClassicDown;
-
-	WiimoteType["setRumble"] = &love::wiimote::Wiimote::setRumble;
 
 	// Start!
 	lua.script(std::string(boot_lua, boot_lua + boot_lua_size));

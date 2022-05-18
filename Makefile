@@ -39,7 +39,7 @@ include $(DEVKITPPC)/wii_rules
 #---------------------------------------------------------------------------------
 TARGET		:=	$(notdir $(CURDIR))
 BUILD		:=	build
-SOURCES		:=	src src/classes/graphics src/classes/wiimote src/lib/FreeTypeGX src/modules
+SOURCES		:=	src src/classes/graphics src/lib/FreeTypeGX src/modules
 DATA		:=	data
 INCLUDES	:=
 

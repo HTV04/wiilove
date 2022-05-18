@@ -21,13 +21,11 @@
 
 // Libraries
 #include "../lib/sol.hpp"
+#include <grrlib-mod.h>
+#include <wiiuse/wpad.h>
 #include <vector>
 #include <tuple>
-#include <grrlib-mod.h>
 #include <cstdlib>
-
-// Classes
-#include "../classes/wiimote/wiimote-class.hpp"
 
 // Modules
 #include "wiimote.hpp"

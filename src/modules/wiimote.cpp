@@ -24,59 +24,137 @@
 #include <ogc/conf.h>
 #include <wiiuse/wpad.h>
 #include <vector>
+#include <map>
 #include <utility>
-
-// Classes
-#include "../classes/wiimote/wiimote-class.hpp"
 
 // Header
 #include "wiimote.hpp"
 
 // Local variables
 namespace {
-	std::vector<love::wiimote::Wiimote> wiimotes(4);
+	WPADData *data;
+
+	struct Wiimote {
+		int status;
+		unsigned int extension;
+		unsigned int buttonsDown;
+		float x, y;
+		float angle;
+
+		bool rumbling;
+	};
+
+	std::vector<Wiimote> wiimotes(4);
+
+	std::map<std::string, int> buttonMap = {
+		{"2", WPAD_BUTTON_2},
+		{"1", WPAD_BUTTON_1},
+		{"b", WPAD_BUTTON_B},
+		{"a", WPAD_BUTTON_A},
+		{"-", WPAD_BUTTON_MINUS},
+		{"left", WPAD_BUTTON_LEFT},
+		{"right", WPAD_BUTTON_RIGHT},
+		{"up", WPAD_BUTTON_UP},
+		{"down", WPAD_BUTTON_DOWN},
+		{"+", WPAD_BUTTON_PLUS},
+		{"z", WPAD_NUNCHUK_BUTTON_Z},
+		{"c", WPAD_NUNCHUK_BUTTON_C}
+	};
+
+	std::map<std::string, int> classicButtonMap = {
+		{"up", WPAD_CLASSIC_BUTTON_UP},
+		{"left", WPAD_CLASSIC_BUTTON_LEFT},
+		{"zr", WPAD_CLASSIC_BUTTON_ZR},
+		{"x", WPAD_CLASSIC_BUTTON_X},
+		{"a", WPAD_CLASSIC_BUTTON_A},
+		{"y", WPAD_CLASSIC_BUTTON_Y},
+		{"b", WPAD_CLASSIC_BUTTON_B},
+		{"zl", WPAD_CLASSIC_BUTTON_ZL},
+		{"r", WPAD_CLASSIC_BUTTON_FULL_R},
+		{"+", WPAD_CLASSIC_BUTTON_PLUS},
+		{"-", WPAD_CLASSIC_BUTTON_MINUS},
+		{"l", WPAD_CLASSIC_BUTTON_FULL_L},
+		{"down", WPAD_CLASSIC_BUTTON_DOWN},
+		{"right", WPAD_CLASSIC_BUTTON_RIGHT}
+	};
+
+	std::map<int, std::string> extensionMap = {
+		{WPAD_EXP_NONE, "None"},
+		{WPAD_EXP_NUNCHUK, "Nunchuk"},
+		{WPAD_EXP_CLASSIC, "Classic Controller"}
+	};
 }
 
 namespace love {
 namespace wiimote {
 
+// Internal functions
 void init() {
-	int homePressed = -1;
-
 	WPAD_ScanPads();
-
-	for (int i = 0; i <= 3; i++) {
-		wiimotes[i].id = i;
-
-		wiimotes[i].update(WPAD_Probe(i, NULL), homePressed); // Init values
-	}
 }
 void update(std::vector<bool> &adds, std::vector<bool> &removes, int &homePressed) {
+	unsigned int buttonsPressed;
+
 	WPAD_ScanPads();
 
 	for (int i = 0; i <= 3; i++) {
 		int status = WPAD_Probe(i, NULL);
 
-		if (wiimotes[i].isConnected() and status != WPAD_ERR_NONE) {
+		if (wiimotes[i].status == WPAD_ERR_NONE && status != WPAD_ERR_NONE) {
 			removes[i] = true;
-		} else if (!wiimotes[i].isConnected() and status == WPAD_ERR_NONE) {
+		} else if (wiimotes[i].status != WPAD_ERR_NONE && status == WPAD_ERR_NONE) {
 			adds[i] = true;
 		}
+		wiimotes[i].status = status;
 
-		wiimotes[i].update(status, homePressed);
+		if (status == WPAD_ERR_NONE) {
+			data = WPAD_Data(i);
+			buttonsPressed = data->btns_d;
+
+			wiimotes[i].buttonsDown = data->btns_h;
+			wiimotes[i].x = data->ir.x;
+			wiimotes[i].y = data->ir.y;
+			wiimotes[i].angle = data->ir.angle;
+
+			if (buttonsPressed & WPAD_BUTTON_HOME || buttonsPressed & WPAD_CLASSIC_BUTTON_HOME) { homePressed = i; }
+		}
 	}
 }
 
 namespace module {
 
-sol::table getWiimotes(sol::this_state s) {
-    sol::table wiimoteTable(s, sol::create);
+// Wii Remote querying functions
+float getAngle(int id) { return wiimotes[id].angle; }
+std::string getExtension(int id) {
+	return extensionMap[wiimotes[id].extension];
+}
+std::pair<float, float> getPosition(int id) {
+	return std::make_pair(wiimotes[id].x, wiimotes[id].y);
+}
+float getX(int id) { return wiimotes[id].x; }
+float getY(int id) { return wiimotes[id].y; }
+bool isConnected(int id) {
+	return wiimotes[id].status == WPAD_ERR_NONE;
+}
+bool isDown(int id, std::string button) {
+	return wiimotes[id].buttonsDown & buttonMap[button];
+}
+bool isRumbling(int id) { return wiimotes[id].rumbling; }
 
-	for (int i = 0; i <= 3; i++) {
-        wiimoteTable[i + 1] = &wiimotes[i];
-    }
+// Classic Controller querying functions
+bool isClassicDown(int id, std::string button) {
+	return wiimotes[id].buttonsDown & classicButtonMap[button];
+}
 
-	return wiimoteTable;
+// Actions
+bool setRumble(int id, bool status) {
+	if (WPAD_Rumble(id, status) == WPAD_ERR_NONE) {
+		wiimotes[id].rumbling = status;
+
+		return true;
+	} else {
+		return false;
+	}
 }
 
 } // module
