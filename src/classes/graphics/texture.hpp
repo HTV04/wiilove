@@ -30,6 +30,8 @@ struct Texture {
 	GRRLIB_texture *texture;
 
 	Texture(std::string filename);
+
+	~Texture();
 };
 
 } // graphics

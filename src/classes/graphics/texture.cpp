@@ -37,5 +37,10 @@ Texture::Texture(std::string filename) {
 	texture = GRRLIB_LoadTextureFromFile(love::filesystem::getFilePath(filename).c_str());
 }
 
+// Destructor
+Texture::~Texture() {
+	GRRLIB_FreeTexture(texture);
+}
+
 } // graphics
 } // love
