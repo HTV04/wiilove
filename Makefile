@@ -137,13 +137,13 @@ clean:
 release: $(BUILD)
 	@rm -rf dist
 	@mkdir -p dist/sd/apps/supergame
-	@mkdir -p dist/dolphin/sd/love/data
+	@mkdir -p dist/dolphin/sd/wiilove/data
 
 	@cp $(OUTPUT).dol dist/sd/apps/supergame/boot.dol
 	@cp -r game/* dist/sd/apps/supergame
 
 	@cp $(OUTPUT).dol dist/dolphin
-	@cp -r game/data/* dist/dolphin/sd/love/data
+	@cp -r game/data/* dist/dolphin/sd/wiilove/data
 
 	@cd dist/sd; zip -r -9 ../wiilove.zip .
 	@cd dist/dolphin; zip -r -9 ../wiilove-dolphin.zip .

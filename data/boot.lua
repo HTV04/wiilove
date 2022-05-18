@@ -47,7 +47,7 @@ do
 end
 
 -- Redirect package paths
-package.path = "data/?.lua; data/?/init.lua"
+package.path = "save/?.lua; save/?/init.lua; data/?.lua; data/?/init.lua"
 package.cpath = "" -- Disable C modules
 
 -- Standard callback handlers

@@ -44,9 +44,9 @@ void init(int argc, char **argv) {
 		// with any arguments.
 		// * We're likely running on Dolphin (directly), because the Homebrew Channel would
 		//   at least pass the executable path. Potentially same issue with Wii VC injects?
-		// * We'll default to sd:/love as the filesystem path.
+		// * We'll default to sd:/wiilove as the filesystem path.
 
-		filesystemPath = "sd:/love";
+		filesystemPath = "sd:/wiilove";
 	}
 
 	// Create filesystem directory if it doesn't exist (but it should already) and
