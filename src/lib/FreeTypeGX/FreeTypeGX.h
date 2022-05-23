@@ -211,6 +211,7 @@ class FreeTypeGX {
 		FT_UInt ftPointSize;		/**< Requested size of the rendered font. */
 		FT_Short ftAscender;		/**< Ascender value of the rendered font. */
 		FT_Short ftDescender;		/**< Descender value of the rendered font. */
+		FT_Int ftHeight;			/**< Height of the rendered font. */
 
 		bool ftKerningEnabled;		/**< Flag indicating the availability of font kerning data. */
 		FT_Face ftFace;				/**< Reusable FreeType FT_Face object. */

@@ -99,6 +99,8 @@ int FreeTypeGX::setMaxVideoWidth(int width) {
  * @param cacheAll	Optional flag to specify if all font characters should be cached when the class object is created. If specified as false the characters only become cached the first time they are used. If not specified default value is false.
  */
 int FreeTypeGX::loadFont(uint8_t* fontBuffer, FT_Long bufferSize, FT_UInt pointSize, bool cacheAll) {
+	FT_ULong charCode;
+
 	int numCached = 0;
 
 	//this->unloadFont(); // NEEDS FIX
@@ -112,6 +114,14 @@ int FreeTypeGX::loadFont(uint8_t* fontBuffer, FT_Long bufferSize, FT_UInt pointS
 	this->ftKerningEnabled = FT_HAS_KERNING(this->ftFace);
 	this->ftAscender = this->ftPointSize * this->ftFace->ascender / this->ftFace->units_per_EM;
 	this->ftDescender = this->ftPointSize * this->ftFace->descender / this->ftFace->units_per_EM;
+	this->ftHeight = 0;
+
+	// Poll all ASCII characters for a proper font height
+	for (charCode = 0; charCode <= 255; charCode++) {
+		if (!FT_Load_Glyph(this->ftFace, FT_Get_Char_Index(this->ftFace, charCode), FT_LOAD_DEFAULT | FT_LOAD_FORCE_AUTOHINT | FT_LOAD_RENDER)) {
+			this->ftHeight = this->ftFace->glyph->bitmap_top > this->ftHeight ? this->ftFace->glyph->bitmap_top : this->ftHeight;
+		}
+	}
 
 	if (cacheAll) {
 		numCached = this->cacheGlyphDataComplete();
@@ -287,7 +297,7 @@ ftgxCharData *FreeTypeGX::cacheGlyphData(wchar_t charCode) {
 	FT_UInt gIndex;
 	int textureWidth = 0, textureHeight = 0;
 
-	gIndex = FT_Get_Char_Index( this->ftFace, charCode );
+	gIndex = FT_Get_Char_Index(this->ftFace, charCode);
 	if (!FT_Load_Glyph(this->ftFace, gIndex, FT_LOAD_DEFAULT | FT_LOAD_FORCE_AUTOHINT | FT_LOAD_RENDER)) {
 
 		if(this->ftFace->glyph->format == FT_GLYPH_FORMAT_BITMAP) {
@@ -301,7 +311,7 @@ ftgxCharData *FreeTypeGX::cacheGlyphData(wchar_t charCode) {
 				gIndex,
 				textureWidth,
 				textureHeight,
-				this->ftFace->glyph->bitmap_top,
+				this->ftHeight - this->ftFace->glyph->bitmap_top,
 				this->ftFace->glyph->bitmap_top,
 				textureHeight - this->ftFace->glyph->bitmap_top,
 				NULL
@@ -496,7 +506,7 @@ int FreeTypeGX::drawText(float x, float y, wchar_t *text, float scaleX, float sc
 			}
 
 			GX_InitTexObj(&glyphTexture, glyphData->glyphDataTexture, glyphData->textureWidth, glyphData->textureHeight, this->textureFormat, GX_CLAMP, GX_CLAMP, GX_FALSE);
-			this->copyTextureToFramebuffer(&glyphTexture, glyphData->textureWidth, glyphData->textureHeight, x_pos - x_offset, y - glyphData->renderOffsetY - y_offset, scaleX, scaleY, offsetX, offsetY, degrees);
+			this->copyTextureToFramebuffer(&glyphTexture, glyphData->textureWidth, glyphData->textureHeight, x_pos - x_offset, y + glyphData->renderOffsetY - y_offset, scaleX, scaleY, offsetX, offsetY, degrees);
 
 			x_pos += static_cast<float>(glyphData->glyphAdvanceX) * scaleX;
 			printed++;
@@ -645,11 +655,6 @@ void FreeTypeGX::copyTextureToFramebuffer(GXTexObj *texObj, float texWidth, floa
 	GX_LoadTexObj(texObj, GX_TEXMAP0);
 	GX_SetTevOp(GX_TEVSTAGE0, GX_MODULATE);
 	GX_SetVtxDesc(GX_VA_TEX0, GX_DIRECT);
-
-	// Follow GRRLIB anti-aliasing settings
-	if (GRRLIB_Settings.antialias == false) {
-        GX_InitTexObjLOD(texObj, GX_NEAR, GX_NEAR, 0.0, 0.0, 0.0, 0, 0, GX_ANISO_1);
-    }
 
 	GX_Begin(GX_QUADS, GX_VTXFMT0, 4);
 		GX_Position3f32(0.0, 0.0, 0.0);
