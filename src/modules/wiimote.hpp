@@ -21,6 +21,8 @@
 
 #pragma once
 
+#ifndef HW_DOL
+
 // Libraries
 #include "../lib/sol.hpp"
 #include <vector>
@@ -50,3 +52,5 @@ bool setRumble(int id, bool status);
 } // module
 } // system
 } // love
+
+#endif // !HW_DOL

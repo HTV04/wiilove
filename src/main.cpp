@@ -20,7 +20,9 @@
 // Libraries
 #include "lib/sol.hpp"
 #include <grrlib-mod.h>
+#ifndef HW_DOL
 #include <wiiuse/wpad.h>
+#endif // !HW_DOL
 #include <string>
 
 // Classes
@@ -35,7 +37,9 @@
 #include "modules/math.hpp"
 #include "modules/system.hpp"
 #include "modules/timer.hpp"
+#ifndef HW_DOL
 #include "modules/wiimote.hpp"
+#endif // !HW_DOL
 
 // Data
 #include "boot_lua.h"
@@ -49,10 +53,12 @@ int main(int argc, char **argv) {
 	// Init GRRLIB
 	GRRLIB_Init();
 
+#ifndef HW_DOL
 	// Init WPAD
 	WPAD_Init();
 	WPAD_SetVRes(0, 640, 480);
 	WPAD_SetDataFormat(WPAD_CHAN_ALL, WPAD_FMT_BTNS_ACC_IR);
+#endif // !HW_DOL
 
 	// Init Lua state with default libraries
 	lua.open_libraries(
@@ -75,9 +81,12 @@ int main(int argc, char **argv) {
 
 	love::event::init();
 	love::graphics::init();
-	love::system::init();
 	love::timer::init();
+
+#ifndef HW_DOL
+	love::system::init();
 	love::wiimote::init();
+#endif // !HW_DOL
 
 	// Create love module
 	lua["love"] = lua.create_table_with(
@@ -178,6 +187,7 @@ int main(int argc, char **argv) {
 			"step", love::timer::module::step,
 
 			"sleep", love::timer::module::sleep
+#ifndef HW_DOL
 		),
 
 		"wiimote", lua.create_table_with(
@@ -193,6 +203,7 @@ int main(int argc, char **argv) {
 			"isClassicDown", love::wiimote::module::isClassicDown,
 
 			"setRumble", love::wiimote::module::setRumble
+#endif // !HW_DOL
 		)
 	);
 

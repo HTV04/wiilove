@@ -19,6 +19,8 @@
  * <https://www.gnu.org/licenses/>.
  */
 
+#ifndef HW_DOL
+
 // Libraries
 #include "../lib/sol.hpp"
 #include <ogc/conf.h>
@@ -160,3 +162,5 @@ bool setRumble(int id, bool status) {
 } // module
 } // wiimote
 } // love
+
+#endif // !HW_DOL

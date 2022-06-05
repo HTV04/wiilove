@@ -22,6 +22,9 @@
 #pragma once
 
 // Libraries
+#ifdef HW_DOL
+#include "../lib/sol.hpp"
+#endif // HW_DOL
 #include <string>
 
 namespace love {
@@ -32,8 +35,13 @@ void init();
 namespace module {
 
 std::string getConsole();
+#ifdef HW_DOL
+sol::object getLanguage();
+sol::object getNickname();
+#else // HW_DOL
 std::string getLanguage();
 std::string getNickname();
+#endif // !HW_DOL
 
 } // module
 } // system

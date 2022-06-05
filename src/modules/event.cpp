@@ -22,7 +22,9 @@
 // Libraries
 #include "../lib/sol.hpp"
 #include <grrlib-mod.h>
+#ifndef HW_DOL
 #include <wiiuse/wpad.h>
+#endif // !HW_DOL
 #include <vector>
 #include <tuple>
 #include <cstdlib>
@@ -44,7 +46,9 @@ namespace {
 	int resetFunc = -1;
 	void resetPressed(unsigned int irq, void *ctx) { resetFunc = SYS_RETURNTOMENU; }
 	void powerPressed() { resetFunc = SYS_POWEROFF; }
+#ifndef HW_DOL
 	void wiimotePowerPressed(int id) { resetFunc = SYS_POWEROFF; }
+#endif // !HW_DOL
 }
 
 namespace love {
@@ -54,7 +58,9 @@ void init () {
 	// SYS_ResetSystem callbacks
 	SYS_SetResetCallback(resetPressed);
 	SYS_SetPowerCallback(powerPressed);
+#ifndef HW_DOL
 	WPAD_SetPowerButtonCallback(wiimotePowerPressed);
+#endif // !HW_DOL
 }
 
 namespace module {

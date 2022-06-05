@@ -20,8 +20,27 @@
  */
 
 // Libraries
+#ifdef HW_DOL
+
+#include "../lib/sol.hpp"
+#include <string>
+
+namespace love {
+namespace system {
+namespace module {
+
+// Querying functions
+std::string getConsole() { return "GameCube"; }
+sol::object getLanguage() { return sol::nil; }
+sol::object getNickname() { return sol::nil; }
+
+} // module
+} // system
+} // love
+
+#else // HW_DOL
+
 #include <ogc/conf.h>
-#include <wiiuse/wpad.h>
 #include <string>
 #include <map>
 
@@ -69,10 +88,12 @@ void init() {
 namespace module {
 
 // Querying functions
-std::string getConsole() { return "Wii"; } // Only Wii is supported... for now ;)
+std::string getConsole() { return "Wii"; }
 std::string getLanguage() { return language; }
 std::string getNickname() { return nickname; }
 
 } // module
 } // system
 } // love
+
+#endif // !HW_DOL
