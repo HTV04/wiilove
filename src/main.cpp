@@ -42,6 +42,7 @@
 #endif // !HW_DOL
 
 // Data
+#include "api_lua.h"
 #include "boot_lua.h"
 
 int main(int argc, char **argv) {
@@ -52,13 +53,6 @@ int main(int argc, char **argv) {
 
 	// Init GRRLIB
 	GRRLIB_Init();
-
-#ifndef HW_DOL
-	// Init WPAD
-	WPAD_Init();
-	WPAD_SetVRes(0, 640, 480);
-	WPAD_SetDataFormat(WPAD_CHAN_ALL, WPAD_FMT_BTNS_ACC_IR);
-#endif // !HW_DOL
 
 	// Init Lua state with default libraries
 	lua.open_libraries(
@@ -77,9 +71,8 @@ int main(int argc, char **argv) {
 	);
 
 	// Init modules if necessary
-	love::filesystem::init(argc, argv); // A lot of things depend on this
+	love::filesystem::init(argc, argv);
 
-	love::event::init();
 	love::graphics::init();
 	love::timer::init();
 
@@ -87,6 +80,8 @@ int main(int argc, char **argv) {
 	love::system::init();
 	love::wiimote::init();
 #endif // !HW_DOL
+
+	love::event::init();
 
 	// Create love module
 	lua["love"] = lua.create_table_with(
@@ -207,21 +202,24 @@ int main(int argc, char **argv) {
 		)
 	);
 
-	// Usertypes setup
-	// NOTE: We have to make these in the global namespace due to sol limitations.
-	//       For now, we'll work around this.
 	FontType = lua.new_usertype<love::graphics::Font>(
 		"_Font", sol::constructors<
 			love::graphics::Font(unsigned int),
 			love::graphics::Font(),
 			love::graphics::Font(std::string, unsigned int),
 			love::graphics::Font(std::string)
-		>()
+		>(),
+
+		"clone", &love::graphics::Font::clone
+	);
+	TextureType = lua.new_usertype<love::graphics::Texture>(
+		"_Texture", sol::constructors<love::graphics::Texture(std::string)>(),
+
+		"clone", &love::graphics::Texture::clone
 	);
 
-	TextureType = lua.new_usertype<love::graphics::Texture>(
-		"_Texture", sol::constructors<love::graphics::Texture(std::string)>()
-	);
+	// Lua API expansion
+	lua.script(std::string(api_lua, api_lua + api_lua_size));
 
 	// Start!
 	lua.script(std::string(boot_lua, boot_lua + boot_lua_size));

@@ -60,7 +60,6 @@ LDFLAGS	=	-g $(MACHDEP) -Wl,-Map,$(notdir $@).map
 LIBS	:= -lgrrlib-mod `freetype-config --libs` -lpngu-mod -lpng -ljpeg -lz -lfat
 LIBS	+= -lluajit
 LIBS	+= -lwiiuse
-#LIBS	+= -lmodplay -laesnd
 LIBS	+= -lbte -logc -lm
 
 #---------------------------------------------------------------------------------

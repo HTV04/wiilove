@@ -37,9 +37,27 @@ Texture::Texture(std::string filename) {
 	texture = GRRLIB_LoadTextureFromFile(love::filesystem::getFilePath(filename).c_str());
 }
 
+// Clone constructor
+Texture::Texture(int *instances, GRRLIB_texture *texture) {
+	this->instances = instances;
+	this->texture = texture;
+}
+
+// Object functions
+Texture *Texture::clone() {
+	instances++;
+
+	return new Texture(instances, texture);
+}
+
 // Destructor
 Texture::~Texture() {
-	GRRLIB_FreeTexture(texture);
+	instances--;
+	if (instances == 0) {
+		GRRLIB_FreeTexture(texture);
+
+		delete instances;
+	}
 }
 
 } // graphics

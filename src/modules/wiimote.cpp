@@ -92,6 +92,10 @@ namespace wiimote {
 
 // Internal functions
 void init() {
+	WPAD_Init();
+	WPAD_SetVRes(0, 640, 480);
+	WPAD_SetDataFormat(WPAD_CHAN_ALL, WPAD_FMT_BTNS_ACC_IR);
+
 	WPAD_ScanPads();
 }
 void update(std::vector<bool> &adds, std::vector<bool> &removes, int &homePressed) {

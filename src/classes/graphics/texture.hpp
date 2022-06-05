@@ -26,12 +26,19 @@
 namespace love {
 namespace graphics {
 
-struct Texture {
-	GRRLIB_texture *texture;
+class Texture {
+	private:
+		int *instances;
 
-	Texture(std::string filename);
+	public:
+		GRRLIB_texture *texture;
 
-	~Texture();
+		Texture(std::string filename);
+		Texture(int *instances, GRRLIB_texture *texture);
+
+		Texture *clone();
+
+		~Texture();
 };
 
 } // graphics

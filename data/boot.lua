@@ -24,28 +24,6 @@ local love = love
 
 local result
 
--- Workaround for global usertypes
-love.graphics.newFont = _Font.new
-love.graphics.newTexture = _Texture.new
-
--- Delete global usertypes
-_Font = nil
-_Texture = nil
-
--- API Expansion
-do
-	local newFont = love.graphics.newFont
-	local setFont = love.graphics.setFont
-
-	function love.graphics.setNewFont(...)
-		local font = newFont(unpack({...}))
-
-		setFont(font)
-
-		return font
-	end
-end
-
 -- Redirect package paths
 package.path = "save/?.lua; save/?/init.lua; data/?.lua; data/?/init.lua"
 package.cpath = "" -- Disable C modules

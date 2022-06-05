@@ -31,6 +31,7 @@ namespace filesystem {
 void init(int argc, char **argv);
 
 std::string getFilePath(std::string filename);
+void getFileData(std::string filename, void *&data, int &size);
 
 namespace module {
 

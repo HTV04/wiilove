@@ -27,13 +27,26 @@
 namespace love {
 namespace graphics {
 
-struct Font {
-	FreeTypeGX *fontSystem;
+class Font {
+	private:
+		int *instances;
+		void *data;
+		int *dataSize;
+		int *fontSize;
 
-	Font(unsigned int size);
-	Font();
-	Font(std::string filename, unsigned int size);
-	Font(std::string filename);
+	public:
+		FreeTypeGX *fontSystem;
+
+		Font(unsigned int size);
+		Font();
+		Font(std::string filename, unsigned int size);
+		Font(std::string filename);
+
+		Font(int *instances, void *data, int *dataSize, int *fontSize);
+
+		Font *clone();
+
+		~Font();
 };
 
 } // graphics

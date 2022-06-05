@@ -24,6 +24,7 @@
 #include <string>
 #include <filesystem>
 #include <fstream>
+#include <cstdlib>
 
 // Header
 #include "filesystem.hpp"
@@ -75,6 +76,20 @@ std::string getFilePath(std::string filename) { // Get the path of a file, using
 		return dataPath;
 	}
 }
+void getFileData(std::string filename, void *&data, int &size) {
+	std::string filePath = getFilePath(filename);
+
+	std::ifstream file(filePath, std::ios::binary | std::ios::ate); // TODO: Add error handling
+	std::stringstream stream;
+
+	size = file.tellg();
+	data = malloc(size);
+
+	file.seekg(0, std::ios::beg);
+	stream << file.rdbuf();
+
+	std::memcpy(data, stream.str().c_str(), size);
+}
 
 namespace module {
 
@@ -85,20 +100,17 @@ bool exists(std::string filename) {
 sol::protected_function load(std::string filename, sol::this_state s) {
 	sol::state_view lua(s);
 
-	// TODO: Add error handling
-	return lua.load_file(getFilePath(filename)).get<sol::protected_function>();
+	return lua.load_file(getFilePath(filename)).get<sol::protected_function>(); // TODO: Add error handling
 }
 std::string read(std::string filename) {
 	std::stringstream stream;
 
-	// TODO: Add error handling
-	stream << std::ifstream(getFilePath(filename)).rdbuf();
+	stream << std::ifstream(getFilePath(filename), std::ios::binary).rdbuf(); // TODO: Add error handling
 
 	return stream.str();
 }
 void write(std::string filename, std::string data) {
-	// TODO: Add error handling
-	std::ofstream out("save/" + filename);
+	std::ofstream out("save/" + filename); // TODO: Add error handling
 
 	out << data; // Write data to file
 }

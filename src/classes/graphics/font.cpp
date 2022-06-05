@@ -20,9 +20,9 @@
  */
 
 // Libraries
-#include "../../lib/sol.hpp" // Prevents macro conflicts
-#include <grrlib-mod.h>
 #include "../../lib/FreeTypeGX/FreeTypeGX.h"
+#include <iostream>
+#include <cstdlib>
 
 // Modules
 #include "../../modules/filesystem.hpp"
@@ -33,28 +33,70 @@
 // Data
 #include "Vera_ttf.h"
 
-#define defaultSize 12
+#define DEFAULT_SIZE 12
 
 namespace love {
 namespace graphics {
 
 // Constructors
 Font::Font(unsigned int size) { // Load Vera.ttf as default font
+	instances = new int(1);
+	data = nullptr;
+	dataSize = nullptr;
+	fontSize = new int(size);
+
 	fontSystem = new FreeTypeGX();
 
-	fontSystem->loadFont(Vera_ttf, Vera_ttf_size, size);
+
+	fontSystem->loadFont(Vera_ttf, Vera_ttf_size, *fontSize);
 }
-Font::Font() : Font(defaultSize) {} // Load Vera.ttf as default font (with default size)
+Font::Font() : Font(DEFAULT_SIZE) {} // Load Vera.ttf as default font (with default size)
 Font::Font(std::string filename, unsigned int size) { // Load TTF font
-	unsigned char *data;
-	int dataSize;
+	instances = new int(1);
+	dataSize = new int(0);
+	fontSize = new int(size);
 
 	fontSystem = new FreeTypeGX();
 
-	dataSize = GRRLIB_LoadFile(love::filesystem::getFilePath(filename).c_str(), &data);
-	fontSystem->loadFont(data, dataSize, size);
+	filesystem::getFileData(filename, data, *dataSize);
+	fontSystem->loadFont(static_cast<unsigned char*>(data), *dataSize, *fontSize);
 }
-Font::Font(std::string filename) : Font(filename, defaultSize) {} // Load TTF font (with default size)
+Font::Font(std::string filename) : Font(filename, DEFAULT_SIZE) {} // Load TTF font (with default size)
+
+// Clone constructor
+Font::Font(int *instances, void *data, int *dataSize, int *fontSize) {
+	this->instances = instances;
+	this->data = data;
+	this->dataSize = dataSize;
+	this->fontSize = fontSize;
+
+	fontSystem = new FreeTypeGX();
+
+	if (data == nullptr)
+		fontSystem->loadFont(Vera_ttf, Vera_ttf_size, *fontSize);
+	else
+		fontSystem->loadFont(static_cast<unsigned char*>(data), *dataSize, *fontSize);
+}
+
+// Object functions
+Font *Font::clone() {
+	instances++;
+
+	return new Font(instances, data, dataSize, fontSize);
+}
+
+// Destructor
+Font::~Font() {
+	delete fontSystem;
+
+	instances--;
+	if (instances == 0) {
+		delete instances;
+		std::free(data);
+		delete dataSize;
+		delete fontSize;
+	}
+}
 
 } // graphics
 } // love
