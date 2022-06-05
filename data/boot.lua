@@ -147,8 +147,10 @@ function love.errhand(err)
 	end
 
 	-- Stop all Wiimote vibrations
-	for _, wiimote in ipairs(love.wiimote.getWiimotes()) do
-		wiimote:setRumble(false)
+	if love.system.getConsole ~= "GameCube" then
+		for _, wiimote in ipairs(love.wiimote.getWiimotes()) do
+			wiimote:setRumble(false)
+		end
 	end
 
 	--love.audio.stop()
