@@ -74,7 +74,7 @@ void init() {
 	unsigned char nicknameInt[22];
 
 	// Cache language
-	if (languageMap.count(languageInt) > 0) {
+	if (languageMap.count(languageInt) == 1) {
 		language = languageMap[languageInt];
 	} else {
 		language = "Unknown";

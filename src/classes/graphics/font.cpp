@@ -47,7 +47,6 @@ Font::Font(unsigned int size) { // Load Vera.ttf as default font
 
 	fontSystem = new FreeTypeGX();
 
-
 	fontSystem->loadFont(Vera_ttf, Vera_ttf_size, *fontSize);
 }
 Font::Font() : Font(DEFAULT_SIZE) {} // Load Vera.ttf as default font (with default size)

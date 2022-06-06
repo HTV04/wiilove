@@ -23,7 +23,9 @@
 #include <grrlib-mod.h>
 #include "../lib/FreeTypeGX/FreeTypeGX.h"
 #include <ogc/gx.h>
+#ifndef HW_DOL
 #include <ogc/conf.h>
+#endif // !HW_DOL
 #include <utility>
 #include <vector>
 #include <tuple>
@@ -58,7 +60,9 @@ namespace love {
 namespace graphics {
 
 void init() {
-    widescreen = CONF_GetAspectRatio() == CONF_ASPECT_16_9;
+#ifndef HW_DOL
+	widescreen = CONF_GetAspectRatio() == CONF_ASPECT_16_9;
+#endif // !HW_DOL
 
 	curFont = new love::graphics::Font();
 
@@ -71,7 +75,11 @@ namespace module {
 std::pair<int, int> getDimensions() { return dimensions; }
 int getHeight() { return height; }
 int getWidth() { return width; }
+#ifdef HW_DOL
+bool isWidescreen() { return false; }
+#else
 bool isWidescreen() { return widescreen; }
+#endif // !HW_DOL
 
 // Transformation functions
 void origin() {
