@@ -20,7 +20,7 @@
  */
 
 // Libraries
-#include "../lib/sol.hpp"
+#include <sol/sol.hpp>
 #include <string>
 #include <filesystem>
 #include <fstream>

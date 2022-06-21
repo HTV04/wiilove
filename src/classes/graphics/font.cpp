@@ -74,7 +74,7 @@ Font::Font(int *instances, void *data, int *dataSize, int *fontSize) {
 	if (data == nullptr)
 		fontSystem->loadFont(Vera_ttf, Vera_ttf_size, *fontSize);
 	else
-		fontSystem->loadFont(static_cast<unsigned char*>(data), *dataSize, *fontSize);
+		fontSystem->loadFont(static_cast<unsigned char *>(data), *dataSize, *fontSize);
 }
 
 // Object functions
@@ -90,10 +90,10 @@ Font::~Font() {
 
 	instances--;
 	if (instances == 0) {
-		delete instances;
-		std::free(data);
-		delete dataSize;
 		delete fontSize;
+		delete dataSize;
+		std::free(data);
+		delete instances;
 	}
 }
 

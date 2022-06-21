@@ -18,7 +18,7 @@
  */
 
 // Libraries
-#include "lib/sol.hpp"
+#include <sol/sol.hpp>
 #include <grrlib-mod.h>
 #ifndef HW_DOL
 #include <wiiuse/wpad.h>
@@ -26,11 +26,13 @@
 #include <string>
 
 // Classes
+#include "classes/audio/source.hpp"
 #include "classes/graphics/font.hpp"
 #include "classes/graphics/texture.hpp"
 
 // Modules
 #include "love.hpp"
+#include "modules/audio.hpp"
 #include "modules/event.hpp"
 #include "modules/filesystem.hpp"
 #include "modules/graphics.hpp"
@@ -47,6 +49,8 @@
 
 int main(int argc, char **argv) {
 	sol::state lua;
+
+	sol::usertype<love::audio::Source> SourceType;
 
 	sol::usertype<love::graphics::Font> FontType;
 	sol::usertype<love::graphics::Texture> TextureType;
@@ -73,6 +77,7 @@ int main(int argc, char **argv) {
 	// Init modules if necessary
 	love::filesystem::init(argc, argv);
 
+	love::audio::init();
 	love::graphics::init();
 	love::timer::init();
 
@@ -200,6 +205,28 @@ int main(int argc, char **argv) {
 			"setRumble", love::wiimote::module::setRumble
 #endif // !HW_DOL
 		)
+	);
+
+	// Usertypes setup
+	// NOTE: We have to make these in the global namespace due to sol limitations.
+	SourceType = lua.new_usertype<love::audio::Source>(
+		"_Source", sol::constructors<love::audio::Source(std::string)>(),
+
+		"pause", &love::audio::Source::pause,
+		"play", &love::audio::Source::play,
+		"stop", &love::audio::Source::stop,
+
+		"getPitch", &love::audio::Source::getPitch,
+		"getVolume", &love::audio::Source::getVolume,
+		"isPaused", &love::audio::Source::isPaused,
+		"isPlaying", &love::audio::Source::isPlaying,
+		"isStopped", &love::audio::Source::isStopped,
+		"seek", &love::audio::Source::seek,
+		"setPitch", &love::audio::Source::setPitch,
+		"setVolume", &love::audio::Source::setVolume,
+		"tell", &love::audio::Source::tell,
+
+		"clone", &love::audio::Source::clone
 	);
 
 	FontType = lua.new_usertype<love::graphics::Font>(

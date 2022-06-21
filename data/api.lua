@@ -26,6 +26,69 @@ local love = love
 love.graphics.newFont = _Font.new
 love.graphics.newTexture = _Texture.new
 
+-- love.audio
+do
+	local newSource = _Source.new
+
+	local sources = {}
+	setmetatable(sources, {__mode = "k"})
+
+	love.audio = {}
+
+	function love.audio.newSource(...)
+		local source = newSource(...)
+
+		sources[source] = true
+
+		return source
+	end
+
+	function love.audio.pause(...)
+		local sourceList = {...}
+
+		for _, source in ipairs(sourceList) do
+			source:pause()
+		end
+	end
+	function love.audio.play(...)
+		local sourceList = {...}
+
+		for _, source in ipairs(sourceList) do
+			source:play()
+		end
+	end
+	function love.audio.resume(...)
+		local sourceList = {...}
+
+		for _, source in ipairs(sourceList) do
+			source:resume()
+		end
+	end
+	function love.audio.stop(...)
+		local sourceList = {...}
+
+		if #sourceList == 0 then
+			for source in pairs(sources) do
+				source:stop()
+			end
+		else
+			for _, source in ipairs(sourceList) do
+				source:stop()
+			end
+		end
+	end
+
+	function love.audio.getActiveSourceCount()
+		local count = 0
+
+		for source in pairs(sources) do
+			if source:isPlaying() then count = count + 1 end
+		end
+
+		return count
+	end
+end
+
 -- love.graphics
 do
 	local newFont = love.graphics.newFont
@@ -41,5 +104,6 @@ do
 end
 
 -- Delete global usertypes
+_Source = nil
 _Font = nil
 _Texture = nil

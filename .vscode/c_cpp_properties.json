@@ -1,0 +1,37 @@
+{
+    "configurations": [
+        {
+            "name": "Wii",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "/opt/devkitpro/libogc-mod/include/**",
+                "/opt/devkitpro/portlibs/ppc/include/**",
+                "/opt/devkitpro/portlibs/wii/include/**"
+            ],
+            "defines": [
+                "HW_RVL"
+            ],
+            "compilerPath": "/opt/devkitpro/devkitPPC/bin/powerpc-eabi-gcc",
+            "cStandard": "gnu17",
+            "cppStandard": "gnu++17",
+            "intelliSenseMode": "linux-gcc-x86"
+        },
+        {
+            "name": "GameCube",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "/opt/devkitpro/libogc-mod/include/**",
+                "/opt/devkitpro/portlibs/ppc/include/**",
+                "/opt/devkitpro/portlibs/wii/include/**"
+            ],
+            "defines": [
+                "HW_DOL"
+            ],
+            "compilerPath": "/opt/devkitpro/devkitPPC/bin/powerpc-eabi-gcc",
+            "cStandard": "gnu17",
+            "cppStandard": "gnu++17",
+            "intelliSenseMode": "linux-gcc-x86"
+        }
+    ],
+    "version": 4
+}

@@ -22,7 +22,7 @@
 #ifndef HW_DOL
 
 // Libraries
-#include "../lib/sol.hpp"
+#include <sol/sol.hpp>
 #include <ogc/conf.h>
 #include <wiiuse/wpad.h>
 #include <vector>
@@ -37,7 +37,7 @@ namespace {
 	WPADData *data;
 
 	struct Wiimote {
-		int status;
+		int status = WPAD_ERR_NONE;
 		unsigned int extension;
 		unsigned int buttonsDown;
 		float x, y;
@@ -121,8 +121,9 @@ void update(std::vector<bool> &adds, std::vector<bool> &removes, int &homePresse
 			wiimotes[i].x = data->ir.x;
 			wiimotes[i].y = data->ir.y;
 			wiimotes[i].angle = data->ir.angle;
+			wiimotes[i].extension = data->exp.type;
 
-			if (buttonsPressed & WPAD_BUTTON_HOME || buttonsPressed & WPAD_CLASSIC_BUTTON_HOME) { homePressed = i; }
+			if ((buttonsPressed & WPAD_BUTTON_HOME) || (buttonsPressed & WPAD_CLASSIC_BUTTON_HOME)) { homePressed = i; }
 		}
 	}
 }

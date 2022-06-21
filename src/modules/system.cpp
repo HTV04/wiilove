@@ -22,7 +22,7 @@
 // Libraries
 #ifdef HW_DOL
 
-#include "../lib/sol.hpp"
+#include <sol/sol.hpp>
 #include <string>
 
 namespace love {

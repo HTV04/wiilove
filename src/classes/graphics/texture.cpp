@@ -20,7 +20,7 @@
  */
 
 // Libraries
-#include "../../lib/sol.hpp" // Prevents macro conflicts
+#include <sol/sol.hpp> // Prevents macro conflicts
 #include <grrlib-mod.h>
 
 // Modules

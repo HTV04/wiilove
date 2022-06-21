@@ -22,7 +22,7 @@
 #pragma once
 
 // Libraries
-#include "../lib/sol.hpp"
+#include <sol/sol.hpp>
 #include <string>
 
 namespace love {

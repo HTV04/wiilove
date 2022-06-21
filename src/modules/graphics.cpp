@@ -77,7 +77,7 @@ int getHeight() { return height; }
 int getWidth() { return width; }
 #ifdef HW_DOL
 bool isWidescreen() { return false; }
-#else
+#else // HW_DOL
 bool isWidescreen() { return widescreen; }
 #endif // !HW_DOL
 

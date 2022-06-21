@@ -21,7 +21,7 @@
 
 // Libraries
 #include <ogc/lwp_watchdog.h>
-#include <sys/unistd.h>
+#include <unistd.h>
 
 // Header
 #include "timer.hpp"

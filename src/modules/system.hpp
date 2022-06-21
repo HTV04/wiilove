@@ -23,7 +23,7 @@
 
 // Libraries
 #ifdef HW_DOL
-#include "../lib/sol.hpp"
+#include <sol/sol.hpp>
 #endif // HW_DOL
 #include <string>
 

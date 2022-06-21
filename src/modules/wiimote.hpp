@@ -24,7 +24,7 @@
 #ifndef HW_DOL
 
 // Libraries
-#include "../lib/sol.hpp"
+#include <sol/sol.hpp>
 #include <vector>
 #include <string>
 

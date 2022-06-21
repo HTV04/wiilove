@@ -20,7 +20,7 @@
  */
 
 // Libraries
-#include "../lib/sol.hpp"
+#include <sol/sol.hpp>
 #include <grrlib-mod.h>
 #ifndef HW_DOL
 #include <wiiuse/wpad.h>
@@ -86,8 +86,10 @@ void pump(sol::this_state s) {
 
 	events.push_back(std::make_tuple(sol::nil, sol::nil, sol::nil, sol::nil, sol::nil, sol::nil, sol::nil));
 
+#ifndef HW_DOL
 	// Update wiimotes
 	love::wiimote::update(wiimoteAdds, wiimoteRemoves, homePressed);
+#endif // !HW_DOL
 
 	if (homePressed != -1) {
 		events.push_back(std::make_tuple(sol::make_object(s, "homepressed"), sol::make_object(s, homePressed), sol::nil, sol::nil, sol::nil, sol::nil, sol::nil));
