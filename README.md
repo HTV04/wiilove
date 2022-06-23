@@ -1,4 +1,6 @@
 # WiiLÖVE
+[![GitHub release (latest SemVer including pre-releases)](https://img.shields.io/github/v/release/HTV04/wiilove?include_prereleases&style=flat-square)](https://github.com/HTV04/wiilove/releases) [![GitHub issues](https://img.shields.io/github/issues/HTV04/wiilove?style=flat-square)](https://github.com/HTV04/wiilove/issues) [![GitHub pull requests](https://img.shields.io/github/issues-pr/HTV04/wiilove?style=flat-square)](https://github.com/HTV04/wiilove/pulls) [![GitHub](https://img.shields.io/github/license/HTV04/wiilove?style=flat-square)](https://github.com/HTV04/wiilove/blob/main/LICENSE) [![Discord](https://img.shields.io/discord/852658576577003550?style=flat-square)](https://discord.gg/tQGzN2Wu48)
+
 An *awesome* framework for making 2D [Nintendo Wii](https://en.wikipedia.org/wiki/Wii) homebrew games in [Lua](https://www.lua.org/). Its API is based on [LÖVE](https://love2d.org/), but its functions are mostly written from scratch and optimized for the Wii.
 
 ```lua
@@ -30,13 +32,19 @@ WiiLÖVE also has a built-in error handler, making game development much easier 
 # Resources
 Since there isn't a guide for WiiLÖVE yet, I recommend checking out Sheepolution's [*How to LÖVE*](https://www.sheepolution.com/learn/book/contents) guide, and then accounting for the differences in WiiLÖVE's API.
 
-Docs are currently a WIP.
+Docs are currently a WIP. Since WiiLÖVE is still in an alpha state, its functions are constantly updating, so docs are a low priority at the moment. In the meantime, see [`src/main.cpp`](src/main.cpp) and [`data/api.lua`](data/api.lua) for the names of all of WiiLÖVE's functions.
 
 Check out some open-source projects that use WiiLÖVE!
 * [Wiirdle](https://github.com/HTV04/wiirdle) - Wordle clone for the Wii made to demonstrate WiiLÖVE's features
 
 # Building
-TODO
+* Ensure the following libraries are installed:
+  * [libogc-mod](https://github.com/HTV04/libogc-mod)
+  * [libfat-mod](https://github.com/HTV04/libfat-mod)
+  * [GRRLIB-mod](https://github.com/HTV04/GRRLIB-mod) and its dependencies
+  * [LuaJIT for devkitPPC](https://github.com/HTV04/LuaJIT)
+* Run `make` (or `make release` to create release ZIPs).
+* Compiled binaries will be available in `bin` (and release ZIPs will be available in `dist`).
 
 # License
 WiiLÖVE is licensed under the [GNU Lesser General Public License v3.0](LICENSE). Therefore, modifications to WiiLÖVE must be open-source and licensed under the same license. However, projects and files that interact with WiiLÖVE externally (for example, Lua scripts that WiiLÖVE runs) are not required to be open-source and can use any license.
