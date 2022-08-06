@@ -51,7 +51,7 @@ INCLUDES	:=	include
 # options for code generation
 #---------------------------------------------------------------------------------
 
-CFLAGS	=	-g -O2 -Wall $(MACHDEP) $(INCLUDE) `freetype-config --cflags` \
+CFLAGS	=	-g -O2 -Wall $(MACHDEP) $(INCLUDE) \
 			-DSOL_ALL_SAFETIES_ON=1
 CXXFLAGS	=	$(CFLAGS)
 
@@ -61,17 +61,18 @@ LDFLAGS	=	-g $(MACHDEP) -Wl,-Map,$(notdir $@).map
 # any extra libraries we wish to link with the project
 # the order can-be/is critical
 #---------------------------------------------------------------------------------
-LIBS	:= -lgrrlib-mod `freetype-config --libs` -lpngu-mod -lpng -ljpeg -lz -lfat
-LIBS	+= -laesnd
-LIBS	+= -lluajit
-LIBS	+= -lwiiuse
-LIBS	+= -lbte -logc -lm
+LIBS	:=	-lgrrlib-mod -lpngu-mod -lpng -ljpeg
+LIBS	+=	-lfreetype -lz -lbz2
+LIBS	+=	-laudiogc -laesnd
+LIBS	+=	-lluajit
+LIBS	+=	-lwiiuse -lfat
+LIBS	+=	-lbte -logc -lm
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing
 # include and lib
 #---------------------------------------------------------------------------------
-LIBDIRS	:= $(PORTLIBS)
+LIBDIRS	:=	$(PORTLIBS)
 
 #---------------------------------------------------------------------------------
 # no real need to edit anything past this point unless you need to add additional
@@ -117,7 +118,8 @@ export HFILES := $(addsuffix .h,$(subst .,_,$(BINFILES)))
 export INCLUDE	:=	$(foreach dir,$(INCLUDES), -I$(CURDIR)/$(dir)) \
 					$(foreach dir,$(LIBDIRS),-I$(dir)/include) \
 					-I$(CURDIR)/$(BUILD) \
-					-I$(LIBOGC_INC)
+					-I$(LIBOGC_INC) \
+					-I$(PORTLIBS_PATH)/ppc/include/freetype2
 
 #---------------------------------------------------------------------------------
 # build a list of library paths
