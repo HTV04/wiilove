@@ -2,7 +2,7 @@
 
 // The MIT License (MIT)
 
-// Copyright (c) 2013-2021 Rapptz, ThePhD and contributors
+// Copyright (c) 2013-2022 Rapptz, ThePhD and contributors
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of
 // this software and associated documentation files (the "Software"), to deal in
@@ -30,6 +30,7 @@
 #include <sol/usertype_traits.hpp>
 #include <sol/policies.hpp>
 #include <sol/unicode.hpp>
+#include <sol/assert.hpp>
 
 #include <memory>
 #include <type_traits>
@@ -37,9 +38,11 @@
 #include <limits>
 #include <cmath>
 #include <string_view>
-#if SOL_IS_ON(SOL_STD_VARIANT_I_)
+#if SOL_IS_ON(SOL_STD_VARIANT)
 #include <variant>
 #endif // Can use variant
+
+#include <sol/debug.hpp>
 
 namespace sol { namespace stack {
 	namespace stack_detail {
@@ -52,7 +55,7 @@ namespace sol { namespace stack {
 			constexpr bool is_same_signedness
 				= (std::is_signed_v<T> && std::is_signed_v<lua_Integer>) || (std::is_unsigned_v<T> && std::is_unsigned_v<lua_Integer>);
 			constexpr bool probaby_fits_within_lua_Integer = sizeof(T) == sizeof(lua_Integer)
-#if SOL_IS_ON(SOL_ALL_INTEGER_VALUES_FIT_I_)
+#if SOL_IS_ON(SOL_ALL_INTEGER_VALUES_FIT)
 				&& ((std::has_unique_object_representations_v<T> && std::has_unique_object_representations_v<lua_Integer>) ? true : is_same_signedness)
 #else
 				&& is_same_signedness
@@ -75,7 +78,7 @@ namespace sol { namespace stack {
 		int msvc_is_ass_with_if_constexpr_push_enum(std::true_type, lua_State* L, const T& value) {
 			if constexpr (meta::any_same_v<std::underlying_type_t<T>,
 				              char
-#if SOL_IS_ON(SOL_CHAR8_T_I_)
+#if SOL_IS_ON(SOL_CHAR8_T)
 				              ,
 				              char8_t
 #endif
@@ -101,7 +104,7 @@ namespace sol { namespace stack {
 	} // namespace stack_detail
 
 	inline int push_environment_of(lua_State* L, int target_index = -1) {
-#if SOL_IS_ON(SOL_SAFE_STACK_CHECK_I_)
+#if SOL_IS_ON(SOL_SAFE_STACK_CHECK)
 		luaL_checkstack(L, 1, detail::not_enough_stack_space_environment);
 #endif // make sure stack doesn't overflow
 #if SOL_LUA_VERSION_I_ < 502
@@ -141,14 +144,18 @@ namespace sol { namespace stack {
 	int push_environment_of(const T& target) {
 		lua_State* target_L = target.lua_state();
 		int target_index = absolute_index(target_L, -target.push());
-		return push_environment_of(target_L, target_index);
+		int env_count = push_environment_of(target_L, target_index);
+		sol_c_assert(env_count == 1);
+		lua_rotate(target_L, target_index, 1);
+		lua_pop(target_L, 1);
+		return env_count;
 	}
 
 	template <typename T>
 	struct unqualified_pusher<detail::as_value_tag<T>> {
 		template <typename F, typename... Args>
 		static int push_fx(lua_State* L, F&& f, Args&&... args) {
-#if SOL_IS_ON(SOL_SAFE_STACK_CHECK_I_)
+#if SOL_IS_ON(SOL_SAFE_STACK_CHECK)
 			luaL_checkstack(L, 1, detail::not_enough_stack_space_userdata);
 #endif // make sure stack doesn't overflow
        // Basically, we store all user-data like this:
@@ -193,7 +200,7 @@ namespace sol { namespace stack {
 		static int push_fx(lua_State* L, F&& f, T* obj) {
 			if (obj == nullptr)
 				return stack::push(L, lua_nil);
-#if SOL_IS_ON(SOL_SAFE_STACK_CHECK_I_)
+#if SOL_IS_ON(SOL_SAFE_STACK_CHECK)
 			luaL_checkstack(L, 1, detail::not_enough_stack_space_userdata);
 #endif // make sure stack doesn't overflow
 			T** pref = detail::usertype_allocate_pointer<T>(L);
@@ -249,7 +256,7 @@ namespace sol { namespace stack {
 
 			template <typename... Args>
 			static int push_deep(lua_State* L, Args&&... args) {
-#if SOL_IS_ON(SOL_SAFE_STACK_CHECK_I_)
+#if SOL_IS_ON(SOL_SAFE_STACK_CHECK)
 				luaL_checkstack(L, 1, detail::not_enough_stack_space_userdata);
 #endif // make sure stack doesn't overflow
 				element** pointer_to_memory = nullptr;
@@ -295,7 +302,7 @@ namespace sol { namespace stack {
 				return p[0];
 			}
 			else if constexpr (std::is_same_v<Tu, bool>) {
-#if SOL_IS_ON(SOL_SAFE_STACK_CHECK_I_)
+#if SOL_IS_ON(SOL_SAFE_STACK_CHECK)
 				luaL_checkstack(L, 1, detail::not_enough_stack_space_generic);
 #endif // make sure stack doesn't overflow
 				lua_pushboolean(L, std::forward<Args>(args)...);
@@ -303,7 +310,7 @@ namespace sol { namespace stack {
 			}
 			else if constexpr (std::is_integral_v<Tu> || std::is_same_v<Tu, lua_Integer>) {
 				const Tu& value(std::forward<Args>(args)...);
-#if SOL_IS_ON(SOL_SAFE_STACK_CHECK_I_)
+#if SOL_IS_ON(SOL_SAFE_STACK_CHECK)
 				luaL_checkstack(L, 1, detail::not_enough_stack_space_integral);
 #endif // make sure stack doesn't overflow
 #if SOL_LUA_VERSION_I_ >= 503
@@ -312,11 +319,11 @@ namespace sol { namespace stack {
 					return 1;
 				}
 #endif // Lua 5.3 and above
-#if SOL_IS_ON(SOL_NUMBER_PRECISION_CHECKS_I_)
+#if SOL_IS_ON(SOL_NUMBER_PRECISION_CHECKS)
 				if (static_cast<T>(llround(static_cast<lua_Number>(value))) != value) {
-#if SOL_IS_OFF(SOL_EXCEPTIONS_I_)
+#if SOL_IS_OFF(SOL_EXCEPTIONS)
 					// Is this really worth it?
-					assert(false && "integer value will be misrepresented in lua");
+					sol_m_assert(false, "integer value will be misrepresented in lua");
 					lua_pushinteger(L, static_cast<lua_Integer>(value));
 					return 1;
 #else
@@ -328,7 +335,7 @@ namespace sol { namespace stack {
 				return 1;
 			}
 			else if constexpr (std::is_floating_point_v<Tu> || std::is_same_v<Tu, lua_Number>) {
-#if SOL_IS_ON(SOL_SAFE_STACK_CHECK_I_)
+#if SOL_IS_ON(SOL_SAFE_STACK_CHECK)
 				luaL_checkstack(L, 1, detail::not_enough_stack_space_floating);
 #endif // make sure stack doesn't overflow
 				lua_pushnumber(L, std::forward<Args>(args)...);
@@ -338,7 +345,7 @@ namespace sol { namespace stack {
 				luaL_Stream* source { std::forward<Args>(args)... };
 				luaL_Stream* stream = static_cast<luaL_Stream*>(detail::alloc_newuserdata(L, sizeof(luaL_Stream)));
 				stream->f = source->f;
-#if SOL_IS_ON(SOL_LUAL_STREAM_USE_CLOSE_FUNCTION_I_)
+#if SOL_IS_ON(SOL_LUAL_STREAM_USE_CLOSE_FUNCTION)
 				stream->closef = source->closef;
 #endif // LuaJIT and Lua 5.1 and below do not have
 				return 1;
@@ -347,7 +354,7 @@ namespace sol { namespace stack {
 				luaL_Stream& source(std::forward<Args>(args)...);
 				luaL_Stream* stream = static_cast<luaL_Stream*>(detail::alloc_newuserdata(L, sizeof(luaL_Stream)));
 				stream->f = source.f;
-#if SOL_IS_ON(SOL_LUAL_STREAM_USE_CLOSE_FUNCTION_I_)
+#if SOL_IS_ON(SOL_LUAL_STREAM_USE_CLOSE_FUNCTION)
 				stream->closef = source.closef;
 #endif // LuaJIT and Lua 5.1 and below do not have
 				return 1;
@@ -423,7 +430,7 @@ namespace sol { namespace stack {
 					lua_seti(L, tableindex, static_cast<lua_Integer>(index++));
 				}
 #else
-#if SOL_IS_ON(SOL_SAFE_STACK_CHECK_I_)
+#if SOL_IS_ON(SOL_SAFE_STACK_CHECK)
 				luaL_checkstack(L, 1, detail::not_enough_stack_space_generic);
 #endif // make sure stack doesn't overflow
 				lua_pushinteger(L, static_cast<lua_Integer>(index));
@@ -436,7 +443,7 @@ namespace sol { namespace stack {
 					int firstindex = tableindex + 1 + 1;
 					for (int pi = 0; pi < p; ++pi) {
 						stack::push(L, index);
-#if SOL_IS_ON(SOL_SAFE_STACK_CHECK_I_)
+#if SOL_IS_ON(SOL_SAFE_STACK_CHECK)
 						luaL_checkstack(L, 1, detail::not_enough_stack_space_generic);
 #endif // make sure stack doesn't overflow
 						lua_pushvalue(L, firstindex);
@@ -506,8 +513,6 @@ namespace sol { namespace stack {
 	struct unqualified_pusher<std::initializer_list<T>> {
 		static int push(lua_State* L, const std::initializer_list<T>& il) noexcept {
 			unqualified_pusher<detail::as_table_tag<std::initializer_list<T>>> p {};
-			// silence annoying VC++ warning
-			(void)p;
 			return p.push(L, il);
 		}
 	};
@@ -515,7 +520,7 @@ namespace sol { namespace stack {
 	template <>
 	struct unqualified_pusher<lua_nil_t> {
 		static int push(lua_State* L, lua_nil_t) noexcept {
-#if SOL_IS_ON(SOL_SAFE_STACK_CHECK_I_)
+#if SOL_IS_ON(SOL_SAFE_STACK_CHECK)
 			luaL_checkstack(L, 1, detail::not_enough_stack_space_generic);
 #endif // make sure stack doesn't overflow
 			lua_pushnil(L);
@@ -533,7 +538,7 @@ namespace sol { namespace stack {
 	template <>
 	struct unqualified_pusher<metatable_key_t> {
 		static int push(lua_State* L, metatable_key_t) {
-#if SOL_IS_ON(SOL_SAFE_STACK_CHECK_I_)
+#if SOL_IS_ON(SOL_SAFE_STACK_CHECK)
 			luaL_checkstack(L, 1, detail::not_enough_stack_space_generic);
 #endif // make sure stack doesn't overflow
 			lua_pushlstring(L, to_string(meta_function::metatable).c_str(), 4);
@@ -544,7 +549,7 @@ namespace sol { namespace stack {
 	template <>
 	struct unqualified_pusher<std::remove_pointer_t<lua_CFunction>> {
 		static int push(lua_State* L, lua_CFunction func, int n = 0) noexcept {
-#if SOL_IS_ON(SOL_SAFE_STACK_CHECK_I_)
+#if SOL_IS_ON(SOL_SAFE_STACK_CHECK)
 			luaL_checkstack(L, 1, detail::not_enough_stack_space_generic);
 #endif // make sure stack doesn't overflow
 			lua_pushcclosure(L, func, n);
@@ -555,7 +560,7 @@ namespace sol { namespace stack {
 	template <>
 	struct unqualified_pusher<lua_CFunction> {
 		static int push(lua_State* L, lua_CFunction func, int n = 0) {
-#if SOL_IS_ON(SOL_SAFE_STACK_CHECK_I_)
+#if SOL_IS_ON(SOL_SAFE_STACK_CHECK)
 			luaL_checkstack(L, 1, detail::not_enough_stack_space_generic);
 #endif // make sure stack doesn't overflow
 			lua_pushcclosure(L, func, n);
@@ -563,11 +568,11 @@ namespace sol { namespace stack {
 		}
 	};
 
-#if SOL_IS_ON(SOL_USE_NOEXCEPT_FUNCTION_TYPE_I_)
+#if SOL_IS_ON(SOL_USE_NOEXCEPT_FUNCTION_TYPE)
 	template <>
 	struct unqualified_pusher<std::remove_pointer_t<detail::lua_CFunction_noexcept>> {
 		static int push(lua_State* L, detail::lua_CFunction_noexcept func, int n = 0) {
-#if SOL_IS_ON(SOL_SAFE_STACK_CHECK_I_)
+#if SOL_IS_ON(SOL_SAFE_STACK_CHECK)
 			luaL_checkstack(L, 1, detail::not_enough_stack_space_generic);
 #endif // make sure stack doesn't overflow
 			lua_pushcclosure(L, func, n);
@@ -578,7 +583,7 @@ namespace sol { namespace stack {
 	template <>
 	struct unqualified_pusher<detail::lua_CFunction_noexcept> {
 		static int push(lua_State* L, detail::lua_CFunction_noexcept func, int n = 0) {
-#if SOL_IS_ON(SOL_SAFE_STACK_CHECK_I_)
+#if SOL_IS_ON(SOL_SAFE_STACK_CHECK)
 			luaL_checkstack(L, 1, detail::not_enough_stack_space_generic);
 #endif // make sure stack doesn't overflow
 			lua_pushcclosure(L, func, n);
@@ -590,7 +595,7 @@ namespace sol { namespace stack {
 	template <>
 	struct unqualified_pusher<c_closure> {
 		static int push(lua_State* L, c_closure cc) {
-#if SOL_IS_ON(SOL_SAFE_STACK_CHECK_I_)
+#if SOL_IS_ON(SOL_SAFE_STACK_CHECK)
 			luaL_checkstack(L, 1, detail::not_enough_stack_space_generic);
 #endif // make sure stack doesn't overflow
 			lua_pushcclosure(L, cc.c_function, cc.upvalues);
@@ -616,7 +621,7 @@ namespace sol { namespace stack {
 	template <>
 	struct unqualified_pusher<void*> {
 		static int push(lua_State* L, void* userdata) noexcept {
-#if SOL_IS_ON(SOL_SAFE_STACK_CHECK_I_)
+#if SOL_IS_ON(SOL_SAFE_STACK_CHECK)
 			luaL_checkstack(L, 1, detail::not_enough_stack_space_generic);
 #endif // make sure stack doesn't overflow
 			lua_pushlightuserdata(L, userdata);
@@ -627,7 +632,7 @@ namespace sol { namespace stack {
 	template <>
 	struct unqualified_pusher<const void*> {
 		static int push(lua_State* L, const void* userdata) noexcept {
-#if SOL_IS_ON(SOL_SAFE_STACK_CHECK_I_)
+#if SOL_IS_ON(SOL_SAFE_STACK_CHECK)
 			luaL_checkstack(L, 1, detail::not_enough_stack_space_generic);
 #endif // make sure stack doesn't overflow
 			lua_pushlightuserdata(L, const_cast<void*>(userdata));
@@ -638,7 +643,7 @@ namespace sol { namespace stack {
 	template <>
 	struct unqualified_pusher<lightuserdata_value> {
 		static int push(lua_State* L, lightuserdata_value userdata) noexcept {
-#if SOL_IS_ON(SOL_SAFE_STACK_CHECK_I_)
+#if SOL_IS_ON(SOL_SAFE_STACK_CHECK)
 			luaL_checkstack(L, 1, detail::not_enough_stack_space_generic);
 #endif // make sure stack doesn't overflow
 			lua_pushlightuserdata(L, userdata);
@@ -649,10 +654,10 @@ namespace sol { namespace stack {
 	template <typename T>
 	struct unqualified_pusher<light<T>> {
 		static int push(lua_State* L, light<T> l) noexcept {
-#if SOL_IS_ON(SOL_SAFE_STACK_CHECK_I_)
+#if SOL_IS_ON(SOL_SAFE_STACK_CHECK)
 			luaL_checkstack(L, 1, detail::not_enough_stack_space_generic);
 #endif // make sure stack doesn't overflow
-			lua_pushlightuserdata(L, static_cast<void*>(l.value));
+			lua_pushlightuserdata(L, static_cast<void*>(l.value()));
 			return 1;
 		}
 	};
@@ -661,14 +666,14 @@ namespace sol { namespace stack {
 	struct unqualified_pusher<user<T>> {
 		template <bool with_meta = true, typename Key, typename... Args>
 		static int push_with(lua_State* L, Key&& name, Args&&... args) {
-#if SOL_IS_ON(SOL_SAFE_STACK_CHECK_I_)
+#if SOL_IS_ON(SOL_SAFE_STACK_CHECK)
 			luaL_checkstack(L, 1, detail::not_enough_stack_space_userdata);
 #endif // make sure stack doesn't overflow
        // A dumb pusher
 			T* data = detail::user_allocate<T>(L);
 			if (with_meta) {
 				// Make sure we have a plain GC set for this data
-#if SOL_IS_ON(SOL_SAFE_STACK_CHECK_I_)
+#if SOL_IS_ON(SOL_SAFE_STACK_CHECK)
 				luaL_checkstack(L, 1, detail::not_enough_stack_space_generic);
 #endif // make sure stack doesn't overflow
 				if (luaL_newmetatable(L, name) != 0) {
@@ -724,7 +729,7 @@ namespace sol { namespace stack {
 	template <>
 	struct unqualified_pusher<userdata_value> {
 		static int push(lua_State* L, userdata_value data) {
-#if SOL_IS_ON(SOL_SAFE_STACK_CHECK_I_)
+#if SOL_IS_ON(SOL_SAFE_STACK_CHECK)
 			luaL_checkstack(L, 1, detail::not_enough_stack_space_userdata);
 #endif // make sure stack doesn't overflow
 			void** ud = detail::usertype_allocate_pointer<void>(L);
@@ -736,7 +741,7 @@ namespace sol { namespace stack {
 	template <>
 	struct unqualified_pusher<const char*> {
 		static int push_sized(lua_State* L, const char* str, std::size_t len) {
-#if SOL_IS_ON(SOL_SAFE_STACK_CHECK_I_)
+#if SOL_IS_ON(SOL_SAFE_STACK_CHECK)
 			luaL_checkstack(L, 1, detail::not_enough_stack_space_string);
 #endif // make sure stack doesn't overflow
 			lua_pushlstring(L, str, len);
@@ -788,7 +793,7 @@ namespace sol { namespace stack {
 	template <size_t N>
 	struct unqualified_pusher<char[N]> {
 		static int push(lua_State* L, const char (&str)[N]) {
-#if SOL_IS_ON(SOL_SAFE_STACK_CHECK_I_)
+#if SOL_IS_ON(SOL_SAFE_STACK_CHECK)
 			luaL_checkstack(L, 1, detail::not_enough_stack_space_string);
 #endif // make sure stack doesn't overflow
 			lua_pushlstring(L, str, std::char_traits<char>::length(str));
@@ -796,7 +801,7 @@ namespace sol { namespace stack {
 		}
 
 		static int push(lua_State* L, const char (&str)[N], std::size_t sz) {
-#if SOL_IS_ON(SOL_SAFE_STACK_CHECK_I_)
+#if SOL_IS_ON(SOL_SAFE_STACK_CHECK)
 			luaL_checkstack(L, 1, detail::not_enough_stack_space_string);
 #endif // make sure stack doesn't overflow
 			lua_pushlstring(L, str, sz);
@@ -812,11 +817,11 @@ namespace sol { namespace stack {
 		}
 	};
 
-#if SOL_IS_ON(SOL_CHAR8_T_I_)
+#if SOL_IS_ON(SOL_CHAR8_T)
 	template <>
 	struct unqualified_pusher<const char8_t*> {
 		static int push_sized(lua_State* L, const char8_t* str, std::size_t len) {
-#if SOL_IS_ON(SOL_SAFE_STACK_CHECK_I_)
+#if SOL_IS_ON(SOL_SAFE_STACK_CHECK)
 			luaL_checkstack(L, 1, detail::not_enough_stack_space_string);
 #endif // make sure stack doesn't overflow
 			lua_pushlstring(L, reinterpret_cast<const char*>(str), len);
@@ -868,7 +873,7 @@ namespace sol { namespace stack {
 	template <size_t N>
 	struct unqualified_pusher<char8_t[N]> {
 		static int push(lua_State* L, const char8_t (&str)[N]) {
-#if SOL_IS_ON(SOL_SAFE_STACK_CHECK_I_)
+#if SOL_IS_ON(SOL_SAFE_STACK_CHECK)
 			luaL_checkstack(L, 1, detail::not_enough_stack_space_string);
 #endif // make sure stack doesn't overflow
 			const char* str_as_char = reinterpret_cast<const char*>(static_cast<const char8_t*>(str));
@@ -877,7 +882,7 @@ namespace sol { namespace stack {
 		}
 
 		static int push(lua_State* L, const char8_t (&str)[N], std::size_t sz) {
-#if SOL_IS_ON(SOL_SAFE_STACK_CHECK_I_)
+#if SOL_IS_ON(SOL_SAFE_STACK_CHECK)
 			luaL_checkstack(L, 1, detail::not_enough_stack_space_string);
 #endif // make sure stack doesn't overflow
 			lua_pushlstring(L, str, sz);
@@ -902,7 +907,7 @@ namespace sol { namespace stack {
 				return stack::push(L, str.data(), str.size());
 			}
 			else {
-#if SOL_IS_ON(SOL_SAFE_STACK_CHECK_I_)
+#if SOL_IS_ON(SOL_SAFE_STACK_CHECK)
 				luaL_checkstack(L, 1, detail::not_enough_stack_space_string);
 #endif // make sure stack doesn't overflow
 				lua_pushlstring(L, str.c_str(), str.size());
@@ -915,7 +920,7 @@ namespace sol { namespace stack {
 				return stack::push(L, str.data(), sz);
 			}
 			else {
-#if SOL_IS_ON(SOL_SAFE_STACK_CHECK_I_)
+#if SOL_IS_ON(SOL_SAFE_STACK_CHECK)
 				luaL_checkstack(L, 1, detail::not_enough_stack_space_string);
 #endif // make sure stack doesn't overflow
 				lua_pushlstring(L, str.c_str(), sz);
@@ -938,7 +943,7 @@ namespace sol { namespace stack {
 	template <>
 	struct unqualified_pusher<meta_function> {
 		static int push(lua_State* L, meta_function m) {
-#if SOL_IS_ON(SOL_SAFE_STACK_CHECK_I_)
+#if SOL_IS_ON(SOL_SAFE_STACK_CHECK)
 			luaL_checkstack(L, 1, detail::not_enough_stack_space_meta_function_name);
 #endif // make sure stack doesn't overflow
 			const std::string& str = to_string(m);
@@ -950,7 +955,7 @@ namespace sol { namespace stack {
 	template <>
 	struct unqualified_pusher<absolute_index> {
 		static int push(lua_State* L, absolute_index ai) {
-#if SOL_IS_ON(SOL_SAFE_STACK_CHECK_I_)
+#if SOL_IS_ON(SOL_SAFE_STACK_CHECK)
 			luaL_checkstack(L, 1, detail::not_enough_stack_space_generic);
 #endif // make sure stack doesn't overflow
 			lua_pushvalue(L, ai);
@@ -961,7 +966,7 @@ namespace sol { namespace stack {
 	template <>
 	struct unqualified_pusher<raw_index> {
 		static int push(lua_State* L, raw_index ri) {
-#if SOL_IS_ON(SOL_SAFE_STACK_CHECK_I_)
+#if SOL_IS_ON(SOL_SAFE_STACK_CHECK)
 			luaL_checkstack(L, 1, detail::not_enough_stack_space_generic);
 #endif // make sure stack doesn't overflow
 			lua_pushvalue(L, ri);
@@ -972,7 +977,7 @@ namespace sol { namespace stack {
 	template <>
 	struct unqualified_pusher<ref_index> {
 		static int push(lua_State* L, ref_index ri) {
-#if SOL_IS_ON(SOL_SAFE_STACK_CHECK_I_)
+#if SOL_IS_ON(SOL_SAFE_STACK_CHECK)
 			luaL_checkstack(L, 1, detail::not_enough_stack_space_generic);
 #endif // make sure stack doesn't overflow
 			lua_rawgeti(L, LUA_REGISTRYINDEX, ri);
@@ -1244,7 +1249,7 @@ namespace sol { namespace stack {
 	struct unqualified_pusher<std::tuple<Args...>> {
 		template <std::size_t... I, typename T>
 		static int push(std::index_sequence<I...>, lua_State* L, T&& t) {
-#if SOL_IS_ON(SOL_SAFE_STACK_CHECK_I_)
+#if SOL_IS_ON(SOL_SAFE_STACK_CHECK)
 			luaL_checkstack(L, static_cast<int>(sizeof...(I)), detail::not_enough_stack_space_generic);
 #endif // make sure stack doesn't overflow
 			int pushcount = 0;
@@ -1348,7 +1353,7 @@ namespace sol { namespace stack {
 		}
 	};
 
-#if SOL_IS_ON(SOL_STD_VARIANT_I_)
+#if SOL_IS_ON(SOL_STD_VARIANT)
 	namespace stack_detail {
 
 		struct push_function {

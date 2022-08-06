@@ -2,7 +2,7 @@
 
 // The MIT License (MIT)
 
-// Copyright (c) 2013-2021 Rapptz, ThePhD and contributors
+// Copyright (c) 2013-2022 Rapptz, ThePhD and contributors
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of
 // this software and associated documentation files (the "Software"), to deal in
@@ -40,7 +40,8 @@
 #include <string>
 #include <string_view>
 #include <optional>
-#if SOL_IS_ON(SOL_STD_VARIANT_I_)
+#include <memory>
+#if SOL_IS_ON(SOL_STD_VARIANT)
 #include <variant>
 #endif // variant shenanigans (thanks, Mac OSX)
 
@@ -55,7 +56,7 @@ namespace sol {
 	} // namespace d
 
 	namespace detail {
-#if SOL_IS_ON(SOL_USE_NOEXCEPT_FUNCTION_TYPE_I_)
+#if SOL_IS_ON(SOL_USE_NOEXCEPT_FUNCTION_TYPE)
 		typedef int (*lua_CFunction_noexcept)(lua_State* L) noexcept;
 #else
 		typedef int (*lua_CFunction_noexcept)(lua_State* L);
@@ -92,7 +93,7 @@ namespace sol {
 	inline bool operator!=(lua_nil_t, lua_nil_t) {
 		return false;
 	}
-#if SOL_IS_ON(SOL_NIL_I_)
+#if SOL_IS_ON(SOL_NIL)
 	using nil_t = lua_nil_t;
 	inline constexpr const nil_t& nil = lua_nil;
 #endif
@@ -658,7 +659,7 @@ namespace sol {
 	enum class type : int {
 		none = LUA_TNONE,
 		lua_nil = LUA_TNIL,
-#if SOL_IS_ON(SOL_NIL_I_)
+#if SOL_IS_ON(SOL_NIL)
 		nil = lua_nil,
 #endif // Objective C/C++ Keyword that's found in OSX SDK and OBJC -- check for all forms to protect
 		string = LUA_TSTRING,
@@ -932,7 +933,7 @@ namespace sol {
 		template <std::size_t N>
 		struct lua_type_of<wchar_t[N]> : std::integral_constant<type, type::string> { };
 
-#if SOL_IS_ON(SOL_CHAR8_T_I_)
+#if SOL_IS_ON(SOL_CHAR8_T)
 		template <std::size_t N>
 		struct lua_type_of<char8_t[N]> : std::integral_constant<type, type::string> { };
 #endif
@@ -949,7 +950,7 @@ namespace sol {
 		template <>
 		struct lua_type_of<wchar_t> : std::integral_constant<type, type::string> { };
 
-#if SOL_IS_ON(SOL_CHAR8_T_I_)
+#if SOL_IS_ON(SOL_CHAR8_T)
 		template <>
 		struct lua_type_of<char8_t> : std::integral_constant<type, type::string> { };
 #endif
@@ -966,7 +967,7 @@ namespace sol {
 		template <>
 		struct lua_type_of<const wchar_t*> : std::integral_constant<type, type::string> { };
 
-#if SOL_IS_ON(SOL_CHAR8_T_I_)
+#if SOL_IS_ON(SOL_CHAR8_T)
 		template <>
 		struct lua_type_of<const char8_t*> : std::integral_constant<type, type::string> { };
 #endif
@@ -1115,7 +1116,7 @@ namespace sol {
 		template <>
 		struct lua_type_of<type> : std::integral_constant<type, type::poly> { };
 
-#if SOL_IS_ON(SOL_GET_FUNCTION_POINTER_UNSAFE_I_)
+#if SOL_IS_ON(SOL_GET_FUNCTION_POINTER_UNSAFE)
 		template <typename T>
 		struct lua_type_of<T*> : std::integral_constant<type, std::is_function_v<T> ? type::function : type::userdata> { };
 #else
@@ -1136,7 +1137,7 @@ namespace sol {
 		template <>
 		struct lua_type_of<meta_function> : std::integral_constant<type, type::string> { };
 
-#if SOL_IS_ON(SOL_STD_VARIANT_I_)
+#if SOL_IS_ON(SOL_STD_VARIANT)
 		template <typename... Tn>
 		struct lua_type_of<std::variant<Tn...>> : std::integral_constant<type, type::poly> { };
 #endif // std::variant deployment sucks on Clang
@@ -1205,7 +1206,7 @@ namespace sol {
 
 	template <typename T>
 	struct is_value_semantic_for_function
-#if SOL_IS_ON(SOL_FUNCTION_CALL_VALUE_SEMANTICS_I_)
+#if SOL_IS_ON(SOL_FUNCTION_CALL_VALUE_SEMANTICS)
 	: std::true_type {
 	};
 #else
@@ -1360,7 +1361,7 @@ namespace sol {
 	template <typename T>
 	struct is_automagical
 	: std::integral_constant<bool,
-	       (SOL_IS_ON(SOL_DEFAULT_AUTOMAGICAL_USERTYPES_I_))
+	       (SOL_IS_ON(SOL_DEFAULT_AUTOMAGICAL_USERTYPES))
 	            || (std::is_array_v<
 	                     meta::unqualified_t<T>> || (!std::is_same_v<meta::unqualified_t<T>, state> && !std::is_same_v<meta::unqualified_t<T>, state_view>))> {
 	};

@@ -2,7 +2,7 @@
 
 // The MIT License (MIT)
 
-// Copyright (c) 2013-2021 Rapptz, ThePhD and contributors
+// Copyright (c) 2013-2022 Rapptz, ThePhD and contributors
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of
 // this software and associated documentation files (the "Software"), to deal in
@@ -34,6 +34,7 @@
 #include <sol/stack_pop.hpp>
 #include <sol/stack_field.hpp>
 #include <sol/stack_probe.hpp>
+#include <sol/assert.hpp>
 
 #include <cstring>
 #include <array>
@@ -149,7 +150,7 @@ namespace sol {
 			template <bool checked, typename Arg, typename... Args, std::size_t I, std::size_t... Is, typename Handler, typename Fx, typename... FxArgs>
 			static decltype(auto) eval(types<Arg, Args...>, std::index_sequence<I, Is...>, lua_State* L_, int start_index_, Handler&& handler_,
 			     record& tracking_, Fx&& fx_, FxArgs&&... fxargs_) {
-#if SOL_IS_ON(SOL_PROPAGATE_EXCEPTIONS_I_)
+#if SOL_IS_ON(SOL_PROPAGATE_EXCEPTIONS)
 				// We can save performance/time by letting errors unwind produced arguments
 				// rather than checking everything once, and then potentially re-doing work
 				if constexpr (checked) {
@@ -186,7 +187,7 @@ namespace sol {
 				     "a reference and std::move it manually if this was your intention.");
 				argument_handler<types<R, Args...>> handler {};
 				record tracking {};
-#if SOL_IS_OFF(SOL_PROPAGATE_EXCEPTIONS_I_)
+#if SOL_IS_OFF(SOL_PROPAGATE_EXCEPTIONS)
 				if constexpr (checkargs) {
 					multi_check<Args...>(L_, start_index_, handler);
 				}
@@ -200,11 +201,21 @@ namespace sol {
 					     argument_types_, argument_indices_, L_, start_index_, handler, tracking, std::forward<Fx>(fx_), std::forward<FxArgs>(args_)...);
 				}
 			}
+
+			template <typename T>
+			void raw_table_set(lua_State* L, T&& arg, int tableindex = -2) {
+				int push_count = push(L, std::forward<T>(arg));
+				sol_c_assert(push_count == 1);
+				std::size_t unique_index = static_cast<std::size_t>(luaL_len(L, tableindex) + 1u);
+				lua_rawseti(L, tableindex, static_cast<int>(unique_index));
+			}
+
 		} // namespace stack_detail
 
 		template <typename T>
 		int set_ref(lua_State* L, T&& arg, int tableindex = -2) {
-			push(L, std::forward<T>(arg));
+			int push_count = push(L, std::forward<T>(arg));
+			sol_c_assert(push_count == 1);
 			return luaL_ref(L, tableindex);
 		}
 
@@ -319,11 +330,11 @@ namespace sol {
 		}
 
 		inline void luajit_exception_handler(lua_State* L, int (*handler)(lua_State*, lua_CFunction) = detail::c_trampoline) {
-#if SOL_IS_ON(SOL_USE_LUAJIT_EXCEPTION_TRAMPOLINE_I_)
+#if SOL_IS_ON(SOL_USE_LUAJIT_EXCEPTION_TRAMPOLINE)
 			if (L == nullptr) {
 				return;
 			}
-#if SOL_IS_ON(SOL_SAFE_STACK_CHECK_I_)
+#if SOL_IS_ON(SOL_SAFE_STACK_CHECK)
 			luaL_checkstack(L, 1, detail::not_enough_stack_space_generic);
 #endif // make sure stack doesn't overflow
 			lua_pushlightuserdata(L, (void*)handler);
@@ -336,7 +347,7 @@ namespace sol {
 		}
 
 		inline void luajit_exception_off(lua_State* L) {
-#if SOL_IS_ON(SOL_USE_LUAJIT_EXCEPTION_TRAMPOLINE_I_)
+#if SOL_IS_ON(SOL_USE_LUAJIT_EXCEPTION_TRAMPOLINE)
 			if (L == nullptr) {
 				return;
 			}

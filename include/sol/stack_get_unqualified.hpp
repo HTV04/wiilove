@@ -2,7 +2,7 @@
 
 // The MIT License (MIT)
 
-// Copyright (c) 2013-2021 Rapptz, ThePhD and contributors
+// Copyright (c) 2013-2022 Rapptz, ThePhD and contributors
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of
 // this software and associated documentation files (the "Software"), to deal in
@@ -37,7 +37,7 @@
 #include <cstdlib>
 #include <cmath>
 #include <string_view>
-#if SOL_IS_ON(SOL_STD_VARIANT_I_)
+#if SOL_IS_ON(SOL_STD_VARIANT)
 #include <variant>
 #endif // Apple clang screwed up
 
@@ -169,7 +169,7 @@ namespace sol { namespace stack {
 				luaL_Stream* pstream = static_cast<luaL_Stream*>(lua_touserdata(L, index));
 				return *pstream;
 			}
-#if SOL_IS_ON(SOL_GET_FUNCTION_POINTER_UNSAFE_I_)
+#if SOL_IS_ON(SOL_GET_FUNCTION_POINTER_UNSAFE)
 			else if constexpr (std::is_function_v<T> || (std::is_pointer_v<T> && std::is_function_v<std::remove_pointer_t<T>>)) {
 				return stack_detail::get_function_pointer<std::remove_pointer_t<T>>(L, index, tracking);
 			}
@@ -210,7 +210,7 @@ namespace sol { namespace stack {
 				}
 				actual r {};
 				if constexpr (!derive<element>::value) {
-#if SOL_IS_ON(SOL_DEBUG_BUILD_I_)
+#if SOL_IS_ON(SOL_DEBUG_BUILD)
 					// In debug mode we would rather abort you for this grave failure rather
 					// than let you deref a null pointer and fuck everything over
 					std::abort();
@@ -247,7 +247,7 @@ namespace sol { namespace stack {
 						// uh oh..
 						break;
 					}
-#if SOL_IS_ON(SOL_DEBUG_BUILD_I_)
+#if SOL_IS_ON(SOL_DEBUG_BUILD)
 					// In debug mode we would rather abort you for this grave failure rather
 					// than let you deref a null pointer and fuck everything over
 					std::abort();
@@ -355,8 +355,8 @@ namespace sol { namespace stack {
 				}
 				bool isnil = false;
 				for (int vi = 0; vi < lua_size<V>::value; ++vi) {
-#if SOL_IS_ON(SOL_LUA_NIL_IN_TABLES_I_) && SOL_LUA_VERSION_I_ >= 600
-#if SOL_IS_ON(SOL_SAFE_STACK_CHECK_I_)
+#if SOL_IS_ON(SOL_LUA_NIL_IN_TABLES) && SOL_LUA_VERSION_I_ >= 600
+#if SOL_IS_ON(SOL_SAFE_STACK_CHECK)
 					luaL_checkstack(L, 1, detail::not_enough_stack_space_generic);
 #endif // make sure stack doesn't overflow
 					lua_pushinteger(L, static_cast<lua_Integer>(i + vi));
@@ -376,7 +376,7 @@ namespace sol { namespace stack {
 						if (i == 0) {
 							break;
 						}
-#if SOL_IS_ON(SOL_LUA_NIL_IN_TABLES_I_) && SOL_LUA_VERSION_I_ >= 600
+#if SOL_IS_ON(SOL_LUA_NIL_IN_TABLES) && SOL_LUA_VERSION_I_ >= 600
 						lua_pop(L, vi);
 #else
 						lua_pop(L, (vi + 1));
@@ -386,7 +386,7 @@ namespace sol { namespace stack {
 					}
 				}
 				if (isnil) {
-#if SOL_IS_ON(SOL_LUA_NIL_IN_TABLES_I_) && SOL_LUA_VERSION_I_ >= 600
+#if SOL_IS_ON(SOL_LUA_NIL_IN_TABLES) && SOL_LUA_VERSION_I_ >= 600
 #else
 					lua_pop(L, lua_size<V>::value);
 #endif
@@ -404,7 +404,7 @@ namespace sol { namespace stack {
 					// see above comment
 					goto done;
 				}
-#if SOL_IS_ON(SOL_SAFE_STACK_CHECK_I_)
+#if SOL_IS_ON(SOL_SAFE_STACK_CHECK)
 				luaL_checkstack(L, 2, detail::not_enough_stack_space_generic);
 #endif // make sure stack doesn't overflow
 				bool isnil = false;
@@ -443,7 +443,7 @@ namespace sol { namespace stack {
 		static T get(types<K, V>, lua_State* L, int relindex, record& tracking) {
 			tracking.use(1);
 
-#if SOL_IS_ON(SOL_SAFE_STACK_CHECK_I_)
+#if SOL_IS_ON(SOL_SAFE_STACK_CHECK)
 			luaL_checkstack(L, 3, detail::not_enough_stack_space_generic);
 #endif // make sure stack doesn't overflow
 
@@ -486,7 +486,7 @@ namespace sol { namespace stack {
 		template <typename V>
 		static C get(types<V>, lua_State* L, int relindex, record& tracking) {
 			tracking.use(1);
-#if SOL_IS_ON(SOL_SAFE_STACK_CHECK_I_)
+#if SOL_IS_ON(SOL_SAFE_STACK_CHECK)
 			luaL_checkstack(L, 3, detail::not_enough_stack_space_generic);
 #endif // make sure stack doesn't overflow
 
@@ -551,7 +551,7 @@ namespace sol { namespace stack {
 		static C get(types<K, V>, lua_State* L, int relindex, record& tracking) {
 			tracking.use(1);
 
-#if SOL_IS_ON(SOL_SAFE_STACK_CHECK_I_)
+#if SOL_IS_ON(SOL_SAFE_STACK_CHECK)
 			luaL_checkstack(L, 3, detail::not_enough_stack_space_generic);
 #endif // make sure stack doesn't overflow
 
@@ -581,23 +581,17 @@ namespace sol { namespace stack {
 					typedef typename T::value_type P;
 					typedef typename P::first_type K;
 					typedef typename P::second_type V;
-					unqualified_getter<as_table_t<T>> g;
-					// VC++ has a bad warning here: shut it up
-					(void)g;
+					unqualified_getter<as_table_t<T>> g{};
 					return g.get(types<K, nested<V>>(), L, index, tracking);
 				}
 				else {
 					typedef typename T::value_type V;
-					unqualified_getter<as_table_t<T>> g;
-					// VC++ has a bad warning here: shut it up
-					(void)g;
+					unqualified_getter<as_table_t<T>> g{};
 					return g.get(types<nested<V>>(), L, index, tracking);
 				}
 			}
 			else {
-				unqualified_getter<Tu> g;
-				// VC++ has a bad warning here: shut it up
-				(void)g;
+				unqualified_getter<Tu> g{};
 				return g.get(L, index, tracking);
 			}
 		}
@@ -883,7 +877,7 @@ namespace sol { namespace stack {
 	struct unqualified_getter<detail::as_value_tag<T>> {
 		static T* get_no_lua_nil(lua_State* L, int index, record& tracking) {
 			void* memory = lua_touserdata(L, index);
-#if SOL_IS_ON(SOL_USE_INTEROP_I_)
+#if SOL_IS_ON(SOL_USE_INTEROP)
 			auto ugr = stack_detail::interop_get<T>(L, index, memory, tracking);
 			if (ugr.first) {
 				return ugr.second;
@@ -933,9 +927,7 @@ namespace sol { namespace stack {
 				tracking.use(1);
 				return nullptr;
 			}
-			unqualified_getter<detail::as_value_tag<T>> g;
-			// Avoid VC++ warning
-			(void)g;
+			unqualified_getter<detail::as_value_tag<T>> g{};
 			return g.get_no_lua_nil(L, index, tracking);
 		}
 	};
@@ -943,9 +935,7 @@ namespace sol { namespace stack {
 	template <typename T>
 	struct unqualified_getter<non_null<T*>> {
 		static T* get(lua_State* L, int index, record& tracking) {
-			unqualified_getter<detail::as_value_tag<T>> g;
-			// Avoid VC++ warning
-			(void)g;
+			unqualified_getter<detail::as_value_tag<T>> g{};
 			return g.get_no_lua_nil(L, index, tracking);
 		}
 	};
@@ -953,9 +943,7 @@ namespace sol { namespace stack {
 	template <typename T>
 	struct unqualified_getter<T&> {
 		static T& get(lua_State* L, int index, record& tracking) {
-			unqualified_getter<detail::as_value_tag<T>> g;
-			// Avoid VC++ warning
-			(void)g;
+			unqualified_getter<detail::as_value_tag<T>> g{};
 			return g.get(L, index, tracking);
 		}
 	};
@@ -963,9 +951,7 @@ namespace sol { namespace stack {
 	template <typename T>
 	struct unqualified_getter<std::reference_wrapper<T>> {
 		static T& get(lua_State* L, int index, record& tracking) {
-			unqualified_getter<T&> g;
-			// Avoid VC++ warning
-			(void)g;
+			unqualified_getter<T&> g{};
 			return g.get(L, index, tracking);
 		}
 	};
@@ -973,20 +959,16 @@ namespace sol { namespace stack {
 	template <typename T>
 	struct unqualified_getter<T*> {
 		static T* get(lua_State* L, int index, record& tracking) {
-#if SOL_IS_ON(SOL_GET_FUNCTION_POINTER_UNSAFE_I_)
+#if SOL_IS_ON(SOL_GET_FUNCTION_POINTER_UNSAFE)
 			if constexpr (std::is_function_v<T>) {
 				return stack_detail::get_function_pointer<T>(L, index, tracking);
 			}
 			else {
-				unqualified_getter<detail::as_pointer_tag<T>> g;
-				// Avoid VC++ warning
-				(void)g;
+				unqualified_getter<detail::as_pointer_tag<T>> g{};
 				return g.get(L, index, tracking);
 			}
 #else
-			unqualified_getter<detail::as_pointer_tag<T>> g;
-			// Avoid VC++ warning
-			(void)g;
+			unqualified_getter<detail::as_pointer_tag<T>> g{};
 			return g.get(L, index, tracking);
 #endif
 		}
@@ -1022,7 +1004,7 @@ namespace sol { namespace stack {
 		}
 	};
 
-#if SOL_IS_ON(SOL_STD_VARIANT_I_)
+#if SOL_IS_ON(SOL_STD_VARIANT)
 
 	template <typename... Tn>
 	struct unqualified_getter<std::variant<Tn...>> {

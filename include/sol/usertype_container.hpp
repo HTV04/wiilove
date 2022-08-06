@@ -2,7 +2,7 @@
 
 // The MIT License (MIT)
 
-// Copyright (c) 2013-2021 Rapptz, ThePhD and contributors
+// Copyright (c) 2013-2022 Rapptz, ThePhD and contributors
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of
 // this software and associated documentation files (the "Software"), to deal in
@@ -517,7 +517,7 @@ namespace sol {
 				iterator it;
 				std::size_t index;
 
-				iter(lua_State* L_, int stack_index, T& source_, iterator it_) : keep_alive(L_, stack_index), source(source_), it(std::move(it_)), index(0) {
+				iter(lua_State* L_, int stack_index, T& source_, iterator it_) : keep_alive(sol::main_thread(L_, L_), stack_index), source(source_), it(std::move(it_)), index(0) {
 				}
 
 				~iter() {
@@ -525,7 +525,7 @@ namespace sol {
 			};
 
 			static auto& get_src(lua_State* L_) {
-#if SOL_IS_ON(SOL_SAFE_USERTYPE_I_)
+#if SOL_IS_ON(SOL_SAFE_USERTYPE)
 				auto p = stack::unqualified_check_get<T*>(L_, 1);
 				if (!p) {
 					luaL_error(L_,
@@ -1394,17 +1394,18 @@ namespace sol {
 				T& source;
 				iterator it;
 
-				iter(lua_State* L_, int stack_index, T& source, iterator it) noexcept : keep_alive(L_, stack_index), source(source), it(std::move(it)) {
+				iter(lua_State* L_, int stack_index, T& source, iterator it) noexcept
+				: keep_alive(sol::main_thread(L_, L_), stack_index), source(source), it(std::move(it)) {
 				}
 
-				~iter () {
+				~iter() {
 
 				}
 			};
 
 			static auto& get_src(lua_State* L_) {
 				auto p = stack::unqualified_check_get<T*>(L_, 1);
-#if SOL_IS_ON(SOL_SAFE_USERTYPE_I_)
+#if SOL_IS_ON(SOL_SAFE_USERTYPE)
 				if (!p) {
 					luaL_error(L_,
 					     "sol: 'self' is not of type '%s' (pass 'self' as first argument with ':' or call on proper type)",
