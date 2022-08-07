@@ -34,7 +34,8 @@ class Texture {
 		GRRLIB_texture *texture;
 
 		Texture(std::string filename);
-		Texture(int *instances, GRRLIB_texture *texture);
+
+		Texture(const Texture &other);
 
 		Texture *clone();
 

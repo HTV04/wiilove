@@ -42,7 +42,7 @@ class Font {
 		Font(std::string filename, unsigned int size);
 		Font(std::string filename);
 
-		Font(int *instances, void *data, int *dataSize, int *fontSize);
+		Font(const Font &other);
 
 		Font *clone();
 

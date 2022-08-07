@@ -63,11 +63,13 @@ Font::Font(std::string filename, unsigned int size) { // Load TTF font
 Font::Font(std::string filename) : Font(filename, defaultFontSize) {} // Load TTF font (with default size)
 
 // Clone constructor
-Font::Font(int *instances, void *data, int *dataSize, int *fontSize) {
-	this->instances = instances;
-	this->data = data;
-	this->dataSize = dataSize;
-	this->fontSize = fontSize;
+Font::Font(const Font &other) {
+	instances = other.instances;
+	data = other.data;
+	dataSize = other.dataSize;
+	fontSize = other.fontSize;
+
+	(*instances)++;
 
 	fontSystem = new FreeTypeGX();
 
@@ -79,17 +81,14 @@ Font::Font(int *instances, void *data, int *dataSize, int *fontSize) {
 
 // Object functions
 Font *Font::clone() {
-	instances++;
-
-	return new Font(instances, data, dataSize, fontSize);
+	return new Font(*this);
 }
 
 // Destructor
 Font::~Font() {
 	delete fontSystem;
 
-	instances--;
-	if (instances == 0) {
+	if (--(*instances) == 0) {
 		delete fontSize;
 		delete dataSize;
 		std::free(data);

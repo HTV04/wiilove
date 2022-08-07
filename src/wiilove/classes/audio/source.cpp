@@ -33,23 +33,23 @@
 namespace love {
 namespace audio {
 
-std::map<std::string, audiogc::type> type_map = {
+std::map<std::string, audiogc::type> typeMap = {
 	{"flac", audiogc::type::flac},
 	{"mp3", audiogc::type::mp3},
 	{"ogg", audiogc::type::vorbis},
 	{"wav", audiogc::type::wav}
 };
-std::map<std::string, audiogc::mode> mode_map = {
+std::map<std::string, audiogc::mode> modeMap = {
 	{"stream", audiogc::mode::stream},
 	{"static", audiogc::mode::store}
 };
 
 // Constructors
 Source::Source(std::string type, std::string filename, std::string mode) {
-	player = new audiogc::player(type_map[type], filesystem::getFilePath(filename), mode_map[mode]);
+	player = new audiogc::player(typeMap[type], filesystem::getFilePath(filename), modeMap[mode]);
 }
 Source::Source(std::string filename, std::string mode) {
-	player = new audiogc::player(audiogc::type::detect, filesystem::getFilePath(filename), mode_map[mode]);
+	player = new audiogc::player(audiogc::type::detect, filesystem::getFilePath(filename), modeMap[mode]);
 }
 
 // Clone constructor

@@ -34,26 +34,27 @@ namespace graphics {
 
 // Constructor
 Texture::Texture(std::string filename) {
+	instances = new int(1);
+
 	texture = GRRLIB_LoadTextureFromFile(love::filesystem::getFilePath(filename).c_str());
 }
 
 // Clone constructor
-Texture::Texture(int *instances, GRRLIB_texture *texture) {
-	this->instances = instances;
-	this->texture = texture;
+Texture::Texture(const Texture &other) {
+	instances = other.instances;
+	texture = other.texture;
+
+	(*instances)++;
 }
 
 // Object functions
 Texture *Texture::clone() {
-	instances++;
-
-	return new Texture(instances, texture);
+	return new Texture(*this);
 }
 
 // Destructor
 Texture::~Texture() {
-	instances--;
-	if (instances == 0) {
+	if (--(*instances) == 0) {
 		GRRLIB_FreeTexture(texture);
 
 		delete instances;
