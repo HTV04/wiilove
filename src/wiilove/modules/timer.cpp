@@ -26,19 +26,16 @@
 // Header
 #include "timer.hpp"
 
-// Local variables
-namespace {
-	unsigned long long lastTime;
-	double deltaTime = 0.0;
-
-	unsigned long long lastFrameTime;
-	double fps = 0.0;
-	double avgDelta = 0.0;
-	double frames = 0.0;
-}
-
 namespace love {
 namespace timer {
+
+unsigned long long lastTime;
+double deltaTime = 0.0;
+
+unsigned long long lastFrameTime;
+double fps = 0.0;
+double avgDelta = 0.0;
+double frames = 0.0;
 
 void init() {
 	lastTime = gettime();

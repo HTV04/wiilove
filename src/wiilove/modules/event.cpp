@@ -35,24 +35,22 @@
 // Header
 #include "event.hpp"
 
-namespace {
-	std::vector<std::tuple<sol::object, sol::object, sol::object, sol::object, sol::object, sol::object, sol::object>> events;
-
-	void preQuit() { // Perform pre-quit tasks
-		// Be a good boy, clear the memory allocated by GRRLIB
-		GRRLIB_Exit();
-	}
-
-	int resetFunc = -1;
-	void resetPressed(unsigned int irq, void *ctx) { resetFunc = SYS_RETURNTOMENU; }
-	void powerPressed() { resetFunc = SYS_POWEROFF; }
-#ifndef HW_DOL
-	void wiimotePowerPressed(int id) { resetFunc = SYS_POWEROFF; }
-#endif // !HW_DOL
-}
-
 namespace love {
 namespace event {
+
+std::vector<std::tuple<sol::object, sol::object, sol::object, sol::object, sol::object, sol::object, sol::object>> events;
+
+void preQuit() { // Perform pre-quit tasks
+	// Be a good boy, clear the memory allocated by GRRLIB
+	GRRLIB_Exit();
+}
+
+int resetFunc = -1;
+void resetPressed(unsigned int irq, void *ctx) { resetFunc = SYS_RETURNTOMENU; }
+void powerPressed() { resetFunc = SYS_POWEROFF; }
+#ifndef HW_DOL
+void wiimotePowerPressed(int id) { resetFunc = SYS_POWEROFF; }
+#endif // !HW_DOL
 
 void init () {
 	// SYS_ResetSystem callbacks

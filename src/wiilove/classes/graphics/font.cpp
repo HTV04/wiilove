@@ -20,7 +20,7 @@
  */
 
 // Libraries
-#include "../../lib/FreeTypeGX/FreeTypeGX.h"
+#include "../../lib/FreeTypeGX.h"
 #include <iostream>
 #include <cstdlib>
 
@@ -33,10 +33,10 @@
 // Data
 #include "Vera_ttf.h"
 
-#define DEFAULT_SIZE 12
-
 namespace love {
 namespace graphics {
+
+constexpr int defaultFontSize = 12;
 
 // Constructors
 Font::Font(unsigned int size) { // Load Vera.ttf as default font
@@ -49,7 +49,7 @@ Font::Font(unsigned int size) { // Load Vera.ttf as default font
 
 	fontSystem->loadFont(Vera_ttf, Vera_ttf_size, *fontSize);
 }
-Font::Font() : Font(DEFAULT_SIZE) {} // Load Vera.ttf as default font (with default size)
+Font::Font() : Font(defaultFontSize) {} // Load Vera.ttf as default font (with default size)
 Font::Font(std::string filename, unsigned int size) { // Load TTF font
 	instances = new int(1);
 	dataSize = new int(0);
@@ -60,7 +60,7 @@ Font::Font(std::string filename, unsigned int size) { // Load TTF font
 	filesystem::getFileData(filename, data, *dataSize);
 	fontSystem->loadFont(static_cast<unsigned char*>(data), *dataSize, *fontSize);
 }
-Font::Font(std::string filename) : Font(filename, DEFAULT_SIZE) {} // Load TTF font (with default size)
+Font::Font(std::string filename) : Font(filename, defaultFontSize) {} // Load TTF font (with default size)
 
 // Clone constructor
 Font::Font(int *instances, void *data, int *dataSize, int *fontSize) {

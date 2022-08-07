@@ -1,4 +1,4 @@
-/* WiiLÖVE Texture class
+/* WiiLÖVE math module
  *
  * This file is part of WiiLÖVE.
  *
@@ -19,35 +19,36 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
-
 // Libraries
-#include "../../lib/FreeTypeGX/FreeTypeGX.h"
+#include <ogc/lwp_watchdog.h>
+#include <wiiuse/wpad.h>
+#include <random>
+
+// Header
+#include "math.hpp"
 
 namespace love {
-namespace graphics {
+namespace math {
 
-class Font {
-	private:
-		int *instances;
-		void *data;
-		int *dataSize;
-		int *fontSize;
+std::default_random_engine randomGenerator(gettime());
 
-	public:
-		FreeTypeGX *fontSystem;
+std::uniform_real_distribution<double> randomDoubleDist(0.0, 1.0);
 
-		Font(unsigned int size);
-		Font();
-		Font(std::string filename, unsigned int size);
-		Font(std::string filename);
+namespace module {
 
-		Font(int *instances, void *data, int *dataSize, int *fontSize);
+// Random number generation
+int random(int min, int max) {
+    std::uniform_int_distribution<int> randomIntDist(min, max);
 
-		Font *clone();
-
-		~Font();
+    return randomIntDist(randomGenerator);
+};
+int random1(int max) {
+    return random(1, max);
+};
+double random2() {
+    return randomDoubleDist(randomGenerator);
 };
 
-} // graphics
+} // module
+} // math
 } // love

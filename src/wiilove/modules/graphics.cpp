@@ -21,7 +21,7 @@
 
 // Libraries
 #include <grrlib-mod.h>
-#include "../lib/FreeTypeGX/FreeTypeGX.h"
+#include "../lib/FreeTypeGX.h"
 #include <ogc/gx.h>
 #ifndef HW_DOL
 #include <ogc/conf.h>
@@ -40,24 +40,20 @@
 // Header
 #include "graphics.hpp"
 
-// Local variables
-namespace {
-	const int width = 640;
-	const int height = 480;
-	const std::pair<int, int> dimensions = std::make_pair(width, height);
-
-	bool widescreen;
-
-	// Transforms are stored for push/pop operations
-	std::vector<GRRLIB_matrix> transforms;
-
-	unsigned int backgroundColor;
-
-	love::graphics::Font *curFont; // Initial font
-}
-
 namespace love {
 namespace graphics {
+
+constexpr int width = 640;
+constexpr int height = 480;
+
+bool widescreen;
+
+// Transforms are stored for push/pop operations
+std::vector<GRRLIB_matrix> transforms;
+
+unsigned int backgroundColor;
+
+love::graphics::Font *curFont; // Initial font
 
 void init() {
 #ifndef HW_DOL
@@ -72,7 +68,7 @@ void init() {
 namespace module {
 
 // Misc. querying functions
-std::pair<int, int> getDimensions() { return dimensions; }
+std::pair<int, int> getDimensions() { return std::make_pair(width, height); }
 int getHeight() { return height; }
 int getWidth() { return width; }
 #ifdef HW_DOL

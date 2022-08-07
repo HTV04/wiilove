@@ -43,16 +43,22 @@ include $(DEVKITPRO)/libogc-mod/wii_rules
 #---------------------------------------------------------------------------------
 TARGET		:=	$(notdir $(CURDIR))
 BUILD		:=	build
-SOURCES		:=	src src/classes/audio src/classes/graphics src/lib/FreeTypeGX src/modules
+ifeq ($(WIILOVE_BUILD),unity)
+SOURCES		:=	src/wiilove-unity
+else
+SOURCES		:=	src/wiilove/classes/audio src/wiilove/classes/graphics src/wiilove/lib src/wiilove/modules src/wiilove
+endif
 DATA		:=	data
-INCLUDES	:=	include
+INCLUDES	:=	include src/wiilove
 
 #---------------------------------------------------------------------------------
 # options for code generation
 #---------------------------------------------------------------------------------
 
-CFLAGS	=	-g -O2 -Wall $(MACHDEP) $(INCLUDE) \
-			-DSOL_ALL_SAFETIES_ON=1
+CFLAGS	=	-Wall $(MACHDEP) $(INCLUDE) \
+			-DSOL_ALL_SAFETIES_ON=1 \
+			-DNDEBUG -O2
+#			-DDEBUG -g -O0
 CXXFLAGS	=	$(CFLAGS)
 
 LDFLAGS	=	-g $(MACHDEP) -Wl,-Map,$(notdir $@).map
@@ -61,12 +67,12 @@ LDFLAGS	=	-g $(MACHDEP) -Wl,-Map,$(notdir $@).map
 # any extra libraries we wish to link with the project
 # the order can-be/is critical
 #---------------------------------------------------------------------------------
-LIBS	:=	-lgrrlib-mod -lpngu-mod -lpng -ljpeg
-LIBS	+=	-lfreetype -lz -lbz2
-LIBS	+=	-laudiogc -laesnd
-LIBS	+=	-lluajit
-LIBS	+=	-lwiiuse -lfat
-LIBS	+=	-lbte -logc -lm
+LIBS	:=	-lgrrlib-mod -lpngu-mod -lpng -ljpeg \
+			-lfreetype -lz -lbz2 \
+			-laudiogc -laesnd \
+			-lluajit \
+			-lwiiuse -lfat \
+			-lbte -logc -lm
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing

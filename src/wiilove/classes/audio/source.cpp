@@ -38,47 +38,45 @@
 // Header
 #include "source.hpp"
 
-#define BUFFER_SIZE 5760 // Max buffer size according to gcmodplay, also DSP_STREAMBUFFER_SIZE * 5
+namespace love {
+namespace audio {
 
-namespace {
-	void aesndCallback(AESNDPB *pb, unsigned int state, void *cbArg) {
-		if (state == VOICE_STATE_STREAM) {
-			love::audio::Source *source = static_cast<love::audio::Source *>(cbArg);
+constexpr int bufferSize = 5760;
 
-			AESND_SetVoiceBuffer(pb, source->buffer, BUFFER_SIZE);
+void aesndCallback(AESNDPB *pb, unsigned int state, void *cbArg) {
+	if (state == VOICE_STATE_STREAM) {
+		love::audio::Source *source = static_cast<love::audio::Source *>(cbArg);
 
-			if (source->playing)
-				LWP_ThreadSignal(source->threadQueue);
-		}
-	}
+		AESND_SetVoiceBuffer(pb, source->buffer, bufferSize);
 
-	void *wavPlayer(void *arg) {
-		love::audio::Source *source = static_cast<love::audio::Source *>(arg);
-
-		while (source->playing) {
-			if (drwav_read_pcm_frames_s16be(source->wav, source->framesPerBuffer, static_cast<short *>(source->buffer)) == 0) {
-				source->position = 0;
-
-				AESND_SetVoiceStream(source->aesndPb, false);
-				AESND_SetVoiceStop(source->aesndPb, true);
-
-				source->playing = false;
-				source->paused = false;
-			} else {
-				DCFlushRange(source->buffer, BUFFER_SIZE);
-
-				source->position += source->framesPerBuffer;
-
-				LWP_ThreadSleep(source->threadQueue);
-			}
-		}
-
-		return 0;
+		if (source->playing)
+			LWP_ThreadSignal(source->threadQueue);
 	}
 }
 
-namespace love {
-namespace audio {
+void *wavPlayer(void *arg) {
+	love::audio::Source *source = static_cast<love::audio::Source *>(arg);
+
+	while (source->playing) {
+		if (drwav_read_pcm_frames_s16be(source->wav, source->framesPerBuffer, static_cast<short *>(source->buffer)) == 0) {
+			source->position = 0;
+
+			AESND_SetVoiceStream(source->aesndPb, false);
+			AESND_SetVoiceStop(source->aesndPb, true);
+
+			source->playing = false;
+			source->paused = false;
+		} else {
+			DCFlushRange(source->buffer, bufferSize);
+
+			source->position += source->framesPerBuffer;
+
+			LWP_ThreadSleep(source->threadQueue);
+		}
+	}
+
+	return 0;
+}
 
 // Internal functions
 void Source::init() {
@@ -88,8 +86,8 @@ void Source::init() {
 
 	drwav_init_file(wav, filename->c_str(), NULL);
 
-	buffer = memalign(32, BUFFER_SIZE);
-	framesPerBuffer = BUFFER_SIZE / (wav->channels * sizeof(short));
+	buffer = memalign(32, bufferSize);
+	framesPerBuffer = bufferSize / (wav->channels * sizeof(short));
 
 	aesndPb = AESND_AllocateVoice(aesndCallback, this);
 

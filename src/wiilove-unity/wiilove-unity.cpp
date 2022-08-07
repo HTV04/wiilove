@@ -1,4 +1,4 @@
-/* WiiLÖVE math module
+/* WiiLÖVE unity build
  *
  * This file is part of WiiLÖVE.
  *
@@ -19,37 +19,22 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-// Libraries
-#include <ogc/lwp_watchdog.h>
-#include <wiiuse/wpad.h>
-#include <random>
+#include "classes/audio/source.cpp"
 
-// Header
-#include "math.hpp"
+#include "classes/graphics/font.cpp"
+#include "classes/graphics/texture.cpp"
 
-namespace {
-    std::default_random_engine generator(gettime());
+#include "lib/FreeTypeGX.cpp"
+#include "lib/Metaphrasis.cpp"
 
-    std::uniform_real_distribution<double> doubleDist(0.0, 1.0);
-}
+#include "modules/audio.cpp"
+#include "modules/event.cpp"
+#include "modules/filesystem.cpp"
+#include "modules/graphics.cpp"
+#include "modules/math.cpp"
+#include "modules/system.cpp"
+#include "modules/timer.cpp"
+#include "modules/wiimote.cpp"
 
-namespace love {
-namespace math {
-namespace module {
-
-// Random number generation
-int random(int min, int max) {
-    std::uniform_int_distribution<int> intDist(min, max);
-
-    return intDist(generator);
-};
-int random1(int max) {
-    return random(1, max);
-};
-double random2() {
-    return doubleDist(generator);
-};
-
-} // module
-} // math
-} // love
+#include "love.cpp"
+#include "main.cpp"

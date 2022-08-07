@@ -44,6 +44,7 @@ Check out some open-source projects that use WiiLÖVE!
   * [GRRLIB-mod](https://github.com/HTV04/GRRLIB-mod) and its dependencies
   * [LuaJIT for devkitPPC](https://github.com/HTV04/LuaJIT)
 * Run `make` (or `make release` to create release ZIPs).
+  * To make a unity build (all source files compiled as one), add `WIILOVE_BUILD=unity` after `make`.
 * Compiled binaries will be available in `bin` (and release ZIPs will be available in `dist`).
 
 # License

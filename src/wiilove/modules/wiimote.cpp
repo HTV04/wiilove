@@ -32,63 +32,60 @@
 // Header
 #include "wiimote.hpp"
 
-// Local variables
-namespace {
-	WPADData *data;
-
-	struct Wiimote {
-		int status = WPAD_ERR_NONE;
-		unsigned int extension;
-		unsigned int buttonsDown;
-		float x, y;
-		float angle;
-
-		bool rumbling;
-	};
-
-	std::vector<Wiimote> wiimotes(4);
-
-	std::map<std::string, int> buttonMap = {
-		{"2", WPAD_BUTTON_2},
-		{"1", WPAD_BUTTON_1},
-		{"b", WPAD_BUTTON_B},
-		{"a", WPAD_BUTTON_A},
-		{"-", WPAD_BUTTON_MINUS},
-		{"left", WPAD_BUTTON_LEFT},
-		{"right", WPAD_BUTTON_RIGHT},
-		{"up", WPAD_BUTTON_UP},
-		{"down", WPAD_BUTTON_DOWN},
-		{"+", WPAD_BUTTON_PLUS},
-		{"z", WPAD_NUNCHUK_BUTTON_Z},
-		{"c", WPAD_NUNCHUK_BUTTON_C}
-	};
-
-	std::map<std::string, int> classicButtonMap = {
-		{"up", WPAD_CLASSIC_BUTTON_UP},
-		{"left", WPAD_CLASSIC_BUTTON_LEFT},
-		{"zr", WPAD_CLASSIC_BUTTON_ZR},
-		{"x", WPAD_CLASSIC_BUTTON_X},
-		{"a", WPAD_CLASSIC_BUTTON_A},
-		{"y", WPAD_CLASSIC_BUTTON_Y},
-		{"b", WPAD_CLASSIC_BUTTON_B},
-		{"zl", WPAD_CLASSIC_BUTTON_ZL},
-		{"r", WPAD_CLASSIC_BUTTON_FULL_R},
-		{"+", WPAD_CLASSIC_BUTTON_PLUS},
-		{"-", WPAD_CLASSIC_BUTTON_MINUS},
-		{"l", WPAD_CLASSIC_BUTTON_FULL_L},
-		{"down", WPAD_CLASSIC_BUTTON_DOWN},
-		{"right", WPAD_CLASSIC_BUTTON_RIGHT}
-	};
-
-	std::map<int, std::string> extensionMap = {
-		{WPAD_EXP_NONE, "None"},
-		{WPAD_EXP_NUNCHUK, "Nunchuk"},
-		{WPAD_EXP_CLASSIC, "Classic Controller"}
-	};
-}
-
 namespace love {
 namespace wiimote {
+
+WPADData *data;
+
+struct Wiimote {
+	int status = WPAD_ERR_NONE;
+	unsigned int extension;
+	unsigned int buttonsDown;
+	float x, y;
+	float angle;
+
+	bool rumbling;
+};
+
+std::vector<Wiimote> wiimotes(4);
+
+std::map<std::string, int> buttonMap = {
+	{"2", WPAD_BUTTON_2},
+	{"1", WPAD_BUTTON_1},
+	{"b", WPAD_BUTTON_B},
+	{"a", WPAD_BUTTON_A},
+	{"-", WPAD_BUTTON_MINUS},
+	{"left", WPAD_BUTTON_LEFT},
+	{"right", WPAD_BUTTON_RIGHT},
+	{"up", WPAD_BUTTON_UP},
+	{"down", WPAD_BUTTON_DOWN},
+	{"+", WPAD_BUTTON_PLUS},
+	{"z", WPAD_NUNCHUK_BUTTON_Z},
+	{"c", WPAD_NUNCHUK_BUTTON_C}
+};
+
+std::map<std::string, int> classicButtonMap = {
+	{"up", WPAD_CLASSIC_BUTTON_UP},
+	{"left", WPAD_CLASSIC_BUTTON_LEFT},
+	{"zr", WPAD_CLASSIC_BUTTON_ZR},
+	{"x", WPAD_CLASSIC_BUTTON_X},
+	{"a", WPAD_CLASSIC_BUTTON_A},
+	{"y", WPAD_CLASSIC_BUTTON_Y},
+	{"b", WPAD_CLASSIC_BUTTON_B},
+	{"zl", WPAD_CLASSIC_BUTTON_ZL},
+	{"r", WPAD_CLASSIC_BUTTON_FULL_R},
+	{"+", WPAD_CLASSIC_BUTTON_PLUS},
+	{"-", WPAD_CLASSIC_BUTTON_MINUS},
+	{"l", WPAD_CLASSIC_BUTTON_FULL_L},
+	{"down", WPAD_CLASSIC_BUTTON_DOWN},
+	{"right", WPAD_CLASSIC_BUTTON_RIGHT}
+};
+
+std::map<int, std::string> extensionMap = {
+	{WPAD_EXP_NONE, "None"},
+	{WPAD_EXP_NUNCHUK, "Nunchuk"},
+	{WPAD_EXP_CLASSIC, "Classic Controller"}
+};
 
 // Internal functions
 void init() {
