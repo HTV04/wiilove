@@ -22,9 +22,7 @@
 #pragma once
 
 // Libraries
-#include <dr_wav.h>
-#include <aesndlib.h>
-#include <ogc/lwp.h>
+#include <audiogc.hpp>
 #include <string>
 
 namespace love {
@@ -32,43 +30,26 @@ namespace audio {
 
 class Source {
 	private:
-		int *instances;
-		std::string *filename;
-
-		void init();
+		audiogc::player *player;
 
 	public:
-		drwav *wav;
+		Source(std::string type, std::string filename, std::string mode);
+		Source(std::string filename, std::string mode);
 
-		void *buffer;
-		int framesPerBuffer;
-		int position = 0;
-
-		AESNDPB *aesndPb;
-
-		float pitch;
-		int volume;
-		bool playing;
-		bool paused;
-
-		lwpq_t threadQueue;
-		lwp_t thread;
-
-		Source(std::string filename);
-
-		Source(int *instances, std::string *filename);
+		Source(const Source &other);
 
 		void pause();
 		void play();
 		void stop();
 
-		float getPitch();
+		unsigned char getChannelCount();
+		double getPitch();
 		unsigned char getVolume();
-		bool isPaused();
+		bool isLooping();
 		bool isPlaying();
-		bool isStopped();
 		void seek(int offset);
-		void setPitch(float pitch);
+		void setLooping(bool loop);
+		double setPitch(double pitch);
 		void setVolume(int volume);
 		double tell();
 

@@ -19,18 +19,10 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#define DR_WAV_IMPLEMENTATION
-
 // Libraries
-#include <dr_wav.h>
-#include <aesndlib.h>
-#include <ogc/cache.h>
-#include <ogc/lwp.h>
-#include <map>
+#include <audiogc.hpp>
 #include <string>
-#include <stdexcept>
-#include <cstdlib>
-#include <malloc.h>
+#include <map>
 
 // Modules
 #include "../../modules/filesystem.hpp"
@@ -41,195 +33,52 @@
 namespace love {
 namespace audio {
 
-constexpr int bufferSize = 5760;
-
-void aesndCallback(AESNDPB *pb, unsigned int state, void *cbArg) {
-	if (state == VOICE_STATE_STREAM) {
-		love::audio::Source *source = static_cast<love::audio::Source *>(cbArg);
-
-		AESND_SetVoiceBuffer(pb, source->buffer, bufferSize);
-
-		if (source->playing)
-			LWP_ThreadSignal(source->threadQueue);
-	}
-}
-
-void *wavPlayer(void *arg) {
-	love::audio::Source *source = static_cast<love::audio::Source *>(arg);
-
-	while (source->playing) {
-		if (drwav_read_pcm_frames_s16be(source->wav, source->framesPerBuffer, static_cast<short *>(source->buffer)) == 0) {
-			source->position = 0;
-
-			AESND_SetVoiceStream(source->aesndPb, false);
-			AESND_SetVoiceStop(source->aesndPb, true);
-
-			source->playing = false;
-			source->paused = false;
-		} else {
-			DCFlushRange(source->buffer, bufferSize);
-
-			source->position += source->framesPerBuffer;
-
-			LWP_ThreadSleep(source->threadQueue);
-		}
-	}
-
-	return 0;
-}
-
-// Internal functions
-void Source::init() {
-	int voiceFormat;
-
-	wav = new drwav;
-
-	drwav_init_file(wav, filename->c_str(), NULL);
-
-	buffer = memalign(32, bufferSize);
-	framesPerBuffer = bufferSize / (wav->channels * sizeof(short));
-
-	aesndPb = AESND_AllocateVoice(aesndCallback, this);
-
-	switch(wav->channels) {
-		case 1:
-			voiceFormat = VOICE_MONO16;
-			break;
-		case 2:
-			voiceFormat = VOICE_STEREO16;
-			break;
-		default:
-			throw std::runtime_error("Unsupported number of channels");
-	}
-	AESND_SetVoiceFormat(aesndPb, voiceFormat);
-	setPitch(1.0);
-	setVolume(255);
-}
+std::map<std::string, audiogc::type> type_map = {
+	{"flac", audiogc::type::flac},
+	{"mp3", audiogc::type::mp3},
+	{"ogg", audiogc::type::vorbis},
+	{"wav", audiogc::type::wav}
+};
+std::map<std::string, audiogc::mode> mode_map = {
+	{"stream", audiogc::mode::stream},
+	{"static", audiogc::mode::store}
+};
 
 // Constructors
-Source::Source(std::string filename) {
-	instances = new int(1);
-	this->filename = new std::string(filesystem::getFilePath(filename));
-
-	init();
+Source::Source(std::string type, std::string filename, std::string mode) {
+	player = new audiogc::player(type_map[type], filesystem::getFilePath(filename), mode_map[mode]);
+}
+Source::Source(std::string filename, std::string mode) {
+	player = new audiogc::player(audiogc::type::detect, filesystem::getFilePath(filename), mode_map[mode]);
 }
 
 // Clone constructor
-Source::Source(int *instances, std::string *filename) {
-	this->instances = instances;
-	this->filename = filename;
-
-	init();
+Source::Source(const Source &other) {
+	this->player = new audiogc::player(*other.player);
 }
 
 // Playback functions
-void Source::pause() {
-	if (playing == true) {
-		AESND_SetVoiceStop(aesndPb, true);
-
-		paused = true;
-	}
-}
-void Source::play() {
-	if (paused == true) {
-		AESND_SetVoiceStop(aesndPb, false);
-
-		paused = false;
-	} else if (playing == false) {
-		seek(0);
-
-		playing = true;
-
-		LWP_InitQueue(&threadQueue);
-		LWP_CreateThread(&thread, wavPlayer, this, NULL, 0, 80);
-
-		AESND_SetVoiceStream(aesndPb, true);
-		AESND_SetVoiceStop(aesndPb, false);
-	}
-}
-void Source::stop() {
-	position = 0;
-
-	AESND_SetVoiceStream(aesndPb, false);
-	AESND_SetVoiceStop(aesndPb, true);
-
-	playing = false;
-	paused = false;
-
-	LWP_ThreadSignal(threadQueue); // Give the thread a chance to exit
-	LWP_JoinThread(thread, NULL);
-}
+void Source::pause() { player->pause(); }
+void Source::play() { player->play(); }
+void Source::stop() { player->stop(); }
 
 // Playback state functions
-float Source::getPitch() { return pitch; }
-unsigned char Source::getVolume() { return volume; }
-bool Source::isPaused() { return paused; }
-bool Source::isPlaying() { return (playing == true) && (paused == false); }
-bool Source::isStopped() { return !playing; }
-void Source::seek(int offset) {
-	int wasPlaying = playing;
-	int wasPaused = paused;
-
-	position = offset * wav->sampleRate;
-
-	if (wasPlaying == true)
-		stop();
-
-	drwav_seek_to_pcm_frame(wav, position);
-
-	if (wasPlaying == true) {
-		if (wasPaused == false)
-			play();
-		else
-			pause();
-	}
-}
-void Source::setPitch(float pitch) {
-	this->pitch = pitch;
-
-	AESND_SetVoiceFrequency(aesndPb, wav->sampleRate * pitch);
-}
-void Source::setVolume(int volume) {
-	// Despite being a short, the safe volume range is 0-255
-	if (volume > 255)
-		volume = 255;
-	else if (volume < 0)
-		volume = 0;
-
-	this->volume = volume;
-
-	AESND_SetVoiceVolume(aesndPb, volume, volume);
-}
-double Source::tell() { return static_cast<double>(position) / wav->sampleRate; }
+unsigned char Source::getChannelCount() { return player->get_channel_count(); }
+double Source::getPitch() { return player->get_pitch(); }
+unsigned char Source::getVolume() { return player->get_volume(); }
+bool Source::isLooping() { return player->is_looping(); }
+bool Source::isPlaying() { return player->is_playing(); }
+void Source::seek(int offset) { player->seek(offset); }
+void Source::setLooping(bool loop) { player->set_looping(loop); }
+double Source::setPitch(double pitch) { return player->set_pitch(pitch); }
+void Source::setVolume(int volume) { player->set_volume(volume); }
+double Source::tell() { return player->tell(); }
 
 // Object functions
-Source *Source::clone() {
-	instances++;
-
-	Source *source = new Source(instances, filename);
-
-	source->setPitch(pitch);
-	source->setVolume(volume);
-
-	return source;
-}
+Source *Source::clone() { return new Source(*this); }
 
 // Destructor
-Source::~Source() {
-	stop();
-
-	AESND_FreeVoice(aesndPb);
-
-	free(buffer);
-
-	delete wav;
-
-	instances--;
-	if (instances == 0) {
-		delete filename;
-		delete instances;
-	}
-}
+Source::~Source() { delete player; }
 
 } // audio
 } // love

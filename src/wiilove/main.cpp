@@ -210,18 +210,22 @@ int main(int argc, char **argv) {
 	// Usertypes setup
 	// NOTE: We have to make these in the global namespace due to sol limitations.
 	SourceType = lua.new_usertype<love::audio::Source>(
-		"_Source", sol::constructors<love::audio::Source(std::string)>(),
+		"_Source", sol::constructors<
+			love::audio::Source(std::string, std::string, std::string),
+			love::audio::Source(std::string, std::string)
+		>(),
 
 		"pause", &love::audio::Source::pause,
 		"play", &love::audio::Source::play,
 		"stop", &love::audio::Source::stop,
 
+		"getChannelCount", &love::audio::Source::getChannelCount,
 		"getPitch", &love::audio::Source::getPitch,
 		"getVolume", &love::audio::Source::getVolume,
-		"isPaused", &love::audio::Source::isPaused,
+		"isLooping", &love::audio::Source::isLooping,
 		"isPlaying", &love::audio::Source::isPlaying,
-		"isStopped", &love::audio::Source::isStopped,
 		"seek", &love::audio::Source::seek,
+		"setLooping", &love::audio::Source::setLooping,
 		"setPitch", &love::audio::Source::setPitch,
 		"setVolume", &love::audio::Source::setVolume,
 		"tell", &love::audio::Source::tell,

@@ -5,6 +5,7 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "/opt/devkitpro/libogc-mod/include/**",
+                "/opt/devkitpro/libogc-mod/portlibs/wii/include/**",
                 "/opt/devkitpro/portlibs/ppc/include/**",
                 "/opt/devkitpro/portlibs/wii/include/**"
             ],
@@ -21,8 +22,9 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "/opt/devkitpro/libogc-mod/include/**",
+                "/opt/devkitpro/libogc-mod/portlibs/gamecube/include/**",
                 "/opt/devkitpro/portlibs/ppc/include/**",
-                "/opt/devkitpro/portlibs/wii/include/**"
+                "/opt/devkitpro/portlibs/gamecube/include/**"
             ],
             "defines": [
                 "HW_DOL"
