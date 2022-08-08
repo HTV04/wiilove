@@ -22,6 +22,7 @@
 // Libraries
 #include <sol/sol.hpp> // Prevents macro conflicts
 #include <grrlib-mod.h>
+#include <utility>
 
 // Modules
 #include "../../modules/filesystem.hpp"
@@ -42,9 +43,17 @@ Texture::Texture(std::string filename) {
 // Clone constructor
 Texture::Texture(const Texture &other) {
 	instances = other.instances;
+
 	texture = other.texture;
 
 	(*instances)++;
+}
+
+// Texture properties
+int Texture::getWidth() { return texture->w; }
+int Texture::getHeight() { return texture->h; }
+std::pair<int, int> Texture::getDimensions() {
+	return std::make_pair(texture->w, texture->h);
 }
 
 // Object functions

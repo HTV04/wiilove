@@ -246,6 +246,10 @@ int main(int argc, char **argv) {
 	TextureType = lua.new_usertype<love::graphics::Texture>(
 		"_Texture", sol::constructors<love::graphics::Texture(std::string)>(),
 
+		"getWidth", &love::graphics::Texture::getWidth,
+		"getHeight", &love::graphics::Texture::getHeight,
+		"getDimensions", &love::graphics::Texture::getDimensions,
+
 		"clone", &love::graphics::Texture::clone
 	);
 

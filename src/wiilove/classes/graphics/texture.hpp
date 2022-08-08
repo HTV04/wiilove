@@ -22,6 +22,7 @@
 #pragma once
 
 #include <grrlib-mod.h>
+#include <utility>
 
 namespace love {
 namespace graphics {
@@ -36,6 +37,10 @@ class Texture {
 		Texture(std::string filename);
 
 		Texture(const Texture &other);
+
+		int getWidth();
+		int getHeight();
+		std::pair<int, int> getDimensions();
 
 		Texture *clone();
 
