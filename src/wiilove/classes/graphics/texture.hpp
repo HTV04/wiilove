@@ -43,6 +43,7 @@ class Texture {
 		std::pair<int, int> getDimensions();
 
 		Texture *clone();
+		void release();
 
 		~Texture();
 };

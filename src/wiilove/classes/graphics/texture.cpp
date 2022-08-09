@@ -60,6 +60,7 @@ std::pair<int, int> Texture::getDimensions() {
 Texture *Texture::clone() {
 	return new Texture(*this);
 }
+void Texture::release() { delete this; }
 
 // Destructor
 Texture::~Texture() {

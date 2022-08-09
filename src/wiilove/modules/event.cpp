@@ -61,6 +61,13 @@ void init () {
 #endif // !HW_DOL
 }
 
+eventValues makeEvent(lua_State *s = nullptr, const char *eventName = nullptr, sol::object value1 = sol::nil, sol::object value2 = sol::nil, sol::object value3 = sol::nil, sol::object value4 = sol::nil, sol::object value5 = sol::nil, sol::object value6 = sol::nil) {
+	if ((s == nullptr) || (eventName == nullptr))
+		return std::make_tuple(sol::nil, sol::nil, sol::nil, sol::nil, sol::nil, sol::nil, sol::nil); // "Nil event"
+	else
+		return std::make_tuple(sol::make_object(s, eventName), value1, value2, value3, value4, value5, value6);
+}
+
 namespace module {
 
 // Event functions, aka WiiLÖVE's "master update"
@@ -82,7 +89,7 @@ void pump(sol::this_state s) {
 
 	int homePressed = -1;
 
-	events.push_back(std::make_tuple(sol::nil, sol::nil, sol::nil, sol::nil, sol::nil, sol::nil, sol::nil));
+	events.push_back(makeEvent());
 
 #ifndef HW_DOL
 	// Update wiimotes
@@ -90,20 +97,20 @@ void pump(sol::this_state s) {
 #endif // !HW_DOL
 
 	if (homePressed != -1) {
-		events.push_back(std::make_tuple(sol::make_object(s, "homepressed"), sol::make_object(s, homePressed), sol::nil, sol::nil, sol::nil, sol::nil, sol::nil));
+		events.push_back(makeEvent(s, "homepressed", sol::make_object(s, homePressed)));
 	}
 	for (int i = 3; i >= 0; i--) {
-		if (wiimoteAdds[i]) {
-			events.push_back(std::make_tuple(sol::make_object(s, "wiimoteconnected"), sol::make_object(s, i), sol::nil, sol::nil, sol::nil, sol::nil, sol::nil));
+		if (wiimoteAdds[i] == true) {
+			events.push_back(makeEvent(s, "wiimoteconnected", sol::make_object(s, i)));
 		}
 
-		if (wiimoteRemoves[i]) {
-			events.push_back(std::make_tuple(sol::make_object(s, "wiimotedisconnected"), sol::make_object(s, i), sol::nil, sol::nil, sol::nil, sol::nil, sol::nil));
+		if (wiimoteRemoves[i] == true) {
+			events.push_back(makeEvent(s, "wiimotedisconnected", sol::make_object(s, i)));
 		}
 	}
 }
-std::tuple<sol::object, sol::object, sol::object, sol::object, sol::object, sol::object, sol::object> poll() {
-	std::tuple<sol::object, sol::object, sol::object, sol::object, sol::object, sol::object, sol::object> event = events.back();
+eventValues poll() {
+	eventValues event = events.back();
 
 	events.pop_back();
 

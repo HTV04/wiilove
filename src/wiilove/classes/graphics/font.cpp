@@ -83,6 +83,7 @@ Font::Font(const Font &other) {
 Font *Font::clone() {
 	return new Font(*this);
 }
+void Font::release() { delete this; }
 
 // Destructor
 Font::~Font() {

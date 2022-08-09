@@ -28,12 +28,14 @@
 namespace love {
 namespace event {
 
+typedef std::tuple<sol::object, sol::object, sol::object, sol::object, sol::object, sol::object, sol::object> eventValues;
+
 void init();
 
 namespace module {
 
 void pump(sol::this_state s);
-std::tuple<sol::object, sol::object, sol::object, sol::object, sol::object, sol::object, sol::object> poll();
+eventValues poll();
 
 void quit();
 

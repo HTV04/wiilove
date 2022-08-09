@@ -54,6 +54,7 @@ class Source {
 		double tell();
 
 		Source *clone();
+		void release();
 
 		~Source();
 };

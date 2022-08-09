@@ -230,7 +230,8 @@ int main(int argc, char **argv) {
 		"setVolume", &love::audio::Source::setVolume,
 		"tell", &love::audio::Source::tell,
 
-		"clone", &love::audio::Source::clone
+		"clone", &love::audio::Source::clone,
+		"release", &love::audio::Source::release
 	);
 
 	FontType = lua.new_usertype<love::graphics::Font>(
@@ -241,7 +242,8 @@ int main(int argc, char **argv) {
 			love::graphics::Font(std::string)
 		>(),
 
-		"clone", &love::graphics::Font::clone
+		"clone", &love::graphics::Font::clone,
+		"release", &love::graphics::Font::release
 	);
 	TextureType = lua.new_usertype<love::graphics::Texture>(
 		"_Texture", sol::constructors<love::graphics::Texture(std::string)>(),
@@ -250,14 +252,15 @@ int main(int argc, char **argv) {
 		"getHeight", &love::graphics::Texture::getHeight,
 		"getDimensions", &love::graphics::Texture::getDimensions,
 
-		"clone", &love::graphics::Texture::clone
+		"clone", &love::graphics::Texture::clone,
+		"release", &love::graphics::Texture::release
 	);
 
 	// Lua API expansion
-	lua.script(std::string(api_lua, api_lua + api_lua_size));
+	lua.script(std::string(api_lua, api_lua + api_lua_size), "WiiLÖVE API", sol::load_mode::text);
 
 	// Start!
-	lua.script(std::string(boot_lua, boot_lua + boot_lua_size));
+	lua.script(std::string(boot_lua, boot_lua + boot_lua_size), "WiiLÖVE Boot", sol::load_mode::text);
 
 	// Quit
 	love::event::module::quit();

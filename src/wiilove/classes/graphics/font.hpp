@@ -45,6 +45,7 @@ class Font {
 		Font(const Font &other);
 
 		Font *clone();
+		void release();
 
 		~Font();
 };

@@ -180,9 +180,12 @@ $(OFILES_SOURCES) : $(HFILES)
 %.lua.o	:	%.lua
 #---------------------------------------------------------------------------------
 	@echo $(notdir $<)
-	$(bin2o)
-
--include $(DEPENDS)
+	@if [ "$(WIILOVE_LUA)" = "minify" ]; then\
+		luamin -f $< > $(<F);\
+		bin2s -a 32 -H `(echo $(<F) | tr . _)`.h $(<F) | $(AS) -o $(<F).o;\
+	else\
+		bin2s -a 32 -H `(echo $(<F) | tr . _)`.h $< | $(AS) -o $(<F).o;\
+	fi
 
 #---------------------------------------------------------------------------------
 # This rule links in binary data with the .ttf extension

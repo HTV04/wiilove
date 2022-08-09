@@ -76,6 +76,7 @@ double Source::tell() { return player->tell(); }
 
 // Object functions
 Source *Source::clone() { return new Source(*this); }
+void Source::release() { delete this; }
 
 // Destructor
 Source::~Source() { delete player; }

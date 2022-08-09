@@ -44,8 +44,16 @@ Check out some open-source projects that use WiiLÖVE!
   * [GRRLIB-mod](https://github.com/HTV04/GRRLIB-mod) and its dependencies
   * [LuaJIT for devkitPPC](https://github.com/HTV04/LuaJIT)
 * Run `make` (or `make release` to create release ZIPs).
-  * To make a unity build (all source files compiled as one), add `WIILOVE_BUILD=unity` after `make`.
 * Compiled binaries will be available in `bin` (and release ZIPs will be available in `dist`).
+
+## Build options
+Append these to `make` to enable them:
+* `WIILOVE_BUILD=unity`: Make a unity build (all source files compiled as one).
+  * May use more memory during compilation, but may also improve compile times and code generation.
+  * Recommended for release builds, but not recommended for debugging because it makes it harder to find the source of errors, among other issues with combining all source files.
+* `WIILOVE_LUA=minify`: Minify internal Lua source files, reducing the size of the compiled binary.
+  * Requires [luamin](https://github.com/mathiasbynens/luamin#using-the-luamin-binary).
+  * Recommended for release builds, but not recommended for debugging because some information is lost during minification.
 
 # License
 WiiLÖVE is licensed under the [GNU Lesser General Public License v3.0](LICENSE). Therefore, modifications to WiiLÖVE must be open-source and licensed under the same license. However, projects and files that interact with WiiLÖVE externally (for example, Lua scripts that WiiLÖVE runs) are not required to be open-source and can use any license.
