@@ -36,7 +36,10 @@
 namespace love {
 namespace graphics {
 
-constexpr int defaultFontSize = 12;
+// Local variables
+namespace {
+	constexpr int defaultFontSize = 12;
+}
 
 // Constructors
 Font::Font(unsigned int size) { // Load Vera.ttf as default font

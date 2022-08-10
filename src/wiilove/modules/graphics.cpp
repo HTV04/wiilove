@@ -43,17 +43,20 @@
 namespace love {
 namespace graphics {
 
-constexpr int width = 640;
-constexpr int height = 480;
+// Local variables
+namespace {
+	constexpr int width = 640;
+	constexpr int height = 480;
 
-bool widescreen;
+	bool widescreen;
 
-// Transforms are stored for push/pop operations
-std::vector<GRRLIB_matrix> transforms;
+	// Transforms are stored for push/pop operations
+	std::vector<GRRLIB_matrix> transforms;
 
-unsigned int backgroundColor;
+	unsigned int backgroundColor;
 
-love::graphics::Font *curFont; // Initial font
+	love::graphics::Font *curFont; // Initial font
+}
 
 void init() {
 #ifndef HW_DOL

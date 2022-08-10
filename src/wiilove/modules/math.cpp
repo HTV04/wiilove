@@ -30,9 +30,12 @@
 namespace love {
 namespace math {
 
-std::default_random_engine randomGenerator(gettime());
+// Local variables
+namespace {
+    std::default_random_engine randomGenerator(gettime());
 
-std::uniform_real_distribution<double> randomDoubleDist(0.0, 1.0);
+    std::uniform_real_distribution<double> randomDoubleDist(0.0, 1.0);
+}
 
 namespace module {
 

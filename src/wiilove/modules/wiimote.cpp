@@ -35,7 +35,10 @@
 namespace love {
 namespace wiimote {
 
-WPADData *data;
+// Local variables
+namespace {
+	WPADData *data;
+}
 
 struct Wiimote {
 	int status = WPAD_ERR_NONE;

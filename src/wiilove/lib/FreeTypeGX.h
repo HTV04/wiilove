@@ -157,8 +157,8 @@ typedef struct ftgxCharData_ {
 	uint32_t* glyphDataTexture;	/**< Glyph texture bitmap data buffer. */
 } ftgxCharData;
 
-#define _TEXT(t) L ## t /**< Unicode helper macro. */
-#define EXPLODE_UINT8_TO_UINT32(x) (x << 24) | (x << 16) | (x << 8) | x
+#define FTGX_TEXT(t) L ## t /**< Unicode helper macro. */
+#define FTGX_EXPLODE_UINT8_TO_UINT32(x) (x << 24) | (x << 16) | (x << 8) | x
 
 #define FTGX_NULL				0x0000
 

@@ -50,21 +50,24 @@ sol::object getNickname() { return sol::nil; }
 namespace love {
 namespace system {
 
-std::map<int, std::string> languageMap = {
-	{CONF_LANG_JAPANESE, "Japanese"},
-	{CONF_LANG_ENGLISH, "English"},
-	{CONF_LANG_GERMAN, "German"},
-	{CONF_LANG_FRENCH, "French"},
-	{CONF_LANG_SPANISH, "Spanish"},
-	{CONF_LANG_ITALIAN, "Italian"},
-	{CONF_LANG_DUTCH, "Dutch"},
-	{CONF_LANG_SIMP_CHINESE, "Simplified Chinese"},
-	{CONF_LANG_TRAD_CHINESE, "Traditional Chinese"},
-	{CONF_LANG_KOREAN, "Korean"}
-};
+// Local variables
+namespace {
+	std::map<int, std::string> languageMap = {
+		{CONF_LANG_JAPANESE, "Japanese"},
+		{CONF_LANG_ENGLISH, "English"},
+		{CONF_LANG_GERMAN, "German"},
+		{CONF_LANG_FRENCH, "French"},
+		{CONF_LANG_SPANISH, "Spanish"},
+		{CONF_LANG_ITALIAN, "Italian"},
+		{CONF_LANG_DUTCH, "Dutch"},
+		{CONF_LANG_SIMP_CHINESE, "Simplified Chinese"},
+		{CONF_LANG_TRAD_CHINESE, "Traditional Chinese"},
+		{CONF_LANG_KOREAN, "Korean"}
+	};
 
-std::string language;
-std::string nickname;
+	std::string language;
+	std::string nickname;
+}
 
 void init() {
 	int languageInt = CONF_GetLanguage();
