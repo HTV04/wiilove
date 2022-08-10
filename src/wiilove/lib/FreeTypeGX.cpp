@@ -366,7 +366,7 @@ void FreeTypeGX::loadGlyphData(FT_Bitmap *bmp, ftgxCharData *charData) {
 
 	for (unsigned int imagePosY = 0; imagePosY < bmp->rows; imagePosY++) {
 		for (unsigned int imagePosX = 0; imagePosX < bmp->width; imagePosX++) {
-			*ptr++ = FTGX_EXPLODE_UINT8_TO_UINT32(*src);
+			*ptr++ = 0xFFFFFF00 + *src;
 			src++;
 		}
 		ptr = dest += charData->textureWidth;

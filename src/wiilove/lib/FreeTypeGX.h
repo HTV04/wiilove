@@ -103,11 +103,11 @@
  * \endcode
  * Alternately you can specify a color you would like to apply to the printed characters:
  * \code
- * freeTypeGX->drawText(10, 25, _TEXT("FreeTypeGX Rocks!"), 0xffffffff);
+ * freeTypeGX->drawText(10, 25, _TEXT("FreeTypeGX Rocks!"), 0xFFFFFFFF);
  * \endcode
  * Furthermore you can also specify a group of styling parameters which will modify the positioning or style of the text:
  * \code
- * freeTypeGX->drawText(10, 25, _TEXT("FreeTypeGX Rocks!"), 0xffffffff,
+ * freeTypeGX->drawText(10, 25, _TEXT("FreeTypeGX Rocks!"), 0xFFFFFFFF,
  *                      FTGX_JUSTIFY_CENTER | FTGX_ALIGN_BOTTOM | FTGX_STYLE_UNDERLINE);
  * \endcode
  * \n
@@ -158,7 +158,6 @@ typedef struct ftgxCharData_ {
 } ftgxCharData;
 
 #define FTGX_TEXT(t) L ## t /**< Unicode helper macro. */
-#define FTGX_EXPLODE_UINT8_TO_UINT32(x) (x << 24) | (x << 16) | (x << 8) | x
 
 #define FTGX_NULL				0x0000
 

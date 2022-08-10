@@ -31,7 +31,7 @@
 #include "font.hpp"
 
 // Data
-#include "Vera_ttf.h"
+#include "open-sans_ttf.h"
 
 namespace love {
 namespace graphics {
@@ -50,7 +50,7 @@ Font::Font(unsigned int size) { // Load Vera.ttf as default font
 
 	fontSystem = new FreeTypeGX();
 
-	fontSystem->loadFont(Vera_ttf, Vera_ttf_size, *fontSize);
+	fontSystem->loadFont(open_sans_ttf, open_sans_ttf_size, *fontSize);
 }
 Font::Font() : Font(defaultFontSize) {} // Load Vera.ttf as default font (with default size)
 Font::Font(std::string filename, unsigned int size) { // Load TTF font
@@ -77,7 +77,7 @@ Font::Font(const Font &other) {
 	fontSystem = new FreeTypeGX();
 
 	if (data == nullptr)
-		fontSystem->loadFont(Vera_ttf, Vera_ttf_size, *fontSize);
+		fontSystem->loadFont(open_sans_ttf, open_sans_ttf_size, *fontSize);
 	else
 		fontSystem->loadFont(static_cast<unsigned char *>(data), *dataSize, *fontSize);
 }
