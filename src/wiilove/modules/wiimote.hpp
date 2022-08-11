@@ -42,10 +42,10 @@ std::pair<float, float> getPosition(int id);
 float getX(int id);
 float getY(int id);
 bool isConnected(int id);
-bool isDown(int id, std::string button);
+bool isDown(int id, const char *button);
 bool isRumbling(int id);
 
-bool isClassicDown(int id, std::string button);
+bool isClassicDown(int id, const char *button);
 
 bool setRumble(int id, bool status);
 

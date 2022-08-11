@@ -1,5 +1,5 @@
 /*
- * FreeTypeGX for GRRLIB
+ * FreeTypeGX for GRRLIB-mod
  *
  * FreeTypeGX is a wrapper class for libFreeType which renders a compiled
  * FreeType parsable font into a GX texture for Wii homebrew development.
@@ -21,7 +21,7 @@
  * along with FreeTypeGX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/** \mainpage FreeTypeGX for GRRLIB
+/** \mainpage FreeTypeGX for GRRLIB-mod
  *
  * \section sec_intro Introduction
  *
@@ -126,6 +126,8 @@
  * FreeTypeGX is distributed under the GNU Lesser General Public License.
  */
 
+#pragma once
+
 #ifndef FREETYPEGX_H_
 #define FREETYPEGX_H_
 
@@ -133,11 +135,12 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include FT_BITMAP_H
-#include "Metaphrasis.h"
+#include <Metaphrasis.h>
 
 #include <malloc.h>
 #include <string.h>
 #include <map>
+#include <string>
 
 /*! \struct ftgxCharData_
  *
@@ -192,10 +195,10 @@ typedef struct ftgxCharData_ {
 
 const unsigned int ftgxWhite = 0xffffffff; /**< Constant color value used only to sanitize Doxygen documentation. */
 
-/*! \class FreeTypeGX for GRRLIB
+/*! \class FreeTypeGX for GRRLIB-mod
  * \brief Wrapper class for the FreeType library with GX rendering. Adapted for GRRLIB.
  * \author Armin Tamzarian and HTV04
- * \version 0.3.2-grrlib1
+ * \version 1.0.0
  *
  * FreeTypeGX acts as a wrapper class for the FreeType library. It supports precaching of transformed glyph data into
  * a specified texture format. Rendering of the data to the EFB is accomplished through the application of high performance
@@ -258,13 +261,11 @@ class FreeTypeGX {
 		int loadFont(uint8_t* fontBuffer, FT_Long bufferSize, FT_UInt pointSize, bool cacheAll = false);
 		int loadFont(const uint8_t* fontBuffer, FT_Long bufferSize, FT_UInt pointSize, bool cacheAll = false);
 
-		int drawText(float x, float y, wchar_t *text, float scaleX = 1.0, float scaleY = 1.0, float offsetX = 0.0, float offsetY = 0.0, float degrees = 0.0, int textStyling = FTGX_NULL);
-		int drawText(float x, float y, wchar_t const *text, float scaleX = 1.0, float scaleY = 1.0, float offsetX = 0.0, float offsetY = 0.0, float degrees = 0.0, int textStyling = FTGX_NULL);
+		int drawText(float x, float y, const wchar_t *text, float scaleX = 1.0, float scaleY = 1.0, float offsetX = 0.0, float offsetY = 0.0, float degrees = 0.0, int textStyling = FTGX_NULL);
+		int drawText(float x, float y, const std::wstring &text, float scaleX = 1.0, float scaleY = 1.0, float offsetX = 0.0, float offsetY = 0.0, float degrees = 0.0, int textStyling = FTGX_NULL);
 
-		int getWidth(wchar_t *text);
-		int getWidth(wchar_t const *text);
-		int getHeight(wchar_t *text);
-		int getHeight(wchar_t const *text);
+		int getWidth(const wchar_t *text);
+		int getHeight(const wchar_t *text);
 };
 
 #endif /* FREETYPEGX_H_ */

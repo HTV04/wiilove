@@ -20,7 +20,7 @@
  */
 
 // Libraries
-#include "../../lib/FreeTypeGX.h"
+#include <FreeTypeGX.h>
 #include <iostream>
 #include <cstdlib>
 
@@ -53,7 +53,7 @@ Font::Font(unsigned int size) { // Load Vera.ttf as default font
 	fontSystem->loadFont(open_sans_ttf, open_sans_ttf_size, *fontSize);
 }
 Font::Font() : Font(defaultFontSize) {} // Load Vera.ttf as default font (with default size)
-Font::Font(std::string filename, unsigned int size) { // Load TTF font
+Font::Font(const char *filename, unsigned int size) { // Load TTF font
 	instances = new int(1);
 	dataSize = new int(0);
 	fontSize = new int(size);
@@ -63,7 +63,7 @@ Font::Font(std::string filename, unsigned int size) { // Load TTF font
 	filesystem::getFileData(filename, data, *dataSize);
 	fontSystem->loadFont(static_cast<unsigned char*>(data), *dataSize, *fontSize);
 }
-Font::Font(std::string filename) : Font(filename, defaultFontSize) {} // Load TTF font (with default size)
+Font::Font(const char *filename) : Font(filename, defaultFontSize) {} // Load TTF font (with default size)
 
 // Clone constructor
 Font::Font(const Font &other) {

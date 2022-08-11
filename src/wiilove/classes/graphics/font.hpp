@@ -22,7 +22,7 @@
 #pragma once
 
 // Libraries
-#include "../../lib/FreeTypeGX.h"
+#include <FreeTypeGX.h>
 
 namespace love {
 namespace graphics {
@@ -39,8 +39,8 @@ class Font {
 
 		Font(unsigned int size);
 		Font();
-		Font(std::string filename, unsigned int size);
-		Font(std::string filename);
+		Font(const char *filename, unsigned int size);
+		Font(const char *filename);
 
 		Font(const Font &other);
 

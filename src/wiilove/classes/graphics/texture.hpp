@@ -34,7 +34,7 @@ class Texture {
 	public:
 		GRRLIB_texture *texture;
 
-		Texture(std::string filename);
+		Texture(const char *filename);
 
 		Texture(const Texture &other);
 

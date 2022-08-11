@@ -21,7 +21,7 @@
 
 // Libraries
 #include <grrlib-mod.h>
-#include "../lib/FreeTypeGX.h"
+#include <FreeTypeGX.h>
 #include <ogc/gx.h>
 #ifndef HW_DOL
 #include <ogc/conf.h>
@@ -145,16 +145,16 @@ void rectangle(bool fill, float x, float y, float width, float height) {
 }
 
 // Font functions
-void print(std::wstring str, float x, float y, float r, float sx, float sy, float ox, float oy) {
-	curFont->fontSystem->drawText(x, y, str.c_str(), sx, sy, ox, oy, r);
+void print(const std::wstring &str, float x, float y, float r, float sx, float sy, float ox, float oy) {
+	curFont->fontSystem->drawText(x, y, str, sx, sy, ox, oy, r);
 }
-void print1(std::wstring str, float x, float y, float r, float sx, float sy) {
+void print1(const std::wstring &str, float x, float y, float r, float sx, float sy) {
 	print(str, x, y, r, sx, sy, 0.0, 0.0);
 }
-void print2(std::wstring str, float x, float y, float r) {
+void print2(const std::wstring &str, float x, float y, float r) {
 	print(str, x, y, r, 1.0, 1.0, 0.0, 0.0);
 }
-void print3(std::wstring str, float x, float y) {
+void print3(const std::wstring &str, float x, float y) {
 	print(str, x, y, 0.0, 1.0, 1.0, 0.0, 0.0);
 }
 void setFont(love::graphics::Font *font) {

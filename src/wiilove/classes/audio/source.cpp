@@ -21,7 +21,6 @@
 
 // Libraries
 #include <audiogc.hpp>
-#include <string>
 #include <map>
 
 // Modules
@@ -35,23 +34,24 @@ namespace audio {
 
 // Local variables
 namespace {
-	std::map<std::string, audiogc::type> typeMap = {
+	std::map<const char *, audiogc::type> typeMap = {
+		{"detect", audiogc::type::detect},
 		{"flac", audiogc::type::flac},
 		{"mp3", audiogc::type::mp3},
 		{"ogg", audiogc::type::vorbis},
 		{"wav", audiogc::type::wav}
 	};
-	std::map<std::string, audiogc::mode> modeMap = {
+	std::map<const char *, audiogc::mode> modeMap = {
 		{"stream", audiogc::mode::stream},
 		{"static", audiogc::mode::store}
 	};
 }
 
 // Constructors
-Source::Source(std::string type, std::string filename, std::string mode) {
+Source::Source(const char *type, const char *filename, const char *mode) {
 	player = new audiogc::player(typeMap[type], filesystem::getFilePath(filename), modeMap[mode]);
 }
-Source::Source(std::string filename, std::string mode) {
+Source::Source(const char *filename, const char *mode) {
 	player = new audiogc::player(audiogc::type::detect, filesystem::getFilePath(filename), modeMap[mode]);
 }
 

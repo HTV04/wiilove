@@ -60,10 +60,10 @@ void circle(bool fill, float x, float y, float radius);
 void line(float x1, float y1, float x2, float y2);
 void rectangle(bool fill, float x, float y, float width, float height);
 
-void print(std::wstring str, float x, float y, float r, float sx, float sy, float ox, float oy);
-void print1(std::wstring str, float x, float y, float r, float sx, float sy);
-void print2(std::wstring str, float x, float y, float r);
-void print3(std::wstring str, float x, float y);
+void print(const std::wstring &str, float x, float y, float r, float sx, float sy, float ox, float oy);
+void print1(const std::wstring &str, float x, float y, float r, float sx, float sy);
+void print2(const std::wstring &str, float x, float y, float r);
+void print3(const std::wstring &str, float x, float y);
 void setFont(love::graphics::Font *font);
 
 void draw(love::graphics::Texture &image, float x, float y, float r, float sx, float sy, float ox, float oy);

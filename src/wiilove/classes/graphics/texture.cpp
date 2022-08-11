@@ -34,7 +34,7 @@ namespace love {
 namespace graphics {
 
 // Constructor
-Texture::Texture(std::string filename) {
+Texture::Texture(const char *filename) {
 	instances = new int(1);
 
 	texture = GRRLIB_LoadTextureFromFile(love::filesystem::getFilePath(filename).c_str());

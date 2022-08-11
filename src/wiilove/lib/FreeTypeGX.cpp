@@ -1,5 +1,5 @@
 /*
- * FreeTypeGX for GRRLIB
+ * FreeTypeGX for GRRLIB-mod
  *
  * FreeTypeGX is a wrapper class for libFreeType which renders a compiled
  * FreeType parsable font into a GX texture for Wii homebrew development.
@@ -22,7 +22,8 @@
  */
 
 #include <grrlib-mod.h>
-#include "FreeTypeGX.h"
+
+#include <FreeTypeGX.h>
 
 /**
  * Default constructor for the FreeTypeGX class.
@@ -471,7 +472,7 @@ ftgxCharData* FreeTypeGX::getCharacter(wchar_t character) {
  * @param textStyle	Flags which specify any styling which should be applied to the rendered string.
  * @return The number of characters printed.
  */
-int FreeTypeGX::drawText(float x, float y, wchar_t *text, float scaleX, float scaleY, float offsetX, float offsetY, float degrees, int textStyle) {
+int FreeTypeGX::drawText(float x, float y, const wchar_t *text, float scaleX, float scaleY, float offsetX, float offsetY, float degrees, int textStyle) {
 	float x_pos = x, printed = 0;
 	float x_offset = 0, y_offset = 0;
 	GXTexObj glyphTexture;
@@ -525,8 +526,8 @@ int FreeTypeGX::drawText(float x, float y, wchar_t *text, float scaleX, float sc
 /**
  * \overload
  */
-int FreeTypeGX::drawText(float x, float y, wchar_t const *text, float scaleX, float scaleY, float offsetX, float offsetY, float degrees, int textStyle) {
-	return this->drawText(x, y, (wchar_t *)text, scaleX, scaleY, offsetX, offsetY, degrees, textStyle);
+int FreeTypeGX::drawText(float x, float y, const std::wstring &text, float scaleX, float scaleY, float offsetX, float offsetY, float degrees, int textStyle) {
+	return this->drawText(x, y, text.c_str(), scaleX, scaleY, offsetX, offsetY, degrees, textStyle);
 }
 
 /**
@@ -560,7 +561,7 @@ void FreeTypeGX::drawTextFeature(float x, float y, int width, int textStyle, flo
  * @param text	NULL terminated string to calculate.
  * @return The width of the text string in pixels.
  */
-int FreeTypeGX::getWidth(wchar_t *text) {
+int FreeTypeGX::getWidth(const wchar_t *text) {
 	int strWidth = 0;
 	FT_Vector pairDelta;
 	ftgxCharData* glyphData = NULL;
@@ -586,14 +587,6 @@ int FreeTypeGX::getWidth(wchar_t *text) {
 }
 
 /**
- *
- * \overload
- */
-int FreeTypeGX::getWidth(wchar_t const *text) {
-	return this->getWidth((wchar_t *)text);
-}
-
-/**
  * Processes the supplied string and return the height of the string in pixels.
  *
  * This routine processes each character of the supplied text string and calculates the height of the entire string.
@@ -602,7 +595,7 @@ int FreeTypeGX::getWidth(wchar_t const *text) {
  * @param text	NULL terminated string to calculate.
  * @return The height of the text string in pixels.
  */
-int FreeTypeGX::getHeight(wchar_t *text) {
+int FreeTypeGX::getHeight(const wchar_t *text) {
 	int strMax = 0, strMin = 0;
 
 	int i = 0;
@@ -619,14 +612,6 @@ int FreeTypeGX::getHeight(wchar_t *text) {
 	}
 
 	return strMax + strMin;
-}
-
-/**
- *
- * \overload
- */
-int FreeTypeGX::getHeight(wchar_t const *text) {
-	return this->getHeight((wchar_t *)text);
 }
 
 /**

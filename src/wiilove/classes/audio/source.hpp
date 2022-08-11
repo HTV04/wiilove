@@ -23,7 +23,6 @@
 
 // Libraries
 #include <audiogc.hpp>
-#include <string>
 
 namespace love {
 namespace audio {
@@ -33,8 +32,8 @@ class Source {
 		audiogc::player *player;
 
 	public:
-		Source(std::string type, std::string filename, std::string mode);
-		Source(std::string filename, std::string mode);
+		Source(const char *type, const char *filename, const char *mode);
+		Source(const char *filename, const char *mode);
 
 		Source(const Source &other);
 

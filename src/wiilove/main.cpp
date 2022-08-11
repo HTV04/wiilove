@@ -211,8 +211,8 @@ int main(int argc, char **argv) {
 	// NOTE: We have to make these in the global namespace due to sol limitations.
 	SourceType = lua.new_usertype<love::audio::Source>(
 		"_Source", sol::constructors<
-			love::audio::Source(std::string, std::string, std::string),
-			love::audio::Source(std::string, std::string)
+			love::audio::Source(const char*, const char*, const char*),
+			love::audio::Source(const char*, const char*)
 		>(),
 
 		"pause", &love::audio::Source::pause,
@@ -238,15 +238,15 @@ int main(int argc, char **argv) {
 		"_Font", sol::constructors<
 			love::graphics::Font(unsigned int),
 			love::graphics::Font(),
-			love::graphics::Font(std::string, unsigned int),
-			love::graphics::Font(std::string)
+			love::graphics::Font(const char *, unsigned int),
+			love::graphics::Font(const char *)
 		>(),
 
 		"clone", &love::graphics::Font::clone,
 		"release", &love::graphics::Font::release
 	);
 	TextureType = lua.new_usertype<love::graphics::Texture>(
-		"_Texture", sol::constructors<love::graphics::Texture(std::string)>(),
+		"_Texture", sol::constructors<love::graphics::Texture(const char *)>(),
 
 		"getWidth", &love::graphics::Texture::getWidth,
 		"getHeight", &love::graphics::Texture::getHeight,

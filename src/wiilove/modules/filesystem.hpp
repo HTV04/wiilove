@@ -30,15 +30,15 @@ namespace filesystem {
 
 void init(int argc, char **argv);
 
-std::string getFilePath(std::string filename);
-void getFileData(std::string filename, void *&data, int &size);
+std::string getFilePath(const std::string &filename);
+void getFileData(const char *filename, void *&data, int &size);
 
 namespace module {
 
-bool exists(std::string filename);
-sol::protected_function load(std::string filename, sol::this_state s);
-std::string read(std::string filename);
-void write (std::string filename, std::string data);
+bool exists(const char *filename);
+sol::protected_function load(const char *filename, sol::this_state s);
+std::string read(const char *filename);
+void write (const std::string &filename, const char *data);
 
 } // module
 } // filesystem

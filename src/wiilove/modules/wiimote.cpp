@@ -52,7 +52,7 @@ struct Wiimote {
 
 std::vector<Wiimote> wiimotes(4);
 
-std::map<std::string, int> buttonMap = {
+std::map<const char *, int> buttonMap = {
 	{"2", WPAD_BUTTON_2},
 	{"1", WPAD_BUTTON_1},
 	{"b", WPAD_BUTTON_B},
@@ -67,7 +67,7 @@ std::map<std::string, int> buttonMap = {
 	{"c", WPAD_NUNCHUK_BUTTON_C}
 };
 
-std::map<std::string, int> classicButtonMap = {
+std::map<const char *, int> classicButtonMap = {
 	{"up", WPAD_CLASSIC_BUTTON_UP},
 	{"left", WPAD_CLASSIC_BUTTON_LEFT},
 	{"zr", WPAD_CLASSIC_BUTTON_ZR},
@@ -143,13 +143,13 @@ float getY(int id) { return wiimotes[id].y; }
 bool isConnected(int id) {
 	return wiimotes[id].status == WPAD_ERR_NONE;
 }
-bool isDown(int id, std::string button) {
+bool isDown(int id, const char *button) {
 	return wiimotes[id].buttonsDown & buttonMap[button];
 }
 bool isRumbling(int id) { return wiimotes[id].rumbling; }
 
 // Classic Controller querying functions
-bool isClassicDown(int id, std::string button) {
+bool isClassicDown(int id, const char *button) {
 	return wiimotes[id].buttonsDown & classicButtonMap[button];
 }
 

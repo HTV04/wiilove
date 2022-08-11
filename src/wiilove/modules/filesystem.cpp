@@ -66,50 +66,46 @@ void init(int argc, char **argv) {
 	}
 }
 
-std::string getFilePath(std::string filename) { // Get the path of a file, using the save directory as a filter and the data directory otherwise.
+std::string getFilePath(const std::string &filename) { // Get the path of a file, using the save directory as a filter and the data directory otherwise.
 	std::string savePath = "save/" + filename;
-	std::string dataPath = "data/" + filename;
 
 	if (std::filesystem::exists(savePath)) {
 		return savePath;
 	} else { // If the save path doesn't exist, return the data path.
-		return dataPath;
+		return "data/" + filename; // TODO: Add error handling
 	}
 }
-void getFileData(std::string filename, void *&data, int &size) {
+void getFileData(const char *filename, void *&data, int &size) {
 	std::string filePath = getFilePath(filename);
 
 	std::ifstream file(filePath, std::ios::binary | std::ios::ate); // TODO: Add error handling
-	std::stringstream stream;
 
 	size = file.tellg();
-	data = malloc(size);
+	data = std::malloc(size);
 
 	file.seekg(0, std::ios::beg);
-	stream << file.rdbuf();
-
-	std::memcpy(data, stream.str().c_str(), size);
+	file.read(static_cast<char *>(data), size);
 }
 
 namespace module {
 
 // Working with files
-bool exists(std::string filename) {
+bool exists(const char *filename) {
 	return std::filesystem::exists(getFilePath(filename));
 }
-sol::protected_function load(std::string filename, sol::this_state s) {
+sol::protected_function load(const char *filename, sol::this_state s) {
 	sol::state_view lua(s);
 
 	return lua.load_file(getFilePath(filename)).get<sol::protected_function>(); // TODO: Add error handling
 }
-std::string read(std::string filename) {
+std::string read(const char *filename) {
 	std::stringstream stream;
 
 	stream << std::ifstream(getFilePath(filename), std::ios::binary).rdbuf(); // TODO: Add error handling
 
 	return stream.str();
 }
-void write(std::string filename, std::string data) {
+void write(const std::string &filename, const char *data) {
 	std::ofstream out("save/" + filename); // TODO: Add error handling
 
 	out << data; // Write data to file
