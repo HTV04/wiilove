@@ -28,6 +28,7 @@
 // Classes
 #include "classes/audio/source.hpp"
 #include "classes/graphics/font.hpp"
+#include "classes/graphics/quad.hpp"
 #include "classes/graphics/texture.hpp"
 
 // Modules
@@ -53,6 +54,7 @@ int main(int argc, char **argv) {
 	sol::usertype<love::audio::Source> SourceType;
 
 	sol::usertype<love::graphics::Font> FontType;
+	sol::usertype<love::graphics::Quad> QuadType;
 	sol::usertype<love::graphics::Texture> TextureType;
 
 	// Init GRRLIB
@@ -136,6 +138,7 @@ int main(int argc, char **argv) {
 			"line", love::graphics::module::line,
 			"rectangle", love::graphics::module::rectangle,
 
+			"getFont", love::graphics::module::getFont,
 			"print", sol::overload(
 				love::graphics::module::print,
 				love::graphics::module::print1,
@@ -148,7 +151,11 @@ int main(int argc, char **argv) {
 				love::graphics::module::draw,
 				love::graphics::module::draw1,
 				love::graphics::module::draw2,
-				love::graphics::module::draw3
+				love::graphics::module::draw3,
+				love::graphics::module::draw4,
+				love::graphics::module::draw5,
+				love::graphics::module::draw6,
+				love::graphics::module::draw7
 			),
 
 			"getAntiAliasing", love::graphics::module::getAntiAliasing,
@@ -244,6 +251,18 @@ int main(int argc, char **argv) {
 
 		"clone", &love::graphics::Font::clone,
 		"release", &love::graphics::Font::release
+	);
+	QuadType = lua.new_usertype<love::graphics::Quad>(
+		"_Quad", sol::constructors<
+			love::graphics::Quad(float, float, float, float, unsigned int, unsigned int),
+			love::graphics::Quad(float, float, float, float, const love::graphics::Texture &)
+		>(),
+
+		"getTextureDimensions", &love::graphics::Quad::getTextureDimensions,
+		"getViewport", &love::graphics::Quad::getViewport,
+		"setViewport", &love::graphics::Quad::setViewport,
+
+		"release", &love::graphics::Quad::release
 	);
 	TextureType = lua.new_usertype<love::graphics::Texture>(
 		"_Texture", sol::constructors<love::graphics::Texture(const char *)>(),

@@ -50,10 +50,10 @@ Texture::Texture(const Texture &other) {
 }
 
 // Texture properties
-int Texture::getWidth() { return texture->w; }
-int Texture::getHeight() { return texture->h; }
-std::pair<int, int> Texture::getDimensions() {
-	return std::make_pair(texture->w, texture->h);
+unsigned int Texture::getWidth() { return texture->width; }
+unsigned int Texture::getHeight() { return texture->height; }
+std::pair<unsigned int, unsigned int> Texture::getDimensions() {
+	return std::make_pair(texture->width, texture->height);
 }
 
 // Object functions

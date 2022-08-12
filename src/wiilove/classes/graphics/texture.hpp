@@ -38,9 +38,9 @@ class Texture {
 
 		Texture(const Texture &other);
 
-		int getWidth();
-		int getHeight();
-		std::pair<int, int> getDimensions();
+		unsigned int getWidth();
+		unsigned int getHeight();
+		std::pair<unsigned int, unsigned int> getDimensions();
 
 		Texture *clone();
 		void release();

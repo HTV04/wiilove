@@ -35,6 +35,7 @@
 
 // Classes
 #include "../classes/graphics/font.hpp"
+#include "../classes/graphics/quad.hpp"
 #include "../classes/graphics/texture.hpp"
 
 // Header
@@ -55,7 +56,7 @@ namespace {
 
 	unsigned int backgroundColor;
 
-	love::graphics::Font *curFont; // Initial font
+	Font *curFont; // Initial font
 }
 
 void init() {
@@ -63,7 +64,7 @@ void init() {
 	widescreen = CONF_GetAspectRatio() == CONF_ASPECT_16_9;
 #endif // !HW_DOL
 
-	curFont = new love::graphics::Font();
+	curFont = new Font();
 
 	module::reset(); // Set defaults
 }
@@ -145,6 +146,7 @@ void rectangle(bool fill, float x, float y, float width, float height) {
 }
 
 // Font functions
+Font *getFont() { return curFont; }
 void print(const std::wstring &str, float x, float y, float r, float sx, float sy, float ox, float oy) {
 	curFont->fontSystem->drawText(x, y, str, sx, sy, ox, oy, r);
 }
@@ -157,22 +159,32 @@ void print2(const std::wstring &str, float x, float y, float r) {
 void print3(const std::wstring &str, float x, float y) {
 	print(str, x, y, 0.0, 1.0, 1.0, 0.0, 0.0);
 }
-void setFont(love::graphics::Font *font) {
-	curFont = font;
-}
+void setFont(Font *font) { curFont = font; }
 
 // Texture functions
-void draw(love::graphics::Texture &image, float x, float y, float r, float sx, float sy, float ox, float oy) {
-	GRRLIB_DrawImg(x, y, image.texture, r, sx, sy, ox, oy);
+void draw(const Texture &texture, float x, float y, float r, float sx, float sy, float ox, float oy) {
+	GRRLIB_DrawTexturePart(x, y, texture.texture, &texture.texture->part, r, sx, sy, ox, oy);
 }
-void draw1(love::graphics::Texture &image, float x, float y, float r, float sx, float sy) {
-	draw(image, x, y, r, sx, sy, 0.0, 0.0);
+void draw1(const Texture &texture, float x, float y, float r, float sx, float sy) {
+	draw(texture, x, y, r, sx, sy, 0.0, 0.0);
 }
-void draw2(love::graphics::Texture &image, float x, float y, float r) {
-	draw(image, x, y, r, 1.0, 1.0, 0.0, 0.0);
+void draw2(const Texture &texture, float x, float y, float r) {
+	draw(texture, x, y, r, 1.0, 1.0, 0.0, 0.0);
 }
-void draw3(love::graphics::Texture &image, float x, float y) {
-	draw(image, x, y, 0.0, 1.0, 1.0, 0.0, 0.0);
+void draw3(const Texture &texture, float x, float y) {
+	draw(texture, x, y, 0.0, 1.0, 1.0, 0.0, 0.0);
+}
+void draw4(const Texture &texture, const Quad &textureQuad, float x, float y, float r, float sx, float sy, float ox, float oy) {
+	GRRLIB_DrawTexturePart(x, y, texture.texture, textureQuad.texturePart, r, sx, sy, ox, oy);
+}
+void draw5(const Texture &texture, const Quad &textureQuad, float x, float y, float r, float sx, float sy) {
+	draw4(texture, textureQuad, x, y, r, sx, sy, 0.0, 0.0);
+}
+void draw6(const Texture &texture, const Quad &textureQuad, float x, float y, float r) {
+	draw4(texture, textureQuad, x, y, r, 1.0, 1.0, 0.0, 0.0);
+}
+void draw7(const Texture &texture, const Quad &textureQuad, float x, float y) {
+	draw4(texture, textureQuad, x, y, 0.0, 1.0, 1.0, 0.0, 0.0);
 }
 
 // Graphics state functions

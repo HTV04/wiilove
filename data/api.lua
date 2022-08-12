@@ -24,6 +24,7 @@ local love = love
 
 -- Global usertype workaround
 love.graphics.newFont = _Font.new
+love.graphics.newQuad = _Quad.new
 love.graphics.newTexture = _Texture.new
 
 -- love.audio
@@ -106,4 +107,5 @@ end
 -- Delete global usertypes
 _Source = nil
 _Font = nil
+_Quad = nil
 _Texture = nil

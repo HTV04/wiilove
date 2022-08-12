@@ -1,4 +1,4 @@
-/* WiiLÖVE unity build
+/* WiiLÖVE Quad class
  *
  * This file is part of WiiLÖVE.
  *
@@ -19,23 +19,34 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#include "classes/audio/source.cpp"
+#pragma once
 
-#include "classes/graphics/font.cpp"
-#include "classes/graphics/quad.cpp"
-#include "classes/graphics/texture.cpp"
+// Libraries
+#include <grrlib-mod.h>
+#include <utility>
+#include <tuple>
 
-#include "lib/FreeTypeGX.cpp"
-#include "lib/Metaphrasis.cpp"
+// Classes
+#include "texture.hpp"
 
-#include "modules/audio.cpp"
-#include "modules/event.cpp"
-#include "modules/filesystem.cpp"
-#include "modules/graphics.cpp"
-#include "modules/math.cpp"
-#include "modules/system.cpp"
-#include "modules/timer.cpp"
-#include "modules/wiimote.cpp"
+namespace love {
+namespace graphics {
 
-#include "love.cpp"
-#include "main.cpp"
+class Quad {
+	public:
+		GRRLIB_texturePart *texturePart;
+
+		Quad(float x, float y, float width, float height, unsigned int sw, unsigned int sh);
+		Quad(float x, float y, float width, float height, const Texture &texture);
+
+		std::pair<unsigned int, unsigned int> getTextureDimensions();
+		std::tuple<float, float, float, float> getViewport();
+		void setViewport(float x, float y, float width, float height);
+
+		void release();
+
+		~Quad();
+};
+
+} // graphics
+} // love
