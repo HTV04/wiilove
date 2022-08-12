@@ -38,22 +38,39 @@ Check out some open-source projects that use WiiLÖVE!
 * [Wiirdle](https://github.com/HTV04/wiirdle) - Wordle clone for the Wii made to demonstrate WiiLÖVE's features
 
 # Building
+Before following these instructions, you will need to [install devkitPro and devkitPPC](https://devkitpro.org/wiki/Getting_Started).
+
+* Add the `htv-dkp-libs` repository. This will allow you to install WiiLÖVE's dependencies from pacman. Follow the instructions [here](https://github.com/HTV04/htv-dkp-libs).
 * Ensure the following libraries are installed:
-  * [libogc-mod](https://github.com/HTV04/libogc-mod)
-  * [libfat-mod](https://github.com/HTV04/libfat-mod)
-  * [GRRLIB-mod](https://github.com/HTV04/GRRLIB-mod) and its dependencies
-  * [LuaJIT for devkitPPC](https://github.com/HTV04/LuaJIT)
+  * `libogc-mod`
+  * `libfat-mod-ogc`
+  * `wii-luajit`
+  * `wii-audiogc`
+  * `wii-grrlib-mod`
+  * `ppc-freetype`
 * Run `make` (or `make release` to create release ZIPs).
 * Compiled binaries will be available in `bin` (and release ZIPs will be available in `dist`).
 
 ## Build options
 Append these to `make` to enable them:
+
+* **WIP:** `WIILOVE_MODE=debug`: Enables features useful for debugging.
+  * Currrently does nothing other than change the internal mode to "debug," but will do more in the future.
+* **EXPERIMENTAL:** `WIILOVE_MODE=final`: Increases performance by not checking for certain errors, and not falling back to the error handler.
+  * Only use this for finalized games or if the extra performance is absolutely necessary. It may cause hard crashes if there are mistakes or errors.
+    * **DO NOT** use this mode for games that can use external code (for example, via a mod loader) however, because it may cause hard crashes if the external code has errors or is malicious. The safety features are definitely recommended for external code, especially because they can allow games to handle errors gracefully.
+
+* `WIILOVE_BUILD=debug`: Make a debug build, disabling optimizations and enabling debug symbols.
+  * Will slow down WiiLÖVE's performance, but will make debugging easier.
 * `WIILOVE_BUILD=unity`: Make a unity build (all source files compiled as one).
   * May use more memory during compilation, but may also improve compile times and code generation.
   * Recommended for release builds, but not recommended for debugging because it makes it harder to find the source of errors, among other issues with combining all source files.
+
 * `WIILOVE_LUA=minify`: Minify internal Lua source files, reducing the size of the compiled binary.
   * Requires [luamin](https://github.com/mathiasbynens/luamin#using-the-luamin-binary).
   * Recommended for release builds, but not recommended for debugging because some information is lost during minification.
+
+Build options used for official releases: `WIILOVE_BUILD=unity WIILOVE_LUA=minify`.
 
 # License
 WiiLÖVE is licensed under the [GNU Lesser General Public License v3.0](LICENSE). Therefore, modifications to WiiLÖVE must be open-source and licensed under the same license. However, projects and files that interact with WiiLÖVE externally (for example, Lua scripts that WiiLÖVE runs) are not required to be open-source and can use any license.

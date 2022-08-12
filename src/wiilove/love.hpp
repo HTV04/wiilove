@@ -27,6 +27,7 @@
 namespace love {
 namespace module {
 
+std::string getMode();
 std::tuple<int, int, int> getVersion();
 
 } // module

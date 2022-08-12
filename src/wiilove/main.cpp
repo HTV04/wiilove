@@ -92,6 +92,7 @@ int main(int argc, char **argv) {
 
 	// Create love module
 	lua["love"] = lua.create_table_with(
+		"getMode", love::module::getMode,
 		"getVersion", love::module::getVersion,
 
 		"event", lua.create_table_with(

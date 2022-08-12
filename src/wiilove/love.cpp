@@ -25,6 +25,15 @@
 namespace love {
 namespace module {
 
+std::string getMode() {
+#if defined(WIILOVE_MODE_FINAL)
+	return "final";
+#elif defined(WIILOVE_MODE_DEBUG) // WIILOVE_MODE_FINAL
+	return "debug";
+#else // WIILOVE_MODE_DEBUG
+	return "release";
+#endif // !WIILOVE_MODE_DEBUG
+}
 std::tuple<int, int, int> getVersion() {
 	return std::make_tuple(1, 0, 0); // Major, minor, patch
 }

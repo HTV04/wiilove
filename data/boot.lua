@@ -22,7 +22,7 @@ License along with this program.  If not, see
 
 local love = love
 
-local result
+local result = 0
 
 -- Redirect package paths
 package.path = "save/?.lua;save/?/init.lua;data/?.lua;data/?/init.lua"
@@ -155,9 +155,17 @@ function love.errhand(err)
 	end
 end
 
--- Load main.lua to intialize functions
-xpcall(love.filesystem.load("main.lua"), love.errhand)
+if love.getMode() == "final" then -- Run everything unprotected
+	-- Load main.lua to intialize functions
+	love.filesystem.load("main.lua")()
 
-_, result = xpcall(love.run, love.errhand)
+	love.run()
+else -- Run everything protected
+	-- Load main.lua to intialize functions
+	xpcall(love.filesystem.load("main.lua"), love.errhand)
+
+	_, result = xpcall(love.run, love.errhand)
+end
+
 
 return result

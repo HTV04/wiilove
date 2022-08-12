@@ -55,10 +55,22 @@ INCLUDES	:=	include src/wiilove
 # options for code generation
 #---------------------------------------------------------------------------------
 
-CFLAGS	=	-Wall $(MACHDEP) $(INCLUDE) \
-			-DSOL_ALL_SAFETIES_ON=1 \
-			-DNDEBUG -O2
-#			-DDEBUG -g -O0
+CFLAGS	=	-Wall $(MACHDEP) $(INCLUDE)
+ifeq ($(WIILOVE_BUILD),debug)
+CFLAGS	+=	-g -O0 -DDEBUG
+else
+CFLAGS	+=	-O2 -DNDEBUG
+endif
+ifeq ($(WIILOVE_MODE),final)
+CFLAGS	+=	-DWIILOVE_MODE_FINAL
+else
+ifeq ($(WIILOVE_MODE),debug)
+CFLAGS	+=	-DWIILOVE_MODE_DEBUG
+else
+CFLAGS	+=	-DWIILOVE_MODE_RELEASE
+endif
+CFLAGS	+=	-DSOL_ALL_SAFETIES_ON=1
+endif
 CXXFLAGS	=	$(CFLAGS)
 
 LDFLAGS	=	-g $(MACHDEP) -Wl,-Map,$(notdir $@).map
