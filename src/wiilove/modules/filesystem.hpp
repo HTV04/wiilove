@@ -36,7 +36,6 @@ void getFileData(const char *filename, void *&data, int &size);
 namespace module {
 
 bool exists(const char *filename);
-sol::protected_function load(const char *filename, sol::this_state s);
 std::string read(const char *filename);
 void write (const std::string &filename, const char *data);
 

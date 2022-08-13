@@ -36,6 +36,7 @@ do
 
 	love.audio = {}
 
+	-- Custom newSource function that registers the Source
 	function love.audio.newSource(...)
 		local source = newSource(...)
 
@@ -45,6 +46,7 @@ do
 	end
 
 	function love.audio.pause(...)
+		local _
 		local sourceList = {...}
 
 		for _, source in ipairs(sourceList) do
@@ -52,6 +54,7 @@ do
 		end
 	end
 	function love.audio.play(...)
+		local _
 		local sourceList = {...}
 
 		for _, source in ipairs(sourceList) do
@@ -59,6 +62,7 @@ do
 		end
 	end
 	function love.audio.resume(...)
+		local _
 		local sourceList = {...}
 
 		for _, source in ipairs(sourceList) do
@@ -66,6 +70,7 @@ do
 		end
 	end
 	function love.audio.stop(...)
+		local _
 		local sourceList = {...}
 
 		if #sourceList == 0 then
@@ -88,6 +93,11 @@ do
 
 		return count
 	end
+end
+
+-- love.filesystem
+function love.filesystem.load(filename)
+	return loadstring(love.filesystem.read(filename), filename)
 end
 
 -- love.graphics

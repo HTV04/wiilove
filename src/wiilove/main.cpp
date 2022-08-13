@@ -104,7 +104,6 @@ int main(int argc, char **argv) {
 
 		"filesystem", lua.create_table_with(
 			"exists", love::filesystem::module::exists,
-			"load", love::filesystem::module::load,
 			"read", love::filesystem::module::read,
 			"write", love::filesystem::module::write
 		),

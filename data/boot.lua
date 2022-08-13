@@ -22,8 +22,6 @@ License along with this program.  If not, see
 
 local love = love
 
-local result = 0
-
 -- Redirect package paths
 package.path = "save/?.lua;save/?/init.lua;data/?.lua;data/?/init.lua"
 package.cpath = "" -- Disable C modules
@@ -87,7 +85,7 @@ function love.run()
 			for name, a,b,c,d,e,f in love.event.poll do
 				if name == "homepressed" then
 					if not love.homepressed or not love.homepressed(a) then
-						return 0
+						return
 					end
 				else
 					love.handlers[name](a,b,c,d,e,f)
@@ -111,18 +109,12 @@ function love.run()
 	end
 end
 
-function love.errhand(err)
+function love.errorhandler(err)
 	local msg = "Error\n\n" ..
 	            tostring(err) ..
 				"\n\n\n" ..
 				string.gsub(string.gsub(debug.traceback(), "\t", ""), "stack traceback:", "Traceback\n") ..
 				"\n\n\nPress HOME to return to loader\n"
-	local msgTable = {}
-
-	-- Temporary workaround for newlines
-	for line in string.gmatch(msg, "([^\n]*)\n") do
-		table.insert(msgTable, line)
-	end
 
 	-- Stop all Wiimote vibrations
 	if love.system.getConsole() ~= "GameCube" then
@@ -141,16 +133,12 @@ function love.errhand(err)
 
 		for name, a,b,c,d,e,f in love.event.poll do
 			if name == "homepressed" then
-				return 1
+				return
 			end
 		end
 
 		love.graphics.clear(89, 157, 220)
-
-		for i, line in ipairs(msgTable) do
-			love.graphics.print(line, 70, 60 + i * 18)
-		end
-
+		love.graphics.print(msg, 40, 40)
 		love.graphics.present()
 	end
 end
@@ -159,13 +147,27 @@ if love.getMode() == "final" then -- Run everything unprotected
 	-- Load main.lua to intialize functions
 	love.filesystem.load("main.lua")()
 
-	love.run()
+	return love.run()
 else -- Run everything protected
+	local main, error
+
+	local success
+
 	-- Load main.lua to intialize functions
-	xpcall(love.filesystem.load("main.lua"), love.errhand)
+	if not love.filesystem.exists("main.lua") then
+		love.errorhandler("Could not find main.lua, no code to run")
 
-	_, result = xpcall(love.run, love.errhand)
+		return
+	end
+	main, error = love.filesystem.load("main.lua")
+	if not main then
+		love.errorhandler(error)
+
+		return
+	end
+	success = xpcall(main, love.errorhandler)
+
+	if success == true then
+		success = xpcall(love.run, love.errorhandler)
+	end
 end
-
-
-return result

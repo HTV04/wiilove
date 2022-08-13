@@ -93,11 +93,6 @@ namespace module {
 bool exists(const char *filename) {
 	return std::filesystem::exists(getFilePath(filename));
 }
-sol::protected_function load(const char *filename, sol::this_state s) {
-	sol::state_view lua(s);
-
-	return lua.load_file(getFilePath(filename)).get<sol::protected_function>(); // TODO: Add error handling
-}
 std::string read(const char *filename) {
 	std::stringstream stream;
 
