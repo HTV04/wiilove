@@ -22,7 +22,7 @@
 #pragma once
 
 // Libraries
-#include <FreeTypeGX.h>
+#include <FreeTypeGX.hpp>
 
 namespace love {
 namespace graphics {

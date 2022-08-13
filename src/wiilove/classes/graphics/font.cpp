@@ -20,7 +20,7 @@
  */
 
 // Libraries
-#include <FreeTypeGX.h>
+#include <FreeTypeGX.hpp>
 #include <iostream>
 #include <cstdlib>
 

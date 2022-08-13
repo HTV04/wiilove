@@ -22,8 +22,16 @@
  */
 
 #include <grrlib-mod.h>
+#include <ogc/gx.h>
+#include <Metaphrasis.hpp>
+#include <algorithm>
+#include <cstdlib>
+#include <cstring>
+#include <malloc.h>
+#include <wchar.h>
 
-#include <FreeTypeGX.h>
+
+#include <FreeTypeGX.hpp>
 
 /**
  * Default constructor for the FreeTypeGX class.
@@ -54,9 +62,9 @@ FreeTypeGX::~FreeTypeGX() {
  * @return Wide character representation of supplied character string.
  */
 wchar_t* FreeTypeGX::charToWideChar(char* strChar) {
-	wchar_t *strWChar = new wchar_t[strlen(strChar) + 1];
+	wchar_t *strWChar = new wchar_t[std::strlen(strChar) + 1];
 
-	int bt = mbstowcs(strWChar, strChar, strlen(strChar));
+	int bt = std::mbstowcs(strWChar, strChar, std::strlen(strChar));
 	if (bt) {
 		strWChar[bt] = (wchar_t)'\0';
 		return strWChar;
@@ -84,7 +92,7 @@ wchar_t* FreeTypeGX::charToWideChar(const char* strChar) {
  * @param width	The pixel width of the video screen.
  * @return The new size of the video screen in pixels.
  */
-int FreeTypeGX::maxVideoWidth = 0;
+int FreeTypeGX::maxVideoWidth = 640;
 int FreeTypeGX::setMaxVideoWidth(int width) {
 	return maxVideoWidth = width;
 }
@@ -100,12 +108,14 @@ int FreeTypeGX::setMaxVideoWidth(int width) {
  * @param cacheAll	Optional flag to specify if all font characters should be cached when the class object is created. If specified as false the characters only become cached the first time they are used. If not specified default value is false.
  */
 int FreeTypeGX::loadFont(uint8_t* fontBuffer, FT_Long bufferSize, FT_UInt pointSize, bool cacheAll) {
-	FT_ULong charCode;
-
 	int numCached = 0;
 
-	//this->unloadFont(); // NEEDS FIX
-	this->ftFontBuffer = (FT_Byte *)fontBuffer;
+	if (this->initialized == true)
+		this->unloadFont();
+	else
+		this->initialized = true;
+
+	this->ftFontBuffer = static_cast<FT_Byte *>(fontBuffer);
 	this->ftFontBufferSize = bufferSize;
 	this->ftPointSize = pointSize;
 
@@ -115,18 +125,10 @@ int FreeTypeGX::loadFont(uint8_t* fontBuffer, FT_Long bufferSize, FT_UInt pointS
 	this->ftKerningEnabled = FT_HAS_KERNING(this->ftFace);
 	this->ftAscender = this->ftPointSize * this->ftFace->ascender / this->ftFace->units_per_EM;
 	this->ftDescender = this->ftPointSize * this->ftFace->descender / this->ftFace->units_per_EM;
-	this->ftHeight = 0;
+	this->ftHeight = this->ftPointSize * this->ftFace->height / this->ftFace->units_per_EM;
 
-	// Poll all ASCII characters for a proper font height
-	for (charCode = 0; charCode <= 255; charCode++) {
-		if (!FT_Load_Glyph(this->ftFace, FT_Get_Char_Index(this->ftFace, charCode), FT_LOAD_DEFAULT | FT_LOAD_FORCE_AUTOHINT | FT_LOAD_RENDER)) {
-			this->ftHeight = this->ftFace->glyph->bitmap_top > this->ftHeight ? this->ftFace->glyph->bitmap_top : this->ftHeight;
-		}
-	}
-
-	if (cacheAll) {
+	if (cacheAll)
 		numCached = this->cacheGlyphDataComplete();
-	}
 
 	return numCached;
 }
@@ -166,7 +168,7 @@ void FreeTypeGX::unloadFont() {
  * @return The resultant enabled state of the font kerning.
  */
 bool FreeTypeGX::setKerningEnabled(bool enabled) {
-	if(!enabled) {
+	if(enabled == false) {
 		return this->ftKerningEnabled = false;
 	}
 
@@ -299,7 +301,7 @@ ftgxCharData *FreeTypeGX::cacheGlyphData(wchar_t charCode) {
 	int textureWidth = 0, textureHeight = 0;
 
 	gIndex = FT_Get_Char_Index(this->ftFace, charCode);
-	if (!FT_Load_Glyph(this->ftFace, gIndex, FT_LOAD_DEFAULT | FT_LOAD_FORCE_AUTOHINT | FT_LOAD_RENDER)) {
+	if (FT_Load_Glyph(this->ftFace, gIndex, FT_LOAD_DEFAULT | FT_LOAD_FORCE_AUTOHINT | FT_LOAD_RENDER) == 0) {
 
 		if(this->ftFace->glyph->format == FT_GLYPH_FORMAT_BITMAP) {
 			FT_Bitmap *glyphBitmap = &(this->ftFace->glyph->bitmap);
@@ -312,7 +314,6 @@ ftgxCharData *FreeTypeGX::cacheGlyphData(wchar_t charCode) {
 				gIndex,
 				textureWidth,
 				textureHeight,
-				this->ftHeight - this->ftFace->glyph->bitmap_top,
 				this->ftFace->glyph->bitmap_top,
 				textureHeight - this->ftFace->glyph->bitmap_top,
 				NULL
@@ -336,11 +337,9 @@ int FreeTypeGX::cacheGlyphDataComplete() {
 	int i = 0;
 	FT_UInt gIndex;
 	FT_ULong charCode = FT_Get_First_Char( this->ftFace, &gIndex );
-	while ( gIndex != 0 ) {
-
-		if(this->cacheGlyphData(charCode) != NULL) {
+	while (gIndex != 0) {
+		if(this->cacheGlyphData(charCode) != NULL)
 			i++;
-		}
 
 		charCode = FT_Get_Next_Char( this->ftFace, charCode, &gIndex );
 	}
@@ -453,7 +452,7 @@ int FreeTypeGX::getStyleOffsetHeight(int format) {
  * @return The font structure for the supplied character.
  */
 ftgxCharData* FreeTypeGX::getCharacter(wchar_t character) {
-	if( this->fontData.find(character) != this->fontData.end() ) {
+	if(this->fontData.find(character) != this->fontData.end()) {
 		return &this->fontData[character];
 	}
 
@@ -474,7 +473,7 @@ ftgxCharData* FreeTypeGX::getCharacter(wchar_t character) {
  */
 int FreeTypeGX::drawText(float x, float y, const wchar_t *text, float scaleX, float scaleY, float offsetX, float offsetY, float degrees, int textStyle) {
 	float x_pos = x, printed = 0;
-	float x_offset = 0, y_offset = 0;
+	float x_offset = 0, y_offset = this->ftHeight * -scaleY;
 	GXTexObj glyphTexture;
 	FT_Vector pairDelta;
 
@@ -485,18 +484,32 @@ int FreeTypeGX::drawText(float x, float y, const wchar_t *text, float scaleX, fl
 	}
 
 	if(textStyle & FTGX_JUSTIFY_MASK) {
-		x_offset = static_cast<float>(this->getStyleOffsetWidth(textWidth > 0 ? textWidth : this->getWidth(text), textStyle));
+		x_offset = static_cast<float>(this->getStyleOffsetWidth(textWidth > 0 ? textWidth : this->getWidth(text), textStyle)) * scaleX;
 	}
 
 	if(textStyle & FTGX_ALIGN_MASK) {
-		y_offset = static_cast<float>(this->getStyleOffsetHeight(textStyle));
+		y_offset = static_cast<float>(this->getStyleOffsetHeight(textStyle)) * scaleY;
 	}
 
-	int i = 0;
-	while(text[i]) {
-		if(maxVideoWidth > 0 && (x_pos > maxVideoWidth)) {
-			break;
+	for (size_t i = 0; i < wcslen(text); i++) {
+		switch (text[i]) {
+			case L'\t':
+				x_pos += static_cast<float>(getCharacter(L' ')->glyphAdvanceX) * scaleX * 4;
+
+				continue;
+
+			case L'\n':
+				x_pos = x;
+				y_offset -= this->ftHeight * scaleY;
+
+				continue;
+
+			case L'\r':
+				continue;
 		}
+
+		if((maxVideoWidth > 0) && (x_pos > maxVideoWidth))
+			continue;
 
 		ftgxCharData* glyphData = getCharacter(text[i]);
 
@@ -507,15 +520,14 @@ int FreeTypeGX::drawText(float x, float y, const wchar_t *text, float scaleX, fl
 			}
 
 			GX_InitTexObj(&glyphTexture, glyphData->glyphDataTexture, glyphData->textureWidth, glyphData->textureHeight, this->textureFormat, GX_CLAMP, GX_CLAMP, GX_FALSE);
-			this->copyTextureToFramebuffer(&glyphTexture, glyphData->textureWidth, glyphData->textureHeight, x_pos - x_offset, y + glyphData->renderOffsetY - y_offset, scaleX, scaleY, offsetX, offsetY, degrees);
+			this->copyTextureToFramebuffer(&glyphTexture, glyphData->textureWidth, glyphData->textureHeight, x_pos - x_offset, (y - y_offset) - (glyphData->renderOffsetMax * scaleY), scaleX, scaleY, offsetX, offsetY, degrees);
 
 			x_pos += static_cast<float>(glyphData->glyphAdvanceX) * scaleX;
 			printed++;
 		}
-
-		i++;
 	}
 
+	// Broken with tabs and newlines right now
 	if(textStyle & FTGX_STYLE_MASK) {
 		this->drawTextFeature(x - x_offset, y - y_offset, textWidth > 0 ? textWidth : textWidth = this->getWidth(text), textStyle, scaleX, scaleY, offsetX, offsetY, degrees);
 	}
@@ -561,13 +573,29 @@ void FreeTypeGX::drawTextFeature(float x, float y, int width, int textStyle, flo
  * @param text	NULL terminated string to calculate.
  * @return The width of the text string in pixels.
  */
-int FreeTypeGX::getWidth(const wchar_t *text) {
+int FreeTypeGX::getWidth(const wchar_t *text, float scaleX) {
+	int lineWidth = 0;
 	int strWidth = 0;
 	FT_Vector pairDelta;
 	ftgxCharData* glyphData = NULL;
 
-	int i = 0;
-	while(text[i]) {
+	for (size_t i = 0; i < wcslen(text); i++) {
+		strWidth = std::max(strWidth, lineWidth);
+
+		switch (text[i]) {
+			case L'\t':
+				lineWidth += static_cast<float>(getCharacter(L' ')->glyphAdvanceX) * 4;
+
+				continue;
+
+			case L'\n':
+				lineWidth = 0;
+
+				continue;
+
+			case L'\r':
+				continue;
+		}
 
 		glyphData = getCharacter(text[i]);
 
@@ -577,13 +605,11 @@ int FreeTypeGX::getWidth(const wchar_t *text) {
 				strWidth += pairDelta.x >> 6;
 			}
 
-			strWidth += glyphData->glyphAdvanceX;
+			lineWidth += glyphData->glyphAdvanceX;
 		}
-
-		i++;
 	}
 
-	return strWidth;
+	return std::max(strWidth, lineWidth) * scaleX;
 }
 
 /**
@@ -595,23 +621,33 @@ int FreeTypeGX::getWidth(const wchar_t *text) {
  * @param text	NULL terminated string to calculate.
  * @return The height of the text string in pixels.
  */
-int FreeTypeGX::getHeight(const wchar_t *text) {
-	int strMax = 0, strMin = 0;
+int FreeTypeGX::getHeight(const wchar_t *text, float scaleY) {
+	int strMax = this->ftHeight;
+	int strMin = 0;
 
-	int i = 0;
-	while(text[i]) {
+	for (size_t i = 0; i < wcslen(text); i++) {
+		switch (text[i]) {
+			case L'\t':
+				continue;
+
+			case L'\n':
+				strMax += this->ftHeight;
+
+				continue;
+
+			case L'\r':
+				continue;
+	}
 
 		ftgxCharData* glyphData = getCharacter(text[i]);
 
 		if(glyphData != NULL) {
-			strMax = glyphData->renderOffsetMax > strMax ? glyphData->renderOffsetMax : strMax;
-			strMin = glyphData->renderOffsetMin > strMin ? glyphData->renderOffsetMin : strMin;
+			strMax = std::max(strMax, glyphData->renderOffsetMax);
+			strMin = std::max(strMin, glyphData->renderOffsetMin);
 		}
-
-		i++;
 	}
 
-	return strMax + strMin;
+	return (this->ftHeight + strMax + strMin) * scaleY;
 }
 
 /**

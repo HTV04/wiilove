@@ -40,7 +40,7 @@
  * -# Copy the contents of the <i>src</i> directory into your project's development path.
  * -# Include the FreeTypeGX header file in your code using syntax such as the following:
  * \code
- * #include "FreeTypeGX.h"
+ * #include "FreeTypeGX.hpp"
  * \endcode
  *
  * \section sec_installation_library Installation (Library)
@@ -52,7 +52,7 @@
  * -# Copy the contents of the <i>libogc</i> directory into your <i>devKitPro/libogc</i> directory.
  * -# Include the FreeTypeGX header file in your code using syntax such as the following:
  * \code
- * #include "FreeTypeGX.h"
+ * #include "FreeTypeGX.hpp"
  * \endcode
  *
  * \section sec_freetypegx_prerequisites FreeTypeGX Prerequisites
@@ -69,7 +69,7 @@
  *
  * \section sec_freetypegx_usage FreeTypeGX Usage
  *
- * -# Within the file you included the FreeTypeGX.h header create an instance object of the FreeTypeGX class:
+ * -# Within the file you included the FreeTypeGX.hpp header create an instance object of the FreeTypeGX class:
  * \code
  * FreeTypeGX *freeTypeGX = new FreeTypeGX();
  * \endcode
@@ -131,14 +131,10 @@
 #ifndef FREETYPEGX_H_
 #define FREETYPEGX_H_
 
-#include <gccore.h>
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include FT_BITMAP_H
-#include <Metaphrasis.h>
-
-#include <malloc.h>
-#include <string.h>
+#include <ogc/gx.h>
 #include <map>
 #include <string>
 
@@ -153,14 +149,11 @@ typedef struct ftgxCharData_ {
 	int textureWidth;	/**< Texture width in pixels/bytes. */
 	int textureHeight;	/**< Texture glyph height in pixels/bytes. */
 
-	int renderOffsetY;	/**< Texture Y axis bearing offset. */
 	int renderOffsetMax;	/**< Texture Y axis bearing maximum value. */
 	int renderOffsetMin;	/**< Texture Y axis bearing minimum value. */
 
 	uint32_t* glyphDataTexture;	/**< Glyph texture bitmap data buffer. */
 } ftgxCharData;
-
-#define FTGX_TEXT(t) L ## t /**< Unicode helper macro. */
 
 #define FTGX_NULL				0x0000
 
@@ -207,6 +200,8 @@ const unsigned int ftgxWhite = 0xffffffff; /**< Constant color value used only t
 class FreeTypeGX {
 
 	private:
+		bool initialized = false;	/**< Flag indicating whether the FreeTypeGX instance has been initialized. */
+
 		FT_Library ftLibrary;		/**< FreeType FT_Library instance. */
 		FT_Byte * ftFontBuffer;		/**< Pointer to the current font buffer */
 		FT_Long ftFontBufferSize;	/**< Size of the current font buffer */
@@ -223,10 +218,10 @@ class FreeTypeGX {
 		uint32_t compatibilityMode;	/**< Compatibility mode for default tev operations and vertex descriptors. */
 		std::map<wchar_t, ftgxCharData> fontData; /**< Map which holds the glyph data structures for the corresponding characters. */
 
-		bool widthCachingEnabled;
+		bool widthCachingEnabled = false;
 		std::map<const wchar_t*, int> cacheTextWidth;
 
-		static int maxVideoWidth; /**< Maximum width of the video screen. */
+		static int maxVideoWidth;	/**< Maximum width of the video screen. */
 
 		static int adjustTextureWidth(int textureWidth, uint8_t textureFormat);
 		static int adjustTextureHeight(int textureHeight, uint8_t textureFormat);
@@ -264,8 +259,8 @@ class FreeTypeGX {
 		int drawText(float x, float y, const wchar_t *text, float scaleX = 1.0, float scaleY = 1.0, float offsetX = 0.0, float offsetY = 0.0, float degrees = 0.0, int textStyling = FTGX_NULL);
 		int drawText(float x, float y, const std::wstring &text, float scaleX = 1.0, float scaleY = 1.0, float offsetX = 0.0, float offsetY = 0.0, float degrees = 0.0, int textStyling = FTGX_NULL);
 
-		int getWidth(const wchar_t *text);
-		int getHeight(const wchar_t *text);
+		int getWidth(const wchar_t *text, float scaleX = 1.0);
+		int getHeight(const wchar_t *text, float scaleY = 1.0);
 };
 
 #endif /* FREETYPEGX_H_ */

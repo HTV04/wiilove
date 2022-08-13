@@ -21,7 +21,7 @@
 
 // Libraries
 #include <grrlib-mod.h>
-#include <FreeTypeGX.h>
+#include <FreeTypeGX.hpp>
 #include <ogc/gx.h>
 #ifndef HW_DOL
 #include <ogc/conf.h>
