@@ -48,7 +48,7 @@ Before following these instructions, you will need to [install devkitPro and dev
   * `wii-audiogc`
   * `wii-grrlib-mod`
   * `ppc-freetype`
-* Run `make` (or `make release` to create release ZIPs).
+* Run `make` (or `make dist` to create release ZIPs).
 * Compiled binaries will be available in `bin` (and release ZIPs will be available in `dist`).
 
 ## Build options

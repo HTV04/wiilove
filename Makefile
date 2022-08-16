@@ -158,7 +158,7 @@ clean:
 	@rm -fr $(BUILD) bin dist
 
 #---------------------------------------------------------------------------------
-release: $(BUILD)
+dist: $(BUILD)
 	@rm -rf dist
 	@mkdir -p dist/sd/apps/supergame
 	@mkdir -p dist/dolphin/sd/wiilove/data

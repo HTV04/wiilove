@@ -1,4 +1,4 @@
-/* WiiLÖVE 1.0.0 "Terra" alpha 3
+/* WiiLÖVE 1.0.0 alpha 4
  *
  * Copyright (C) 2022  HTV04
  *
@@ -275,7 +275,7 @@ int main(int argc, char **argv) {
 		"release", &love::graphics::Texture::release
 	);
 
-	// Lua API expansion
+	// Lua-based API
 	lua.script(std::string(api_lua, api_lua + api_lua_size), "WiiLÖVE API", sol::load_mode::text);
 
 	// Start!
