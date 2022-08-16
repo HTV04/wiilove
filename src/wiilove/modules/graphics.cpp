@@ -23,7 +23,7 @@
 #include <grrlib-mod.h>
 #include <FreeTypeGX.hpp>
 #include <ogc/gx.h>
-#ifndef HW_DOL
+#if !defined(HW_DOL)
 #include <ogc/conf.h>
 #endif // !HW_DOL
 #include <utility>
@@ -60,7 +60,7 @@ namespace {
 }
 
 void init() {
-#ifndef HW_DOL
+#if !defined(HW_DOL)
 	widescreen = CONF_GetAspectRatio() == CONF_ASPECT_16_9;
 #endif // !HW_DOL
 

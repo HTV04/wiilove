@@ -147,7 +147,9 @@ if love.getMode() == "final" then -- Run everything unprotected
 	-- Load main.lua to intialize functions
 	love.filesystem.load("main.lua")()
 
-	return love.run()
+	love.run()
+
+	return
 else -- Run everything protected
 	local main, error
 

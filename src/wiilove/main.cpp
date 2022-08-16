@@ -20,7 +20,7 @@
 // Libraries
 #include <sol/sol.hpp>
 #include <grrlib-mod.h>
-#ifndef HW_DOL
+#if !defined(HW_DOL)
 #include <wiiuse/wpad.h>
 #endif // !HW_DOL
 #include <string>
@@ -40,7 +40,7 @@
 #include "modules/math.hpp"
 #include "modules/system.hpp"
 #include "modules/timer.hpp"
-#ifndef HW_DOL
+#if !defined(HW_DOL)
 #include "modules/wiimote.hpp"
 #endif // !HW_DOL
 
@@ -83,7 +83,7 @@ int main(int argc, char **argv) {
 	love::graphics::init();
 	love::timer::init();
 
-#ifndef HW_DOL
+#if !defined(HW_DOL)
 	love::system::init();
 	love::wiimote::init();
 #endif // !HW_DOL
@@ -194,7 +194,7 @@ int main(int argc, char **argv) {
 			"step", love::timer::module::step,
 
 			"sleep", love::timer::module::sleep
-#ifndef HW_DOL
+#if !defined(HW_DOL)
 		),
 
 		"wiimote", lua.create_table_with(

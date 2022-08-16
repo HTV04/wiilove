@@ -19,7 +19,7 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#ifndef HW_DOL
+#if !defined(HW_DOL)
 
 // Libraries
 #include <sol/sol.hpp>

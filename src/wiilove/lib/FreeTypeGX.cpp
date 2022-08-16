@@ -473,7 +473,7 @@ ftgxCharData* FreeTypeGX::getCharacter(wchar_t character) {
  */
 int FreeTypeGX::drawText(float x, float y, const wchar_t *text, float scaleX, float scaleY, float offsetX, float offsetY, float degrees, int textStyle) {
 	float x_pos = x, printed = 0;
-	float x_offset = 0, y_offset = this->ftHeight * -scaleY;
+	float x_offset = 0, y_offset = -this->ftHeight * scaleY;
 	GXTexObj glyphTexture;
 	FT_Vector pairDelta;
 
@@ -488,7 +488,7 @@ int FreeTypeGX::drawText(float x, float y, const wchar_t *text, float scaleX, fl
 	}
 
 	if(textStyle & FTGX_ALIGN_MASK) {
-		y_offset = static_cast<float>(this->getStyleOffsetHeight(textStyle)) * scaleY;
+		y_offset += static_cast<float>(this->getStyleOffsetHeight(textStyle)) * scaleY;
 	}
 
 	for (size_t i = 0; i < wcslen(text); i++) {

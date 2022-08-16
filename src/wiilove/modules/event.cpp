@@ -22,7 +22,7 @@
 // Libraries
 #include <sol/sol.hpp>
 #include <grrlib-mod.h>
-#ifndef HW_DOL
+#if !defined(HW_DOL)
 #include <wiiuse/wpad.h>
 #endif // !HW_DOL
 #include <vector>
@@ -50,7 +50,7 @@ namespace {
 	int resetFunc = -1;
 	void resetPressed(unsigned int irq, void *ctx) { resetFunc = SYS_RETURNTOMENU; }
 	void powerPressed() { resetFunc = SYS_POWEROFF; }
-#ifndef HW_DOL
+#if !defined(HW_DOL)
 	void wiimotePowerPressed(int id) { resetFunc = SYS_POWEROFF; }
 #endif // !HW_DOL
 }
@@ -59,7 +59,7 @@ void init () {
 	// SYS_ResetSystem callbacks
 	SYS_SetResetCallback(resetPressed);
 	SYS_SetPowerCallback(powerPressed);
-#ifndef HW_DOL
+#if !defined(HW_DOL)
 	WPAD_SetPowerButtonCallback(wiimotePowerPressed);
 #endif // !HW_DOL
 }
@@ -94,7 +94,7 @@ void pump(sol::this_state s) {
 
 	events.push_back(makeEvent());
 
-#ifndef HW_DOL
+#if !defined(HW_DOL)
 	// Update wiimotes
 	love::wiimote::update(wiimoteAdds, wiimoteRemoves, homePressed);
 #endif // !HW_DOL
