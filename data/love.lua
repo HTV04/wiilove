@@ -1,5 +1,5 @@
 --[[----------------------------------------------------------------------------
-WiiLÖVE api.lua
+WiiLÖVE Lua API
 
 This file is part of WiiLÖVE.
 
@@ -19,8 +19,6 @@ You should have received a copy of the GNU Lesser General Public
 License along with this program.  If not, see
 <https://www.gnu.org/licenses/>.
 ------------------------------------------------------------------------------]]
-
-local love = love
 
 -- Global usertype workaround
 love.graphics.newFont = _Font.new
@@ -96,8 +94,12 @@ do
 end
 
 -- love.filesystem
-function love.filesystem.load(filename)
-	return loadstring(love.filesystem.read(filename), filename)
+do
+	local read = love.filesystem.read
+
+	function love.filesystem.load(filename)
+		return loadstring(read(filename), filename)
+	end
 end
 
 -- love.graphics
@@ -119,3 +121,5 @@ _Source = nil
 _Font = nil
 _Quad = nil
 _Texture = nil
+
+return love

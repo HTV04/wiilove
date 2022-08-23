@@ -21,10 +21,14 @@
 
 #pragma once
 
+// Libraries
 #include <string>
 #include <tuple>
 
 namespace love {
+
+void init(lua_State *s, int argc, char **argv);
+
 namespace module {
 
 std::string getMode();

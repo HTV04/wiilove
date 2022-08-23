@@ -1,5 +1,5 @@
 --[[----------------------------------------------------------------------------
-WiiLÖVE boot.lua
+WiiLÖVE Boot
 
 This file is part of WiiLÖVE.
 
@@ -20,7 +20,7 @@ License along with this program.  If not, see
 <https://www.gnu.org/licenses/>.
 ------------------------------------------------------------------------------]]
 
-local love = love
+local love = require("love")
 
 -- Redirect package paths
 package.path = "save/?.lua;save/?/init.lua;data/?.lua;data/?/init.lua"

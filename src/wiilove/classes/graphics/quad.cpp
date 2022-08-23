@@ -20,8 +20,8 @@
  */
 
 // Libraries
-#include <sol/sol.hpp> // Prevents macro conflicts
 #include <grrlib-mod.h>
+#include <sol/sol.hpp>
 #include <utility>
 #include <tuple>
 

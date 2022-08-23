@@ -21,6 +21,7 @@
 
 // Libraries
 #include <sol/sol.hpp>
+#include <fat.h>
 #include <string>
 #include <filesystem>
 #include <fstream>
@@ -35,6 +36,10 @@ namespace filesystem {
 void init(int argc, char **argv) {
 	std::string executablePath;
 	std::string filesystemPath;
+
+	if (fatInitDefault() == false) {
+		throw std::runtime_error("Failed to initialize filesystem");
+	}
 
 	if (argc > 0) {
 		executablePath = argv[0];

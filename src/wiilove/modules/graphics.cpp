@@ -31,7 +31,6 @@
 #include <tuple>
 #include <string>
 #include <stdexcept>
-#include <cmath>
 
 // Classes
 #include "../classes/graphics/font.hpp"
@@ -60,6 +59,9 @@ namespace {
 }
 
 void init() {
+	// Init GRRLIB
+	GRRLIB_Init();
+
 #if !defined(HW_DOL)
 	widescreen = CONF_GetAspectRatio() == CONF_ASPECT_16_9;
 #endif // !HW_DOL
