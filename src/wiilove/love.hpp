@@ -28,6 +28,7 @@
 namespace love {
 
 void init(lua_State *s, int argc, char **argv);
+void quit();
 
 namespace module {
 

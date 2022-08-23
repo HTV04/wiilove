@@ -52,5 +52,7 @@ int main(int argc, char **argv) {
 	lua.script(std::string(boot_lua, boot_lua + boot_lua_size), "WiiLÖVE Boot", sol::load_mode::text);
 
 	// Quit
-	love::event::module::quit();
+	love::quit();
+
+	std::exit(0);
 }

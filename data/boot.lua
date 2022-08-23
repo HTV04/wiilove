@@ -29,6 +29,12 @@ package.cpath = "" -- Disable C modules
 -- Standard callback handlers
 love.handlers = setmetatable({
 	-- WIP: These handlers may change in the future
+	wiimoteconnected = function(w)
+		if love.wiimoteconnected then return love.wiimoteconnected(w) end
+	end,
+	wiimotedisconnected = function(w)
+		if love.wiimotedisconnected then return love.wiimotedisconnected(w) end
+	end,
 	gamepadpressed = function(j,b) -- Unused for now
 		if love.gamepadpressed then return love.gamepadpressed(j,b) end
 	end,
@@ -37,18 +43,6 @@ love.handlers = setmetatable({
 	end,
 	gamepadaxis = function(j,a,v) -- Unused for now
 		if love.gamepadaxis then return love.gamepadaxis(j,a,v) end
-	end,
-	wiimoteconnected = function(w)
-		if love.wiimoteconnected then return love.wiimoteconnected(w) end
-	end,
-	wiimotedisconnected = function(w)
-		if love.wiimotedisconnected then return love.wiimotedisconnected(w) end
-	end,
-	joystickadded = function(j) -- Unused for now
-		if love.joystickadded then return love.joystickadded(j) end
-	end,
-	joystickremoved = function(j) -- Unused for now
-		if love.joystickremoved then return love.joystickremoved(j) end
 	end,
 	keypressed = function(b,s,r) -- Unused for now
 		if love.keypressed then return love.keypressed(b,s,r) end
@@ -61,6 +55,9 @@ love.handlers = setmetatable({
 	end,
 	textedited = function(t,s,l) -- Unused for now
 		if love.textedited then return love.textedited(t,s,l) end
+	end,
+	homepressed = function(w)
+		if love.homepressed then return love.homepressed(w) end
 	end,
 }, {
 	__index = function(self, name)
@@ -83,8 +80,8 @@ function love.run()
 			love.event.pump()
 
 			for name, a,b,c,d,e,f in love.event.poll do
-				if name == "homepressed" then
-					if not love.homepressed or not love.homepressed(a) then
+				if name == "quit" then
+					if not love.quit or not love.quit() then
 						return
 					end
 				else

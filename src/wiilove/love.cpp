@@ -262,6 +262,12 @@ void init(lua_State *s, int argc, char **argv) {
 	lua.require_script("love", std::string(love_lua, love_lua + love_lua_size), false, "WiiLÖVE Lua API", sol::load_mode::text);
 }
 
+// Perform pre-exit tasks
+void quit() {
+	// Be a good boy, clear the memory allocated by GRRLIB
+	GRRLIB_Exit();
+}
+
 namespace module {
 
 std::string getMode() {
