@@ -53,7 +53,7 @@ namespace {
 	// Transforms are stored for push/pop operations
 	std::vector<GRRLIB_matrix> transforms;
 
-	unsigned int backgroundColor;
+	std::tuple<unsigned char, unsigned char, unsigned char, unsigned char> backgroundColor;
 
 	Font *curFont; // Initial font
 }
@@ -111,15 +111,8 @@ void translate(float dx, float dy) {
 void clear(unsigned char r, unsigned char g, unsigned char b, unsigned char a) {
 	GRRLIB_FillScreen(GRRLIB_RGBA(r, g, b, a));
 }
-void clear1(unsigned char r, unsigned char g, unsigned char b) {
-	clear(r, g, b, 255);
-}
-void clear2()
-{
-	GRRLIB_FillScreen(backgroundColor);
-}
 std::tuple<unsigned char, unsigned char, unsigned char, unsigned char> getBackgroundColor() {
-	return std::make_tuple(GRRLIB_R(backgroundColor), GRRLIB_G(backgroundColor), GRRLIB_B(backgroundColor), GRRLIB_A(backgroundColor));
+	return backgroundColor;
 }
 std::tuple<unsigned char, unsigned char, unsigned char, unsigned char> getColor() {
 	unsigned long int color = GRRLIB_Settings.color;
@@ -127,13 +120,10 @@ std::tuple<unsigned char, unsigned char, unsigned char, unsigned char> getColor(
 	return std::make_tuple(GRRLIB_R(color), GRRLIB_G(color), GRRLIB_B(color), GRRLIB_A(color));
 }
 void setBackgroundColor(unsigned char r, unsigned char g, unsigned char b, unsigned char a) {
-	backgroundColor = GRRLIB_RGBA(r, g, b, a);
+	backgroundColor = std::make_tuple(GRRLIB_R(r), GRRLIB_G(g), GRRLIB_B(b), GRRLIB_A(a));
 }
 void setColor(unsigned char r, unsigned char g, unsigned char b, unsigned char a) {
 	GRRLIB_Settings.color = GRRLIB_RGBA(r, g, b, a);
-}
-void setColor1(unsigned char r, unsigned char g, unsigned char b) {
-	setColor(r, g, b, 255);
 }
 
 // Basic drawing functions
@@ -149,44 +139,17 @@ void rectangle(bool fill, float x, float y, float width, float height) {
 
 // Font functions
 Font *getFont() { return curFont; }
-void print(const std::wstring &str, float x, float y, float r, float sx, float sy, float ox, float oy) {
-	curFont->fontSystem->drawText(x, y, str, sx, sy, ox, oy, r);
-}
-void print1(const std::wstring &str, float x, float y, float r, float sx, float sy) {
-	print(str, x, y, r, sx, sy, 0.0, 0.0);
-}
-void print2(const std::wstring &str, float x, float y, float r) {
-	print(str, x, y, r, 1.0, 1.0, 0.0, 0.0);
-}
-void print3(const std::wstring &str, float x, float y) {
-	print(str, x, y, 0.0, 1.0, 1.0, 0.0, 0.0);
+void print(const std::wstring &text, float x, float y, float r, float sx, float sy, float ox, float oy) {
+	curFont->fontSystem->drawText(x, y, text, sx, sy, ox, oy, r);
 }
 void setFont(Font *font) { curFont = font; }
 
 // Texture functions
-void draw(const Texture &texture, float x, float y, float r, float sx, float sy, float ox, float oy) {
-	GRRLIB_DrawTexturePart(x, y, texture.texture, &texture.texture->part, r, sx, sy, ox, oy);
-}
-void draw1(const Texture &texture, float x, float y, float r, float sx, float sy) {
-	draw(texture, x, y, r, sx, sy, 0.0, 0.0);
-}
-void draw2(const Texture &texture, float x, float y, float r) {
-	draw(texture, x, y, r, 1.0, 1.0, 0.0, 0.0);
-}
-void draw3(const Texture &texture, float x, float y) {
-	draw(texture, x, y, 0.0, 1.0, 1.0, 0.0, 0.0);
-}
-void draw4(const Texture &texture, const Quad &textureQuad, float x, float y, float r, float sx, float sy, float ox, float oy) {
+void draw(const Texture &texture, const Quad &textureQuad, float x, float y, float r, float sx, float sy, float ox, float oy) {
 	GRRLIB_DrawTexturePart(x, y, texture.texture, textureQuad.texturePart, r, sx, sy, ox, oy);
 }
-void draw5(const Texture &texture, const Quad &textureQuad, float x, float y, float r, float sx, float sy) {
-	draw4(texture, textureQuad, x, y, r, sx, sy, 0.0, 0.0);
-}
-void draw6(const Texture &texture, const Quad &textureQuad, float x, float y, float r) {
-	draw4(texture, textureQuad, x, y, r, 1.0, 1.0, 0.0, 0.0);
-}
-void draw7(const Texture &texture, const Quad &textureQuad, float x, float y) {
-	draw4(texture, textureQuad, x, y, 0.0, 1.0, 1.0, 0.0, 0.0);
+void draw1(const Texture &texture, float x, float y, float r, float sx, float sy, float ox, float oy) {
+	GRRLIB_DrawTexturePart(x, y, texture.texture, &texture.texture->part, r, sx, sy, ox, oy);
 }
 
 // Graphics state functions
@@ -204,7 +167,7 @@ unsigned char getPointSize() {
 }
 void reset() {
 	GRRLIB_Settings.color = 0xFFFFFFFF;
-	backgroundColor = 0x000000FF;
+	backgroundColor = std::make_tuple(0, 0, 0, 255);
 
 	origin();
 

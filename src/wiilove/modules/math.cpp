@@ -45,10 +45,7 @@ int random(int min, int max) {
 
     return randomIntDist(randomGenerator);
 };
-int random1(int max) {
-    return random(1, max);
-};
-double random2() {
+double random1() {
     return randomDoubleDist(randomGenerator);
 };
 

@@ -98,7 +98,7 @@ function love.run()
 
 		-- Draw
 		love.graphics.origin()
-		love.graphics.clear()
+		love.graphics.clear(love.graphics.getBackgroundColor())
 
 		if love.draw then love.draw() end
 

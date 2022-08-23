@@ -97,18 +97,11 @@ void init(lua_State *s, int argc, char **argv) {
 			"getWidth", love::graphics::module::getWidth,
 			"isWidescreen", love::graphics::module::isWidescreen,
 
-			"clear", sol::overload(
-				love::graphics::module::clear,
-				love::graphics::module::clear1,
-				love::graphics::module::clear2
-			),
+			"clear", love::graphics::module::clear,
 			"getBackgroundColor", love::graphics::module::getBackgroundColor,
 			"getColor", love::graphics::module::getColor,
 			"setBackgroundColor", love::graphics::module::setBackgroundColor,
-			"setColor", sol::overload(
-				love::graphics::module::setColor,
-				love::graphics::module::setColor1
-			),
+			"setColor", love::graphics::module::setColor,
 
 			"origin", love::graphics::module::origin,
 			"pop", love::graphics::module::pop,
@@ -122,23 +115,12 @@ void init(lua_State *s, int argc, char **argv) {
 			"rectangle", love::graphics::module::rectangle,
 
 			"getFont", love::graphics::module::getFont,
-			"print", sol::overload(
-				love::graphics::module::print,
-				love::graphics::module::print1,
-				love::graphics::module::print2,
-				love::graphics::module::print3
-			),
+			"print", love::graphics::module::print,
 			"setFont", love::graphics::module::setFont,
 
 			"draw", sol::overload(
 				love::graphics::module::draw,
-				love::graphics::module::draw1,
-				love::graphics::module::draw2,
-				love::graphics::module::draw3,
-				love::graphics::module::draw4,
-				love::graphics::module::draw5,
-				love::graphics::module::draw6,
-				love::graphics::module::draw7
+				love::graphics::module::draw1
 			),
 
 			"getAntiAliasing", love::graphics::module::getAntiAliasing,
@@ -157,8 +139,7 @@ void init(lua_State *s, int argc, char **argv) {
 		"math", lua.create_table_with(
 			"random", sol::overload(
 				love::math::module::random,
-				love::math::module::random1,
-				love::math::module::random2
+				love::math::module::random1
 			)
 		),
 

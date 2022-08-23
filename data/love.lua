@@ -104,8 +104,66 @@ end
 
 -- love.graphics
 do
+	local clear = love.graphics.clear
+	local setBackgroundColor = love.graphics.setBackgroundColor
+	local setColor = love.graphics.setColor
+
+	local print = love.graphics.print
+
+	local draw = love.graphics.draw
+
 	local newFont = love.graphics.newFont
 	local setFont = love.graphics.setFont
+
+	function love.graphics.clear(r, g, b, a)
+		a = a or 255
+
+		clear(r, g, b, a)
+	end
+	function love.graphics.setBackgroundColor(r, g, b, a)
+		a = a or 255
+
+		setBackgroundColor(r, g, b, a)
+	end
+	function love.graphics.setColor(r, g, b, a)
+		a = a or 255
+
+		setColor(r, g, b, a)
+	end
+
+	function love.graphics.print(text, x, y, r, sx, sy, ox, oy)
+		x = x or 0
+		y = y or 0
+		r = r or 0
+		sx = sx or 1
+		sy = sy or 1
+		ox = ox or 0
+		oy = oy or 0
+
+		print(text, x, y, r, sx, sy, ox, oy)
+	end
+
+	function love.graphics.draw(texture, textureQuad, x, y, r, sx, sy, ox, oy)
+		if not textureQuad then
+			textureQuad = 0
+			x = x or 0
+			y = y or 0
+			r = r or 1
+			sx = sx or 1
+			sy = sy or 0
+			ox = ox or 0
+		else
+			x = x or 0
+			y = y or 0
+			r = r or 0
+			sx = sx or 1
+			sy = sy or 1
+			ox = ox or 0
+			oy = oy or 0
+		end
+
+		draw(texture, textureQuad, x, y, r, sx, sy, ox, oy)
+	end
 
 	function love.graphics.setNewFont(...)
 		local font = newFont(...)
@@ -113,6 +171,19 @@ do
 		setFont(font)
 
 		return font
+	end
+end
+
+do
+	local random = love.math.random
+
+	function love.math.random(min, max)
+		if min and (not max) then
+			max = min
+			min = 1
+		end
+
+		random(min, max)
 	end
 end
 

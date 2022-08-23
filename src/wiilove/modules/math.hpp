@@ -26,8 +26,7 @@ namespace math {
 namespace module {
 
 int random(int min, int max);
-int random1(int max);
-double random2();
+double random1();
 
 } // module
 } // math
