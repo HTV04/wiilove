@@ -81,7 +81,7 @@ void init(lua_State *s, int argc, char **argv) {
 		"event", lua.create_table_with(
 			"pump", love::event::module::pump,
 			"poll", love::event::module::poll,
-
+			"push", love::event::module::push,
 			"quit", love::event::module::quit
 		),
 
