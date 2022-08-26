@@ -31,8 +31,8 @@ namespace module {
 
 // Querying functions
 std::string getConsole() { return "GameCube"; }
-sol::object getLanguage() { return sol::nil; }
-sol::object getNickname() { return sol::nil; }
+sol::object getLanguage() { return sol::lua_nil; }
+sol::object getNickname() { return sol::lua_nil; }
 
 } // module
 } // system

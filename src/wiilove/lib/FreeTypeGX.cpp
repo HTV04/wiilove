@@ -741,6 +741,6 @@ void FreeTypeGX::copyFeatureToFramebuffer(float featureWidth, float featureHeigh
 	GX_SetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
     GX_SetVtxDesc(GX_VA_TEX0, GX_NONE);
 
-	// Revert matrix
+	// Restore matrix
 	GRRLIB_SetMatrix(&matrixObject);
 }

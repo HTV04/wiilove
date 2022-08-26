@@ -62,7 +62,7 @@ void init () {
 #endif // !HW_DOL
 }
 
-void pushEvent(lua_State *s, const char *eventName, sol::object value1 = sol::nil, sol::object value2 = sol::nil, sol::object value3 = sol::nil, sol::object value4 = sol::nil, sol::object value5 = sol::nil, sol::object value6 = sol::nil) {
+void pushEvent(lua_State *s, const char *eventName, sol::object value1 = sol::lua_nil, sol::object value2 = sol::lua_nil, sol::object value3 = sol::lua_nil, sol::object value4 = sol::lua_nil, sol::object value5 = sol::lua_nil, sol::object value6 = sol::lua_nil) {
 	events.push_back(std::make_tuple(sol::make_object(s, eventName), value1, value2, value3, value4, value5, value6));
 }
 
@@ -113,7 +113,7 @@ values poll() {
 
 		it = events.end();
 
-		return std::make_tuple(sol::nil, sol::nil, sol::nil, sol::nil, sol::nil, sol::nil, sol::nil); // "Nil event"
+		return std::make_tuple(sol::lua_nil, sol::lua_nil, sol::lua_nil, sol::lua_nil, sol::lua_nil, sol::lua_nil, sol::lua_nil); // "Nil event"
 	} else {
 		return *it++;
 	}

@@ -110,18 +110,25 @@ void init(lua_State *s, int argc, char **argv) {
 			"rotate", love::graphics::module::rotate,
 			"translate", love::graphics::module::translate,
 
-			"circle", love::graphics::module::circle,
+			"ellipse", love::graphics::module::ellipse,
 			"line", love::graphics::module::line,
+			"points", sol::overload(
+				love::graphics::module::points,
+				love::graphics::module::points1,
+				love::graphics::module::points2
+			),
+			"polygon", sol::overload(
+				love::graphics::module::polygon,
+				love::graphics::module::polygon1
+			),
 			"rectangle", love::graphics::module::rectangle,
 
 			"getFont", love::graphics::module::getFont,
 			"print", love::graphics::module::print,
 			"setFont", love::graphics::module::setFont,
 
-			"draw", sol::overload(
-				love::graphics::module::draw,
-				love::graphics::module::draw1
-			),
+			"draw", love::graphics::module::draw,
+			"drawQuad", love::graphics::module::drawQuad,
 
 			"getAntiAliasing", love::graphics::module::getAntiAliasing,
 			"getDeflicker", love::graphics::module::getDeflicker,

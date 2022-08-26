@@ -22,7 +22,7 @@
 // Libraries
 #include <grrlib-mod.h>
 #include <FreeTypeGX.hpp>
-#include <ogc/gx.h>
+#include <sol/sol.hpp>
 #if !defined(HW_DOL)
 #include <ogc/conf.h>
 #endif // !HW_DOL
@@ -53,7 +53,7 @@ namespace {
 	// Transforms are stored for push/pop operations
 	std::vector<GRRLIB_matrix> transforms;
 
-	std::tuple<unsigned char, unsigned char, unsigned char, unsigned char> backgroundColor;
+	unsigned int backgroundColor;
 
 	Font *curFont; // Initial font
 }
@@ -112,7 +112,7 @@ void clear(unsigned char r, unsigned char g, unsigned char b, unsigned char a) {
 	GRRLIB_FillScreen(GRRLIB_RGBA(r, g, b, a));
 }
 std::tuple<unsigned char, unsigned char, unsigned char, unsigned char> getBackgroundColor() {
-	return backgroundColor;
+	return std::make_tuple(GRRLIB_R(backgroundColor), GRRLIB_G(backgroundColor), GRRLIB_B(backgroundColor), GRRLIB_A(backgroundColor));
 }
 std::tuple<unsigned char, unsigned char, unsigned char, unsigned char> getColor() {
 	unsigned long int color = GRRLIB_Settings.color;
@@ -120,18 +120,95 @@ std::tuple<unsigned char, unsigned char, unsigned char, unsigned char> getColor(
 	return std::make_tuple(GRRLIB_R(color), GRRLIB_G(color), GRRLIB_B(color), GRRLIB_A(color));
 }
 void setBackgroundColor(unsigned char r, unsigned char g, unsigned char b, unsigned char a) {
-	backgroundColor = std::make_tuple(GRRLIB_R(r), GRRLIB_G(g), GRRLIB_B(b), GRRLIB_A(a));
+	backgroundColor = GRRLIB_RGBA(r, g, b, a);
+
+	GRRLIB_SetBackgroundColor(r, g, b, a);
 }
 void setColor(unsigned char r, unsigned char g, unsigned char b, unsigned char a) {
 	GRRLIB_Settings.color = GRRLIB_RGBA(r, g, b, a);
 }
 
 // Basic drawing functions
-void circle(bool fill, float x, float y, float radius) {
-	GRRLIB_Circle(x, y, radius, fill);
+void ellipse(bool fill, float x, float y, float radiusX, float radiusY) {
+	GRRLIB_Ellipse(x, y, radiusX, radiusY, fill);
 }
 void line(float x1, float y1, float x2, float y2) {
 	GRRLIB_Line(x1, y1, x2, y2);
+}
+void points(float x, float y) { // Tiny optimzation so we don't have to do so much for two coordinates :P
+	GRRLIB_Point(x, y);
+}
+void points1(sol::table vertexTable) {
+	if (vertexTable[1].is<sol::table>() == true) {
+		std::pair<std::vector<guVector>, std::vector<unsigned int>> v;
+		unsigned int size = vertexTable.size();
+
+		v.first.reserve(size);
+		v.second.reserve(size);
+
+		for (std::pair<sol::object, sol::object> &dataTable : vertexTable) {
+			sol::table data = dataTable.second.as<sol::table>();
+
+			v.first.push_back({data[1], data[2], 0.0});
+			v.second.push_back(0);
+
+			for (int i = 3; i <= 6; i++) {
+				if (data[i] == sol::lua_nil)
+					v.second.back() += 0xFF << (24 - (8 * (i - 3)));
+				else
+					v.second.back() += data.get<unsigned int>(i) << (24 - (8 * (i - 3)));
+			}
+		}
+
+		GRRLIB_Points(v.first.data(), v.second.data(), size);
+	} else {
+		std::vector<guVector> v;
+		unsigned int size = vertexTable.size();
+
+		v.reserve(size / 2);
+
+		for (unsigned int i = 1; i < size; i += 2) {
+			v.push_back({vertexTable[i].get<float>(), vertexTable[i + 1].get<float>(), 0.0});
+		}
+
+		GRRLIB_Points(v.data(), nullptr, size / 2);
+	}
+}
+void points2(sol::variadic_args vertices) {
+	std::vector<guVector> v;
+	unsigned int size = vertices.size();
+
+	v.reserve(size / 2);
+
+	for (unsigned int i = 1; i < size; i += 2) {
+		v.push_back({vertices[i].get<float>(), vertices[i + 1].get<float>(), 0.0});
+	}
+
+	GRRLIB_Points(v.data(), nullptr, size / 2);
+}
+void polygon(bool fill, sol::table vertices) {
+	std::vector<guVector> v;
+	unsigned int size = vertices.size();
+
+	v.reserve(size / 2);
+
+	for (unsigned int i = 1; i < size; i += 2) {
+		v.push_back({vertices[i].get<float>(), vertices[i + 1].get<float>(), 0.0});
+	}
+
+	GRRLIB_Polygon(v.data(), size / 2, fill);
+}
+void polygon1(bool fill, sol::variadic_args vertices) {
+	std::vector<guVector> v;
+	unsigned int size = vertices.size();
+
+	v.reserve(size / 2);
+
+	for (unsigned int i = 1; i < size; i += 2) {
+		v.push_back({vertices[i].get<float>(), vertices[i + 1].get<float>(), 0.0});
+	}
+
+	GRRLIB_Polygon(v.data(), size / 2, fill);
 }
 void rectangle(bool fill, float x, float y, float width, float height) {
 	GRRLIB_Rectangle(x, y, width, height, fill);
@@ -145,11 +222,11 @@ void print(const std::wstring &text, float x, float y, float r, float sx, float 
 void setFont(Font *font) { curFont = font; }
 
 // Texture functions
-void draw(const Texture &texture, const Quad &textureQuad, float x, float y, float r, float sx, float sy, float ox, float oy) {
-	GRRLIB_DrawTexturePart(x, y, texture.texture, textureQuad.texturePart, r, sx, sy, ox, oy);
-}
-void draw1(const Texture &texture, float x, float y, float r, float sx, float sy, float ox, float oy) {
+void draw(const Texture &texture, float x, float y, float r, float sx, float sy, float ox, float oy) {
 	GRRLIB_DrawTexturePart(x, y, texture.texture, &texture.texture->part, r, sx, sy, ox, oy);
+}
+void drawQuad(const Texture &texture, const Quad &textureQuad, float x, float y, float r, float sx, float sy, float ox, float oy) {
+	GRRLIB_DrawTexturePart(x, y, texture.texture, textureQuad.texturePart, r, sx, sy, ox, oy);
 }
 
 // Graphics state functions
@@ -167,7 +244,7 @@ unsigned char getPointSize() {
 }
 void reset() {
 	GRRLIB_Settings.color = 0xFFFFFFFF;
-	backgroundColor = std::make_tuple(0, 0, 0, 255);
+	backgroundColor = 0x000000FF;
 
 	origin();
 

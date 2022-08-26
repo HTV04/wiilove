@@ -98,7 +98,6 @@ function love.run()
 
 		-- Draw
 		love.graphics.origin()
-		love.graphics.clear(love.graphics.getBackgroundColor())
 
 		if love.draw then love.draw() end
 
@@ -123,6 +122,7 @@ function love.errorhandler(err)
 	love.audio.stop()
 
 	love.graphics.reset()
+	love.graphics.setBackgroundColor(89, 157, 220)
 	love.graphics.setNewFont(14)
 
 	while true do
@@ -134,7 +134,6 @@ function love.errorhandler(err)
 			end
 		end
 
-		love.graphics.clear(89, 157, 220)
 		love.graphics.print(msg, 40, 40)
 		love.graphics.present()
 	end

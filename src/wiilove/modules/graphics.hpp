@@ -56,16 +56,21 @@ void scale(float x, float y);
 void rotate(float angle);
 void translate(float dx, float dy);
 
-void circle(bool fill, float x, float y, float radius);
+void ellipse(bool fill, float x, float y, float radiusX, float radiusY);
 void line(float x1, float y1, float x2, float y2);
+void points(float x, float y);
+void points1(sol::table vertexTable);
+void points2(sol::variadic_args vertices);
+void polygon(bool fill, sol::table vertices);
+void polygon1(bool fill, sol::variadic_args vertices);
 void rectangle(bool fill, float x, float y, float width, float height);
 
 Font *getFont();
 void print(const std::wstring &text, float x, float y, float r, float sx, float sy, float ox, float oy);
 void setFont(Font *font);
 
-void draw(const Texture &texture, const Quad &textureQuad, float x, float y, float r, float sx, float sy, float ox, float oy);
-void draw1(const Texture &texture, float x, float y, float r, float sx, float sy, float ox, float oy);
+void draw(const Texture &texture, float x, float y, float r, float sx, float sy, float ox, float oy);
+void drawQuad(const Texture &texture, const Quad &textureQuad, float x, float y, float r, float sx, float sy, float ox, float oy);
 
 bool getAntiAliasing();
 unsigned char getDeflicker();

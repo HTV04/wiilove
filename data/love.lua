@@ -20,6 +20,11 @@ License along with this program.  If not, see
 <https://www.gnu.org/licenses/>.
 ------------------------------------------------------------------------------]]
 
+-- Lua function cache
+local ipairs = ipairs
+local loadstring = loadstring
+local setmetatable = setmetatable
+
 -- Global usertype workaround
 love.graphics.newFont = _Font.new
 love.graphics.newQuad = _Quad.new
@@ -44,7 +49,6 @@ do
 	end
 
 	function love.audio.pause(...)
-		local _
 		local sourceList = {...}
 
 		for _, source in ipairs(sourceList) do
@@ -52,7 +56,6 @@ do
 		end
 	end
 	function love.audio.play(...)
-		local _
 		local sourceList = {...}
 
 		for _, source in ipairs(sourceList) do
@@ -60,7 +63,6 @@ do
 		end
 	end
 	function love.audio.resume(...)
-		local _
 		local sourceList = {...}
 
 		for _, source in ipairs(sourceList) do
@@ -68,7 +70,6 @@ do
 		end
 	end
 	function love.audio.stop(...)
-		local _
 		local sourceList = {...}
 
 		if #sourceList == 0 then
@@ -108,9 +109,12 @@ do
 	local setBackgroundColor = love.graphics.setBackgroundColor
 	local setColor = love.graphics.setColor
 
+	local ellipse = love.graphics.ellipse
+
 	local print = love.graphics.print
 
 	local draw = love.graphics.draw
+	local drawQuad = love.graphics.drawQuad
 
 	local newFont = love.graphics.newFont
 	local setFont = love.graphics.setFont
@@ -131,6 +135,10 @@ do
 		setColor(r, g, b, a)
 	end
 
+	function love.graphics.circle(fill, x, y, radius)
+		ellipse(fill, x, y, radius, radius)
+	end
+
 	function love.graphics.print(text, x, y, r, sx, sy, ox, oy)
 		x = x or 0
 		y = y or 0
@@ -143,26 +151,27 @@ do
 		print(text, x, y, r, sx, sy, ox, oy)
 	end
 
-	function love.graphics.draw(texture, textureQuad, x, y, r, sx, sy, ox, oy)
-		if not textureQuad then
-			textureQuad = 0
-			x = x or 0
-			y = y or 0
-			r = r or 1
-			sx = sx or 1
-			sy = sy or 0
-			ox = ox or 0
-		else
-			x = x or 0
-			y = y or 0
-			r = r or 0
-			sx = sx or 1
-			sy = sy or 1
-			ox = ox or 0
-			oy = oy or 0
-		end
+	function love.graphics.draw(texture, x, y, r, sx, sy, ox, oy)
+		x = x or 0
+		y = y or 0
+		r = r or 0
+		sx = sx or 1
+		sy = sy or 1
+		ox = ox or 0
+		oy = oy or 0
 
-		draw(texture, textureQuad, x, y, r, sx, sy, ox, oy)
+		draw(texture, x, y, r, sx, sy, ox, oy)
+	end
+	function love.graphics.drawQuad(texture, textureQuad, x, y, r, sx, sy, ox, oy)
+		x = x or 0
+		y = y or 0
+		r = r or 0
+		sx = sx or 1
+		sy = sy or 1
+		ox = ox or 0
+		oy = oy or 0
+
+		drawQuad(texture, textureQuad, x, y, r, sx, sy, ox, oy)
 	end
 
 	function love.graphics.setNewFont(...)
