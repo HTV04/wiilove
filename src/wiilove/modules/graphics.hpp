@@ -76,11 +76,14 @@ bool getAntiAliasing();
 unsigned char getDeflicker();
 unsigned char getLineWidth();
 unsigned char getPointSize();
+std::tuple<unsigned int, unsigned int, unsigned int, unsigned int> getScissor();
 void reset();
 void setAntiAliasing(bool enable);
 void setDeflicker(bool enable);
 void setLineWidth(unsigned char width);
 void setPointSize(unsigned char size);
+void setScissor(unsigned int x, unsigned int y, unsigned int width, unsigned int height);
+void setScissor1();
 
 void present();
 

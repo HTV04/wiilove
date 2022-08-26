@@ -242,6 +242,13 @@ unsigned char getLineWidth() {
 unsigned char getPointSize() {
 	return GRRLIB_Settings.pointSize;
 }
+std::tuple<unsigned int, unsigned int, unsigned int, unsigned int> getScissor() {
+	unsigned int x, y, width, height;
+
+	GRRLIB_GetScissor(&x, &y, &width, &height);
+
+	return std::make_tuple(x, y, width, height);
+}
 void reset() {
 	GRRLIB_Settings.color = 0xFFFFFFFF;
 	backgroundColor = 0x000000FF;
@@ -252,6 +259,8 @@ void reset() {
 	GRRLIB_SetDeflicker(true);
 	GRRLIB_SetPointSize(6);
 	GRRLIB_SetLineWidth(6);
+
+	GRRLIB_ResetScissor();
 }
 void setAntiAliasing(bool enable) {
 	GRRLIB_Settings.antialias = enable;
@@ -264,6 +273,12 @@ void setLineWidth(unsigned char width) {
 }
 void setPointSize(unsigned char size) {
 	GRRLIB_SetPointSize(size);
+}
+void setScissor(unsigned int x, unsigned int y, unsigned int width, unsigned int height) {
+	GRRLIB_SetScissor(x, y, width, height);
+}
+void setScissor1() {
+	GRRLIB_ResetScissor();
 }
 
 // Rendering functions

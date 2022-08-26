@@ -134,11 +134,16 @@ void init(lua_State *s, int argc, char **argv) {
 			"getDeflicker", love::graphics::module::getDeflicker,
 			"getLineWidth", love::graphics::module::getLineWidth,
 			"getPointSize", love::graphics::module::getPointSize,
+			"getScissor", love::graphics::module::getScissor,
 			"reset", love::graphics::module::reset,
 			"setAntiAliasing", love::graphics::module::setAntiAliasing,
 			"setDeflicker", love::graphics::module::setDeflicker,
 			"setLineWidth", love::graphics::module::setLineWidth,
 			"setPointSize", love::graphics::module::setPointSize,
+			"setScissor", sol::overload(
+				love::graphics::module::setScissor,
+				love::graphics::module::setScissor1
+			),
 
 			"present", love::graphics::module::present
 		),
